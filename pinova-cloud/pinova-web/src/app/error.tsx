@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, RefreshCw } from "lucide-react";
+import { ArrowLeft, RefreshCw, TriangleAlert } from "lucide-react";
 import { useEffect } from "react";
 import { PinovaBrand } from "@/components/pinova-brand";
 import styles from "./error.module.css";
@@ -25,7 +25,6 @@ export default function AppError({
         <Link href="/" aria-label="返回 PINOVA 首页">
           <PinovaBrand />
         </Link>
-        <span>ERROR / RECOVERY</span>
       </header>
 
       <main className={styles.main}>
@@ -34,12 +33,9 @@ export default function AppError({
           role="alert"
           aria-labelledby="error-title"
         >
-          <div className={styles.index} aria-hidden="true">
-            <span>ERR</span>
-            <i />
-            <span>RETRY</span>
-          </div>
-          <p className={styles.eyebrow}>PAGE LOAD INTERRUPTED</p>
+          <span className={styles.messageIcon} aria-hidden="true">
+            <TriangleAlert size={22} />
+          </span>
           <h1 id="error-title">页面加载失败</h1>
           <p className={styles.description}>
             页面加载过程中发生错误。请重新加载；如果仍然失败，可以返回首页重新进入。
@@ -56,11 +52,6 @@ export default function AppError({
           </div>
         </section>
       </main>
-
-      <footer className={styles.footer}>
-        <span>PINOVA COLOR MATERIAL STUDIO</span>
-        <span>STATUS / INTERRUPTED</span>
-      </footer>
     </div>
   );
 }
