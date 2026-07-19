@@ -38,7 +38,7 @@
 }
 
 .breadcrumb {
-  min-height: 36px;
+  min-height: 48px;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -48,15 +48,16 @@
 }
 
 .breadcrumb a {
-  min-height: 36px;
+  min-height: 44px;
   display: inline-flex;
   align-items: center;
   gap: 5px;
   color: inherit;
+  transition: color var(--motion-fast);
 }
 
 .breadcrumb a:hover {
-  color: var(--catalog-ink);
+  color: var(--catalog-accent-strong);
 }
 
 .pageHeading {
@@ -81,7 +82,7 @@
   margin: 0 0 3px;
   color: var(--catalog-accent-strong);
   font-size: 11px;
-  font-weight: 760;
+  font-weight: 700;
 }
 
 .pageHeading h1,
@@ -149,7 +150,7 @@
   background: var(--catalog-surface-muted);
   color: var(--catalog-muted);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -181,7 +182,7 @@
 .sectionHeading > small {
   color: var(--catalog-muted);
   font-family: var(--font-mono);
-  font-size: 10px;
+  font-size: 11px;
 }
 
 .addressGrid {
@@ -244,6 +245,10 @@
   box-shadow: 0 0 0 3px var(--catalog-focus);
 }
 
+.addressOption:has(input:focus-visible) {
+  box-shadow: 0 0 0 3px var(--catalog-focus);
+}
+
 .addressOption[data-selected="true"] .addressCheck {
   background: var(--catalog-accent);
   box-shadow: none;
@@ -277,11 +282,11 @@
 }
 
 .addressIdentity small {
-  padding: 2px 6px;
+  padding: 3px 7px;
   border-radius: 4px;
   background: var(--catalog-emerald);
   color: #fff;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -323,7 +328,7 @@
 .itemLine {
   min-width: 0;
   padding-block: 12px;
-  border-top: 1px solid var(--catalog-surface-muted);
+  border-top: 1px solid var(--catalog-rule);
   display: grid;
   grid-template-columns: 72px minmax(0, 1fr) auto;
   align-items: center;
@@ -356,14 +361,19 @@
 .itemInfo > a {
   color: var(--catalog-ink);
   font-size: 13px;
-  font-weight: 720;
+  font-weight: 700;
   line-height: 1.45;
+  transition: color var(--motion-fast);
+}
+
+.itemInfo > a:hover {
+  color: var(--catalog-accent-strong);
 }
 
 .itemInfo > span,
 .itemPrice small {
   color: var(--catalog-muted);
-  font-size: 10px;
+  font-size: 12px;
 }
 
 .itemPrice {
@@ -446,8 +456,8 @@
 }
 
 .summaryTotal dd {
-  color: var(--catalog-accent-strong);
-  font-size: 21px;
+  color: var(--catalog-accent);
+  font-size: 20px;
 }
 
 .submitButton,
@@ -465,7 +475,17 @@
   background: var(--catalog-accent);
   color: #fff;
   font-size: 13px;
-  font-weight: 740;
+  font-weight: 700;
+  transition:
+    background var(--motion-fast),
+    transform var(--motion-fast);
+}
+
+.submitButton:active:not(:disabled),
+.statePanel > a:active,
+.statePanel > button:active,
+.stateActions a:active {
+  transform: translateY(1px);
 }
 
 .submitButton {
@@ -492,9 +512,9 @@
   grid-template-columns: auto minmax(0, 1fr);
   align-items: start;
   gap: 8px;
-  background: color-mix(in srgb, var(--catalog-danger) 7%, #fff);
+  background: var(--catalog-danger-soft);
   color: var(--catalog-danger);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.5;
 }
 
@@ -655,7 +675,16 @@
   .submitButton,
   .statePanel > a,
   .statePanel > button,
-  .stateActions a {
+  .stateActions a,
+  .breadcrumb a,
+  .itemInfo > a {
     transition: none;
+  }
+
+  .submitButton:active:not(:disabled),
+  .statePanel > a:active,
+  .statePanel > button:active,
+  .stateActions a:active {
+    transform: none;
   }
 }

@@ -68,44 +68,39 @@ export function useCheckout() {
     setStatus("ready");
   }, []);
 
-  const load = useCallback(async () => {
-    setStatus("loading");
-    setLoadError(null);
-    setSubmitError(null);
-    try {
-      const nextData = await fetchCheckoutData();
-      if (!nextData) {
-        setData(null);
-        setStatus("requires-login");
-        return;
-      }
-      applyCheckoutData(nextData);
-    } catch (error) {
-      setLoadError(requestErrorMessage(error));
-      setStatus("error");
-    }
-  }, [applyCheckoutData]);
-
-  useEffect(() => {
-    let active = true;
-    void fetchCheckoutData()
-      .then((nextData) => {
-        if (!active) return;
+  const load = useCallback(
+    async (isActive: () => boolean = () => true) => {
+      setStatus("loading");
+      setLoadError(null);
+      setSubmitError(null);
+      try {
+        const nextData = await fetchCheckoutData();
+        if (!isActive()) return;
         if (!nextData) {
+          setData(null);
           setStatus("requires-login");
           return;
         }
         applyCheckoutData(nextData);
-      })
-      .catch((error: unknown) => {
-        if (!active) return;
+      } catch (error) {
+        if (!isActive()) return;
         setLoadError(requestErrorMessage(error));
         setStatus("error");
-      });
+      }
+    },
+    [applyCheckoutData],
+  );
+
+  useEffect(() => {
+    let active = true;
+    const runInitialLoad = async () => {
+      await load(() => active);
+    };
+    void runInitialLoad();
     return () => {
       active = false;
     };
-  }, [applyCheckoutData]);
+  }, [load]);
 
   const summary = useMemo(() => summarizeCheckout(data), [data]);
   const selectedAddress = useMemo<MemberAddress | null>(
