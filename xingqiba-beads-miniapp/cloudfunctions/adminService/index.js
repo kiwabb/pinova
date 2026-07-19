@@ -1,6 +1,6 @@
 const cloud = require('wx-server-sdk')
 const cloudbase = require('@cloudbase/node-sdk')
-const { auditRetentionCutoff, bookingSlotUsage, bookingUsageTransition, canReactivateBooking, documentPayload, hasUniqueIds, isAdminUploadFileId, isValidBusinessId, memberRecordMatchesExpected, normalizeHexColor, normalizeMemberConfig, normalizeStoreConfig, normalizeStringList, normalizeText, revisionDecision, unreferencedFileIds, workVersionDecision } = require('./business')
+const { auditRetentionCutoff, bookingSlotUsage, bookingUsageTransition, canReactivateBooking, documentPayload, hasUniqueIds, importPatternDecision, isAdminUploadFileId, isValidBusinessId, memberRecordMatchesExpected, normalizeHexColor, normalizeImportPattern, normalizeMemberConfig, normalizeStoreConfig, normalizeStringList, normalizeText, revisionDecision, unreferencedFileIds, workVersionDecision } = require('./business')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
@@ -240,6 +240,77 @@ async function saveCollection(event, uid) {
   const removedFiles = previousFiles.filter((fileId) => !nextFiles.includes(fileId) && isAdminUploadFileId(fileId, 'collections'))
   if (removedFiles.length) await deleteUnreferencedAdminFiles(removedFiles).catch((error) => console.warn('cleanup removed files failed', error))
   return { success: true, data: { id: collectionId, revision: nextRevision } }
+}
+
+async function importPattern(event, uid) {
+  const normalizedPattern = normalizeImportPattern(event.pattern)
+  if (normalizedPattern.error) return { success: false, code: 'INVALID_ARGUMENT', message: normalizedPattern.error }
+  const pattern = normalizedPattern.data
+  const setAsCover = event.setAsCover === true
+  const patternId = `pattern-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+
+  const collectionId = normalizeText(event.collectionId, 80)
+  if (!collectionId) {
+    const input = event.newCollection && typeof event.newCollection === 'object' ? event.newCollection : {}
+    const saveResult = await saveCollection({
+      expectedRevision: 0,
+      collection: {
+        title: input.title,
+        category: input.category,
+        description: input.description || '',
+        level: input.level || '公开',
+        status: 'draft',
+        images: setAsCover ? [pattern.image] : [],
+        items: [{ id: patternId, name: pattern.name, image: pattern.image }],
+        background: input.background,
+        sort: input.sort,
+      },
+    }, uid)
+    if (!saveResult.success) return saveResult
+    return { success: true, data: { collectionId: saveResult.data.id, patternId, revision: saveResult.data.revision, count: 1, coverAdded: setAsCover, created: true, status: 'draft' } }
+  }
+  if (!isValidBusinessId(collectionId)) return { success: false, code: 'INVALID_ARGUMENT', message: '图集 ID 格式不正确' }
+
+  const auditId = `collection-import-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`
+  let outcome = null
+  try {
+    await db.runTransaction(async (transaction) => {
+      let collection
+      try {
+        collection = (await transaction.collection('collections').doc(collectionId).get()).data
+      } catch (error) {
+        throw new Error('COLLECTION_NOT_FOUND')
+      }
+      const decision = importPatternDecision(collection, { id: patternId, name: pattern.name, image: pattern.image }, { collectionId, setAsCover })
+      if (decision.error) throw new Error(`IMPORT_${decision.error}`)
+      const currentRevision = Math.max(1, Math.floor(Number(collection.revision) || 1))
+      const nextRevision = currentRevision + 1
+      await transaction.collection('collections').doc(collectionId).update({ data: {
+        items: decision.data.items,
+        images: decision.data.images,
+        count: decision.data.count,
+        revision: nextRevision,
+        updatedAt: db.serverDate(),
+        updatedBy: uid,
+      } })
+      await transaction.collection('admin_audit_logs').doc(auditId).set({ data: {
+        action: 'importPattern',
+        targetId: collectionId,
+        operatorId: uid,
+        before: auditSummary({ title: collection.title, count: Array.isArray(collection.items) ? collection.items.length : 0, revision: currentRevision }),
+        after: auditSummary({ title: collection.title, patternName: pattern.name, count: decision.data.count, coverAdded: decision.data.coverAdded, revision: nextRevision }),
+        createdAt: db.serverDate(),
+      } })
+      outcome = { collectionId, patternId, revision: nextRevision, count: decision.data.count, coverAdded: decision.data.coverAdded, created: false, status: collection.status || 'draft' }
+    })
+  } catch (error) {
+    if (error?.message === 'COLLECTION_NOT_FOUND' || error?.message === 'IMPORT_NOT_FOUND') return { success: false, code: 'NOT_FOUND', message: '图集不存在或已被删除，请刷新列表后重试' }
+    if (error?.message === 'IMPORT_ARCHIVED') return { success: false, code: 'INVALID_ARGUMENT', message: '图集已归档，请先在管理后台恢复后再导入' }
+    if (error?.message === 'IMPORT_ITEMS_FULL') return { success: false, code: 'ITEMS_FULL', message: '该图集图纸已达 100 张上限，请选择其他图集' }
+    if (error?.message === 'IMPORT_DUPLICATE_ID') return { success: false, code: 'CONFLICT', message: '图纸编号冲突，请重试' }
+    throw error
+  }
+  return { success: true, data: outcome }
 }
 
 async function referencedAdminFileIds(fileList) {
@@ -1018,6 +1089,7 @@ exports.main = async (event = {}) => {
     if (event.action === 'getDashboard') return await getDashboard()
     if (event.action === 'listCollections') return await listCollections()
     if (event.action === 'saveCollection') return await saveCollection(event, auth.uid)
+    if (event.action === 'importPattern') return await importPattern(event, auth.uid)
     if (event.action === 'updateStatus') return await updateStatus(event, auth.uid)
     if (event.action === 'archiveCollection') return await archiveCollection(event, auth.uid)
     if (event.action === 'deleteFiles') return await deleteFiles(event)

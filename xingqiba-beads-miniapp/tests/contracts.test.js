@@ -49,6 +49,14 @@ test('管理后台调用的 action 全部存在服务端处理分支', () => {
   assert.deepEqual([...clientActions].filter((action) => !serverActions.has(action)), [])
 })
 
+test('网页工作台调用的管理 action 全部存在服务端处理分支', () => {
+  const source = filesUnder('web-studio/src', ['.ts', '.tsx']).map((file) => fs.readFileSync(file, 'utf8')).join('\n')
+  const clientActions = actionsFromCalls(source, 'callAdmin')
+  assert.ok(clientActions.has('importPattern'))
+  const serverActions = handledActions('cloudfunctions/adminService/index.js')
+  assert.deepEqual([...clientActions].filter((action) => !serverActions.has(action)), [])
+})
+
 test('线上业务工程不包含无鉴权 quickstart 示例云函数', () => {
   assert.equal(fs.existsSync(path.join(root, 'cloudfunctions/quickstartFunctions')), false)
   assert.doesNotMatch(read('uploadCloudFunction.sh'), /quickstartFunctions/)

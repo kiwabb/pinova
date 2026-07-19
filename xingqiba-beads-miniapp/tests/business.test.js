@@ -25,10 +25,12 @@ const {
   canReactivateBooking,
   documentPayload,
   hasUniqueIds,
+  importPatternDecision,
   isAdminUploadFileId,
   isValidBusinessId,
   memberRecordMatchesExpected,
   normalizeHexColor,
+  normalizeImportPattern,
   normalizeMemberConfig,
   normalizeStoreConfig,
   revisionDecision,
@@ -266,4 +268,51 @@ test('图集搜索和筛选在服务端对完整数据集生效', () => {
   assert.deepEqual(filterCollections(items, galleryFilters({ keyword: '黄鹤楼' })), [items[0]])
   assert.deepEqual(filterCollections(items, galleryFilters({ category: '情侣', level: 'V2' })), [items[1]])
   assert.deepEqual(filterCollections(items, galleryFilters({ level: 'VIP' })), items)
+})
+
+test('导入图纸校验名称和图集云存储图片路径', () => {
+  const image = 'cloud://env.bucket-id/admin/collections/studio-1.webp'
+  assert.equal(normalizeImportPattern({ name: '', image }).error, '请填写图纸名称')
+  assert.equal(normalizeImportPattern({ name: '小狗', image: 'cloud://env.bucket-id/admin/store/a.webp' }).error, '图纸图片尚未上传成功，请重新导入')
+  assert.equal(normalizeImportPattern({ name: '小狗', image: 'https://evil.example/a.webp' }).error, '图纸图片尚未上传成功，请重新导入')
+  assert.deepEqual(normalizeImportPattern({ name: '  小狗头像  ', image }).data, { name: '小狗头像', image })
+})
+
+test('导入图纸原子追加条目并可选补充封面', () => {
+  const image = 'cloud://env.bucket-id/admin/collections/studio-2.webp'
+  const collection = { status: 'published', images: ['cover-1'], items: [{ id: 'p1', name: '第一张', image: 'img-1' }] }
+  const appended = importPatternDecision(collection, { id: 'p2', name: '第二张', image }, { collectionId: 'c1', setAsCover: true })
+  assert.equal(appended.data.count, 2)
+  assert.deepEqual(appended.data.items[1], { id: 'p2', name: '第二张', image })
+  assert.deepEqual(appended.data.images, ['cover-1', image])
+  assert.equal(appended.data.coverAdded, true)
+  const noCover = importPatternDecision(collection, { id: 'p2', name: '第二张', image }, { collectionId: 'c1' })
+  assert.deepEqual(noCover.data.images, ['cover-1'])
+  assert.equal(noCover.data.coverAdded, false)
+  const coverFull = importPatternDecision({ status: 'draft', images: ['a', 'b', 'c', 'd'], items: [] }, { id: 'p1', name: '新图', image }, { setAsCover: true })
+  assert.equal(coverFull.data.coverAdded, false)
+  assert.deepEqual(coverFull.data.images, ['a', 'b', 'c', 'd'])
+})
+
+test('导入图纸拦截归档、满额和重复编号', () => {
+  const pattern = { id: 'p-new', name: '新图纸', image: 'img-new' }
+  assert.equal(importPatternDecision(null, pattern).error, 'NOT_FOUND')
+  assert.equal(importPatternDecision({ status: 'archived', items: [] }, pattern).error, 'ARCHIVED')
+  const full = { status: 'draft', images: [], items: Array.from({ length: 100 }, (_, index) => ({ id: `p${index}`, name: '图', image: 'img' })) }
+  assert.equal(importPatternDecision(full, pattern).error, 'ITEMS_FULL')
+  assert.equal(importPatternDecision({ status: 'draft', images: [], items: [{ id: 'p-new', name: '旧图', image: 'img' }] }, pattern).error, 'DUPLICATE_ID')
+})
+
+test('导入图纸把旧字符串条目物化为固定图片映射', () => {
+  const legacy = importPatternDecision(
+    { status: 'draft', images: ['cover-a', 'cover-b'], items: ['老图纸一', '老图纸二', '老图纸三'] },
+    { id: 'p-new', name: '新图纸', image: 'img-new' },
+    { collectionId: 'legacy-1' },
+  )
+  assert.deepEqual(legacy.data.items.slice(0, 3), [
+    { id: 'legacy-1-pattern-1', name: '老图纸一', image: 'cover-a' },
+    { id: 'legacy-1-pattern-2', name: '老图纸二', image: 'cover-b' },
+    { id: 'legacy-1-pattern-3', name: '老图纸三', image: 'cover-a' },
+  ])
+  assert.equal(legacy.data.count, 4)
 })

@@ -2,6 +2,7 @@ import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } fro
 import {
   Brush,
   CircleDot,
+  CloudUpload,
   Dog,
   Download,
   Eraser,
@@ -28,6 +29,7 @@ import type { ConvertResult, ConvertSettings, EditorTool, ImageMode, PatternProj
 import { exportPatternPng } from './engine/export'
 
 const MeltPreview = lazy(() => import('./components/MeltPreview').then((module) => ({ default: module.MeltPreview })))
+const ImportDialog = lazy(() => import('./components/ImportDialog').then((module) => ({ default: module.ImportDialog })))
 
 interface WorkerSuccess {
   ok: true
@@ -84,6 +86,7 @@ export default function App() {
   const [history, setHistory] = useState<Int16Array[]>([])
   const [redoStack, setRedoStack] = useState<Int16Array[]>([])
   const [busy, setBusy] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
   const [message, setMessage] = useState('所有处理均在浏览器本地完成')
   const [toast, setToast] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -289,7 +292,8 @@ export default function App() {
         <div className="header-actions">
           <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(event) => handleFile(event.target.files?.[0])} />
           <button className="button secondary" onClick={() => fileInputRef.current?.click()}><Upload size={18} />导入图片</button>
-          <button className="button primary" onClick={() => exportPatternPng(project, studioPalette)}><Download size={18} />导出图纸</button>
+          <button className="button secondary" onClick={() => exportPatternPng(project, studioPalette)}><Download size={18} />导出图纸</button>
+          <button className="button primary" onClick={() => setImportOpen(true)}><CloudUpload size={18} />导入图集</button>
         </div>
       </header>
 
@@ -419,6 +423,18 @@ export default function App() {
           </section>
         </aside>
       </main>
+      {importOpen && (
+        <Suspense fallback={<div className="import-layer"><div className="import-loading floating"><span className="spinner dark" />正在载入云端模块</div></div>}>
+          <ImportDialog
+            project={project}
+            palette={studioPalette}
+            onClose={(message) => {
+              setImportOpen(false)
+              if (message) showToast(message)
+            }}
+          />
+        </Suspense>
+      )}
       <div className={toast ? 'toast show' : 'toast'} role="status" aria-live="polite">{toast}</div>
     </div>
   )

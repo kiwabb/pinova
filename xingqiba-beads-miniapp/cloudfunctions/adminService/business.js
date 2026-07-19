@@ -126,6 +126,35 @@ function normalizeStoreConfig(input = {}) {
   } }
 }
 
+function normalizeImportPattern(input = {}) {
+  const name = normalizeText(input.name, 40)
+  const image = normalizeText(input.image, 500)
+  if (!name) return { error: '请填写图纸名称' }
+  if (!isAdminUploadFileId(image, 'collections')) return { error: '图纸图片尚未上传成功，请重新导入' }
+  return { data: { name, image } }
+}
+
+function importPatternDecision(collection, pattern, options = {}) {
+  if (!collection || typeof collection !== 'object') return { error: 'NOT_FOUND' }
+  if (collection.status === 'archived') return { error: 'ARCHIVED' }
+  const images = Array.isArray(collection.images) ? collection.images.filter((item) => typeof item === 'string' && item) : []
+  const collectionKey = normalizeText(options.collectionId, 80) || 'collection'
+  const existingItems = Array.isArray(collection.items) ? collection.items.map((item, index) => typeof item === 'string'
+    ? { id: `${collectionKey}-pattern-${index + 1}`, name: normalizeText(item, 40), image: images[index % Math.max(1, images.length)] || '' }
+    : { id: normalizeText(item?.id, 80) || `pattern-${index + 1}`, name: normalizeText(item?.name, 40), image: normalizeText(item?.image, 500) }) : []
+  if (existingItems.length >= 100) return { error: 'ITEMS_FULL' }
+  if (existingItems.some((item) => item.id === pattern.id)) return { error: 'DUPLICATE_ID' }
+  const coverAdded = Boolean(options.setAsCover) && images.length < 4 && !images.includes(pattern.image)
+  return {
+    data: {
+      items: [...existingItems, { id: pattern.id, name: pattern.name, image: pattern.image }],
+      images: coverAdded ? [...images, pattern.image] : images,
+      count: existingItems.length + 1,
+      coverAdded,
+    },
+  }
+}
+
 function bookingUsageTransition(currentStatus, nextStatus, used, capacity) {
   const wasActive = currentStatus !== 'cancelled'
   const willBeActive = nextStatus !== 'cancelled'
@@ -156,4 +185,4 @@ function auditRetentionCutoff(now = Date.now(), retentionDays = 365) {
   return new Date((Number.isFinite(timestamp) ? timestamp : Date.now()) - days * 86400000)
 }
 
-module.exports = { auditRetentionCutoff, bookingSlotUsage, bookingUsageTransition, canReactivateBooking, documentPayload, hasUniqueIds, isAdminUploadFileId, isValidBusinessId, memberRecordMatchesExpected, normalizeHexColor, normalizeMemberConfig, normalizeStoreConfig, normalizeStringList, normalizeText, revisionDecision, unreferencedFileIds, workVersionDecision }
+module.exports = { auditRetentionCutoff, bookingSlotUsage, bookingUsageTransition, canReactivateBooking, documentPayload, hasUniqueIds, importPatternDecision, isAdminUploadFileId, isValidBusinessId, memberRecordMatchesExpected, normalizeHexColor, normalizeImportPattern, normalizeMemberConfig, normalizeStoreConfig, normalizeStringList, normalizeText, revisionDecision, unreferencedFileIds, workVersionDecision }
