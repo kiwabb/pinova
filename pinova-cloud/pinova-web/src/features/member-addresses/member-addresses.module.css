@@ -47,7 +47,7 @@
 .headingIcon {
   width: 48px;
   height: 48px;
-  border-radius: var(--catalog-radius-surface, 8px);
+  border-radius: var(--catalog-radius-surface);
   display: grid;
   place-items: center;
   background: var(--catalog-accent-soft);
@@ -59,7 +59,7 @@
   margin: 0 0 4px;
   color: var(--catalog-accent-strong);
   font-size: 11px;
-  font-weight: 760;
+  font-weight: 700;
 }
 
 .pageHeading h1,
@@ -94,13 +94,13 @@
 .cancelIcon {
   min-height: 44px;
   border: 0;
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
   font-size: 13px;
-  font-weight: 720;
+  font-weight: 700;
   transition:
     background var(--motion-fast),
     color var(--motion-fast),
@@ -127,14 +127,22 @@
   padding-top: 8px;
   color: var(--catalog-emerald-strong);
   font-size: 13px;
-  font-weight: 650;
+  font-weight: 600;
+}
+
+.liveRegion:not(:empty) {
+  width: fit-content;
+  margin-top: 4px;
+  border-radius: var(--catalog-radius-control);
+  background: color-mix(in srgb, var(--catalog-emerald) 8%, var(--catalog-surface));
+  padding: 8px 12px;
 }
 
 .errorBanner {
   min-height: 52px;
   margin-bottom: 16px;
   padding: 8px 10px 8px 14px;
-  border-radius: var(--catalog-radius-surface, 8px);
+  border-radius: var(--catalog-radius-surface);
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
@@ -157,9 +165,12 @@
 .loadingState,
 .loginState {
   min-height: 360px;
+  border-radius: var(--catalog-radius-surface);
   display: flex;
   align-items: center;
   justify-content: center;
+  background: var(--catalog-surface);
+  box-shadow: var(--catalog-shadow-card);
   color: var(--catalog-muted);
 }
 
@@ -236,13 +247,10 @@
 .addressCard {
   min-width: 0;
   padding: 18px;
-  border-radius: var(--catalog-radius-surface, 8px);
+  border-radius: var(--catalog-radius-surface);
   background: var(--catalog-surface);
-  box-shadow: var(--catalog-shadow-card, 0 4px 16px rgb(17 19 17 / 6%));
-  transition:
-    opacity var(--motion-fast),
-    transform var(--motion-fast),
-    box-shadow var(--motion-fast);
+  box-shadow: var(--catalog-shadow-card);
+  transition: opacity var(--motion-fast);
 }
 
 .addressCard[aria-busy="true"] {
@@ -278,13 +286,13 @@
 .addressBadges span {
   min-height: 24px;
   padding-inline: 8px;
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   display: inline-flex;
   align-items: center;
   background: var(--catalog-surface-muted);
   color: var(--catalog-muted);
   font-size: 11px;
-  font-weight: 680;
+  font-weight: 600;
 }
 
 .addressBadges .defaultBadge {
@@ -339,7 +347,7 @@
   min-height: 52px;
   margin-top: 10px;
   padding: 4px 6px 4px 12px;
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -347,7 +355,7 @@
   background: color-mix(in srgb, var(--catalog-danger) 6%, #fff);
   color: var(--catalog-danger);
   font-size: 12px;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .deleteConfirm span {
@@ -360,12 +368,13 @@
 
 .emptyState {
   min-height: 260px;
-  border-radius: var(--catalog-radius-surface, 8px);
+  border-radius: var(--catalog-radius-surface);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
   background: var(--catalog-surface);
+  box-shadow: var(--catalog-shadow-card);
   color: var(--catalog-muted);
   text-align: center;
 }
@@ -378,9 +387,9 @@
 
 .formPanel {
   align-self: start;
-  border-radius: var(--catalog-radius-surface, 8px);
+  border-radius: var(--catalog-radius-surface);
   background: var(--catalog-surface);
-  box-shadow: var(--catalog-shadow-card, 0 4px 16px rgb(17 19 17 / 6%));
+  box-shadow: var(--catalog-shadow-card);
 }
 
 .form {
@@ -423,7 +432,7 @@
   gap: 6px;
   color: var(--catalog-ink);
   font-size: 12px;
-  font-weight: 680;
+  font-weight: 600;
 }
 
 .field input,
@@ -431,7 +440,7 @@
   width: 100%;
   min-width: 0;
   border: 1px solid transparent;
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   outline: 0;
   background: var(--catalog-surface-muted);
   color: var(--catalog-ink);
@@ -484,7 +493,7 @@
   margin-bottom: 10px;
   padding: 0;
   font-size: 13px;
-  font-weight: 740;
+  font-weight: 700;
 }
 
 .regionSelectGrid {
@@ -506,7 +515,7 @@
 .regionSelectLabel {
   color: var(--catalog-ink);
   font-size: 12px;
-  font-weight: 680;
+  font-weight: 600;
 }
 
 .regionSelectTrigger {
@@ -515,7 +524,7 @@
   height: 48px;
   padding: 0 12px;
   border: 1px solid transparent;
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -586,11 +595,11 @@
   top: calc(100% - 1px);
   z-index: 20;
   border: 1px solid var(--catalog-rule);
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   overflow-y: auto;
   overscroll-behavior: contain;
   background: var(--catalog-surface);
-  box-shadow: 0 14px 30px rgb(17 19 17 / 14%);
+  box-shadow: var(--catalog-shadow-float);
   animation: address-menu-in 160ms var(--motion-ease-out);
 }
 
@@ -634,7 +643,7 @@
   gap: 9px;
   color: var(--catalog-ink);
   font-size: 13px;
-  font-weight: 650;
+  font-weight: 600;
   cursor: pointer;
 }
 
@@ -646,7 +655,7 @@
 .toggleMark {
   width: 22px;
   height: 22px;
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   display: grid;
   place-items: center;
   background: var(--catalog-surface-muted);

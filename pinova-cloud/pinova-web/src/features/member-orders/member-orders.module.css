@@ -46,7 +46,7 @@
   margin: 0 0 4px;
   color: var(--catalog-accent-strong);
   font-size: 11px;
-  font-weight: 760;
+  font-weight: 700;
 }
 
 .pageHeading h1 {
@@ -103,7 +103,7 @@
 
 .statusFilters button[aria-pressed="true"] {
   background: var(--catalog-surface);
-  box-shadow: 0 3px 10px rgb(17 19 17 / 7%);
+  box-shadow: var(--catalog-shadow-raise);
   color: var(--catalog-accent-strong);
 }
 
@@ -133,7 +133,7 @@
   justify-content: center;
   gap: 7px;
   font-size: 13px;
-  font-weight: 720;
+  font-weight: 700;
   transition:
     background var(--motion-fast),
     color var(--motion-fast),
@@ -199,9 +199,13 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  color: var(--catalog-warning);
+  color: var(--catalog-muted);
   font-size: 13px;
-  font-weight: 760;
+  font-weight: 700;
+}
+
+.orderStatus[data-status="PENDING_PAYMENT"] {
+  color: var(--catalog-warning);
 }
 
 .orderStatus i {
@@ -315,9 +319,10 @@
 }
 
 .orderFooter strong {
-  color: var(--catalog-accent-strong);
+  color: var(--catalog-accent);
   font-family: var(--font-mono);
-  font-size: 19px;
+  font-size: 20px;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
