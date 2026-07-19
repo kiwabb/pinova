@@ -453,7 +453,8 @@
 .submitButton,
 .statePanel > a,
 .statePanel > button,
-.stateActions a {
+.stateActions a,
+.stateActions button {
   min-height: 48px;
   padding-inline: 16px;
   border: 0;
@@ -475,8 +476,17 @@
 .submitButton:hover:not(:disabled),
 .statePanel > a:hover,
 .statePanel > button:hover,
-.stateActions a:hover {
+.stateActions button:hover {
   background: var(--catalog-accent-strong);
+}
+
+.stateActions a {
+  background: var(--catalog-surface-muted);
+  color: var(--catalog-ink);
+}
+
+.stateActions a:hover {
+  background: var(--catalog-rule);
 }
 
 .submitButton:disabled {
@@ -556,15 +566,6 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 8px;
-}
-
-.stateActions a:last-child {
-  background: var(--catalog-surface-muted);
-  color: var(--catalog-ink);
-}
-
-.stateActions a:last-child:hover {
-  background: var(--catalog-rule);
 }
 
 @keyframes checkout-spin {
@@ -655,7 +656,8 @@
   .submitButton,
   .statePanel > a,
   .statePanel > button,
-  .stateActions a {
+  .stateActions a,
+  .stateActions button {
     transition: none;
   }
 }

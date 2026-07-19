@@ -30,6 +30,7 @@ interface MemberOrderItemDto {
 
 interface MemberOrderDto {
   orderNo: string;
+  checkoutNo: string;
   status: string;
   fulfillmentType: number | string;
   currencyCode: string;
@@ -86,6 +87,7 @@ function mapOrder(order: MemberOrderDto): MemberOrder {
   }
   return {
     orderNo: order.orderNo,
+    checkoutNo: order.checkoutNo,
     status: order.status,
     fulfillmentType: toNumber(order.fulfillmentType, "履约类型"),
     currencyCode: order.currencyCode,

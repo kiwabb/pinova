@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.PaymentOrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.pinova.pojo.entity.PaymentOrder">
+        <id column="id" property="id" />
+        <result column="payment_no" property="paymentNo" />
+        <result column="checkout_no" property="checkoutNo" />
+        <result column="member_id" property="memberId" />
+        <result column="provider_code" property="providerCode" />
+        <result column="provider_transaction_no" property="providerTransactionNo" />
+        <result column="currency_code" property="currencyCode" />
+        <result column="amount_fen" property="amountFen" />
+        <result column="status" property="status" />
+        <result column="attempt_count" property="attemptCount" />
+        <result column="expires_at" property="expiresAt" />
+        <result column="last_queried_at" property="lastQueriedAt" />
+        <result column="paid_at" property="paidAt" />
+        <result column="failed_at" property="failedAt" />
+        <result column="closed_at" property="closedAt" />
+        <result column="review_required_at" property="reviewRequiredAt" />
+        <result column="failure_code" property="failureCode" />
+        <result column="failure_message" property="failureMessage" />
+        <result column="version" property="version" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, payment_no, checkout_no, member_id, provider_code, provider_transaction_no, currency_code, amount_fen, status, attempt_count, expires_at, last_queried_at, paid_at, failed_at, closed_at, review_required_at, failure_code, failure_message, version, created_at, created_by, updated_at, updated_by
+    </sql>
+
+</mapper>

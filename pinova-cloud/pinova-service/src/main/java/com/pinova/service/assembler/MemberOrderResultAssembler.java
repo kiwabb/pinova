@@ -17,6 +17,7 @@ public final class MemberOrderResultAssembler {
             List<TradeOrderItem> items) {
         return new MemberOrderSummaryResult(
                 order.getOrderNo(),
+                order.getCheckoutNo(),
                 TradeOrderStatus.fromCode(order.getStatus()).name(),
                 order.getFulfillmentType(),
                 order.getCurrencyCode(),

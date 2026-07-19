@@ -18,6 +18,7 @@ export interface MemberOrderItem {
 
 export interface MemberOrder {
   orderNo: string;
+  checkoutNo: string;
   status: MemberOrderStatus;
   fulfillmentType: number;
   currencyCode: string;

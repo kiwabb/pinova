@@ -34,6 +34,14 @@ public interface InventoryStockMapper extends BaseMapper<InventoryStock> {
             @Param("shopId") Long shopId,
             @Param("skuId") Long skuId);
 
+    @Select("""
+            SELECT *
+            FROM pinova.inventory_stock
+            WHERE id = #{stockId}
+            FOR UPDATE
+            """)
+    InventoryStock selectByIdForUpdate(@Param("stockId") Long stockId);
+
     @Update("""
             UPDATE pinova.inventory_stock
             SET reserved_quantity = reserved_quantity + #{quantity},
@@ -64,5 +72,41 @@ public interface InventoryStockMapper extends BaseMapper<InventoryStock> {
             @Param("stockId") Long stockId,
             @Param("quantity") Long quantity,
             @Param("version") Integer version,
+            @Param("operatorId") Long operatorId);
+
+    @Update("""
+            UPDATE pinova.inventory_stock
+            SET on_hand_quantity = on_hand_quantity - #{quantity},
+                reserved_quantity = reserved_quantity - #{quantity},
+                version = version + 1,
+                updated_at = #{updatedAt},
+                updated_by = #{operatorId}
+            WHERE id = #{stockId}
+              AND version = #{version}
+              AND on_hand_quantity >= #{quantity}
+              AND reserved_quantity >= #{quantity}
+            """)
+    int deductReserved(
+            @Param("stockId") Long stockId,
+            @Param("quantity") Long quantity,
+            @Param("version") Integer version,
+            @Param("updatedAt") java.time.Instant updatedAt,
+            @Param("operatorId") Long operatorId);
+
+    @Update("""
+            UPDATE pinova.inventory_stock
+            SET reserved_quantity = reserved_quantity - #{quantity},
+                version = version + 1,
+                updated_at = #{updatedAt},
+                updated_by = #{operatorId}
+            WHERE id = #{stockId}
+              AND version = #{version}
+              AND reserved_quantity >= #{quantity}
+            """)
+    int releaseReserved(
+            @Param("stockId") Long stockId,
+            @Param("quantity") Long quantity,
+            @Param("version") Integer version,
+            @Param("updatedAt") java.time.Instant updatedAt,
             @Param("operatorId") Long operatorId);
 }

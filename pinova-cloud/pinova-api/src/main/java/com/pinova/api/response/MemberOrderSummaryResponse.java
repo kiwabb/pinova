@@ -5,6 +5,7 @@ import java.util.List;
 
 public record MemberOrderSummaryResponse(
         String orderNo,
+        String checkoutNo,
         String status,
         short fulfillmentType,
         String currencyCode,

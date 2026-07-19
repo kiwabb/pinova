@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Package } from "lucide-react";
+import { CreditCard, Package } from "lucide-react";
 import { formatPrice } from "@/lib/format-price";
 import {
   formatMemberOrderTime,
@@ -10,9 +10,10 @@ import styles from "../member-orders.module.css";
 
 interface MemberOrderCardProps {
   order: MemberOrder;
+  onPay: (checkoutNo: string) => void;
 }
 
-export function MemberOrderCard({ order }: MemberOrderCardProps) {
+export function MemberOrderCard({ order, onPay }: MemberOrderCardProps) {
   const headingId = `order-${order.orderNo}`;
   const itemCount = order.items.reduce((total, item) => total + item.quantity, 0);
 
@@ -65,6 +66,16 @@ export function MemberOrderCard({ order }: MemberOrderCardProps) {
           <span>订单金额</span>
           <strong>{formatPrice(order.payableAmountFen)}</strong>
         </div>
+        {order.status === "PENDING_PAYMENT" && (
+          <button
+            className={styles.payButton}
+            type="button"
+            onClick={() => onPay(order.checkoutNo)}
+          >
+            <CreditCard aria-hidden="true" size={16} />
+            去支付
+          </button>
+        )}
       </footer>
     </article>
   );

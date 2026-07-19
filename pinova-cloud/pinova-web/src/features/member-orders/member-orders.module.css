@@ -314,6 +314,28 @@
   gap: 10px;
 }
 
+.payButton {
+  min-height: 44px;
+  padding-inline: 12px;
+  border: 0;
+  border-radius: var(--catalog-radius-control);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: var(--catalog-accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 740;
+  transition:
+    background var(--motion-fast),
+    transform var(--motion-fast);
+}
+
+.payButton:hover {
+  background: var(--catalog-accent-strong);
+}
+
 .orderFooter strong {
   color: var(--catalog-accent-strong);
   font-family: var(--font-mono);
@@ -473,10 +495,15 @@
   .orderFooter {
     min-height: 60px;
     padding-inline: 16px;
+    flex-wrap: wrap;
   }
 
   .orderFooter > div > span {
     display: none;
+  }
+
+  .payButton {
+    width: 100%;
   }
 }
 
@@ -520,6 +547,7 @@
   .statusFilters button,
   .errorBanner button,
   .pagination button,
+  .payButton,
   .statePanel > button,
   .statePanel > a {
     transition: none;

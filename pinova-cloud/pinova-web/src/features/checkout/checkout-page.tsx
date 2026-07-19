@@ -6,14 +6,16 @@ import {
   ArrowRight,
   CheckCircle2,
   ChevronRight,
+  CreditCard,
   Home,
   LoaderCircle,
   LockKeyhole,
   RefreshCw,
   ShoppingBag,
 } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { CommercePageHeader } from "@/components/commerce-page-header";
+import { PaymentDialog } from "@/features/payments";
 import { CheckoutAddressList } from "./components/checkout-address-list";
 import { CheckoutItemList } from "./components/checkout-item-list";
 import { CheckoutSummary } from "./components/checkout-summary";
@@ -24,6 +26,8 @@ const MAX_REMARK_LENGTH = 200;
 
 export function CheckoutPage() {
   const [buyerRemark, setBuyerRemark] = useState("");
+  const [paymentOpen, setPaymentOpen] = useState(false);
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
   const {
     data,
     isSubmitting,
@@ -39,6 +43,10 @@ export function CheckoutPage() {
     summary,
   } = useCheckout();
   const cartCount = data?.cart.items.reduce((total, item) => total + item.quantity, 0);
+  const requiresPayment = submittedCheckout?.orders.some(
+    (order) => order.status === "PENDING_PAYMENT",
+  );
+  const handlePaid = useCallback(() => setPaymentCompleted(true), []);
 
   return (
     <div className={styles.page}>
@@ -102,14 +110,24 @@ export function CheckoutPage() {
         ) : submittedCheckout ? (
           <div className={styles.statePanel} role="status" aria-live="polite">
             <CheckCircle2 aria-hidden="true" size={30} />
-            <h2>订单已提交</h2>
-            <p>本次已创建 {submittedCheckout.orders.length} 笔订单</p>
+            <h2>{paymentCompleted ? "支付已完成" : "订单已提交"}</h2>
+            <p>
+              {paymentCompleted
+                ? `本次结算的 ${submittedCheckout.orders.length} 笔订单已进入待履约`
+                : `本次已创建 ${submittedCheckout.orders.length} 笔订单`}
+            </p>
             <ul className={styles.submittedOrders} aria-label="已提交订单">
               {submittedCheckout.orders.map((order) => (
                 <li key={order.id}>{order.orderNo}</li>
               ))}
             </ul>
             <div className={styles.stateActions}>
+              {requiresPayment && !paymentCompleted && (
+                <button type="button" onClick={() => setPaymentOpen(true)}>
+                  <CreditCard aria-hidden="true" size={18} />
+                  立即支付
+                </button>
+              )}
               <Link href="/account/orders">
                 查看我的订单
                 <ArrowRight aria-hidden="true" size={18} />
@@ -171,6 +189,13 @@ export function CheckoutPage() {
           </div>
         ) : null}
       </main>
+      {paymentOpen && submittedCheckout && (
+        <PaymentDialog
+          checkoutNo={submittedCheckout.checkoutNo}
+          onClose={() => setPaymentOpen(false)}
+          onPaid={handlePaid}
+        />
+      )}
     </div>
   );
 }

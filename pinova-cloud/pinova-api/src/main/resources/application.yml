@@ -27,6 +27,9 @@ mybatis-plus:
       logic-not-delete-value: false
 
 pinova:
+  payment:
+    mock-enabled: ${PINOVA_PAYMENT_MOCK_ENABLED:false}
+    expiration-scan-delay-ms: ${PINOVA_PAYMENT_EXPIRATION_SCAN_DELAY_MS:60000}
   storage:
     public-base-url: ${PINOVA_MEDIA_PUBLIC_BASE_URL:http://127.0.0.1:19000}
     bucket: ${PINOVA_MINIO_BUCKET:pinova-public}

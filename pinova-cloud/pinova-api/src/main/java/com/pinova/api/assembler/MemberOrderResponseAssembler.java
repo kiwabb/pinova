@@ -28,6 +28,7 @@ public class MemberOrderResponseAssembler {
     private MemberOrderSummaryResponse toSummaryResponse(MemberOrderSummaryResult result) {
         return new MemberOrderSummaryResponse(
                 result.orderNo(),
+                result.checkoutNo(),
                 result.status(),
                 result.fulfillmentType(),
                 result.currencyCode(),

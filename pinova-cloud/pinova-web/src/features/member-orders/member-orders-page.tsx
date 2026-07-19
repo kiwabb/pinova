@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CommercePageHeader } from "@/components/commerce-page-header";
+import { PaymentDialog } from "@/features/payments";
 import { MemberOrderCard } from "./components/member-order-card";
 import { OrderStatusFilter } from "./components/order-status-filter";
 import {
@@ -40,6 +41,7 @@ export function MemberOrdersPage() {
   const [requiresLogin, setRequiresLogin] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
+  const [paymentCheckoutNo, setPaymentCheckoutNo] = useState<string | null>(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -163,7 +165,11 @@ export function MemberOrdersPage() {
           <>
             <section className={styles.orderList} aria-label="订单列表">
               {data.items.map((order) => (
-                <MemberOrderCard key={order.orderNo} order={order} />
+                <MemberOrderCard
+                  key={order.orderNo}
+                  order={order}
+                  onPay={setPaymentCheckoutNo}
+                />
               ))}
             </section>
 
@@ -216,6 +222,13 @@ export function MemberOrdersPage() {
           </section>
         ) : null}
       </main>
+      {paymentCheckoutNo && (
+        <PaymentDialog
+          checkoutNo={paymentCheckoutNo}
+          onClose={() => setPaymentCheckoutNo(null)}
+          onPaid={reload}
+        />
+      )}
     </div>
   );
 }

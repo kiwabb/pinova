@@ -16,6 +16,7 @@ class MemberOrderResultAssemblerTest {
         Instant submittedAt = Instant.parse("2026-07-19T04:00:00Z");
         TradeOrder order = new TradeOrder();
         order.setOrderNo("PO202607190001");
+        order.setCheckoutNo("550e8400-e29b-41d4-a716-446655440000");
         order.setStatus((short) 0);
         order.setFulfillmentType((short) 1);
         order.setCurrencyCode("CNY");
@@ -34,6 +35,7 @@ class MemberOrderResultAssemblerTest {
         MemberOrderSummaryResult result = MemberOrderResultAssembler.toSummaryResult(order, List.of(item));
 
         assertEquals("PENDING_PAYMENT", result.status());
+        assertEquals("550e8400-e29b-41d4-a716-446655440000", result.checkoutNo());
         assertEquals(submittedAt, result.submittedAt());
         assertEquals("48 色基础拼豆套装", result.items().getFirst().productName());
         assertEquals("products/starter-kit.webp", result.items().getFirst().imageKey());
