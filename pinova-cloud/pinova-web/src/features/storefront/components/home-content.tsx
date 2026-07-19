@@ -24,10 +24,7 @@ export function HomeContent(props: HomeContentProps) {
 
   return (
     <>
-      <HomeHero
-        categories={props.categories}
-        product={merchandising.featuredProduct}
-      />
+      <HomeHero product={merchandising.featuredProduct} />
       <CategoryShowcase categories={props.categories} />
       <HomeProductSection
         appliedSearch={props.appliedSearch}

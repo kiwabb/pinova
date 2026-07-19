@@ -50,7 +50,10 @@ test("renders the storefront without horizontal overflow", async ({
     page.getByRole("heading", { name: "武汉城市记忆大幅套装", level: 1 }),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "探索材料世界" })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "热卖推荐" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "推荐商品" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "实物材料", level: 3 }),
+  ).toBeVisible();
   await expect(page.locator("article")).toHaveCount(9);
   await expect(page.getByText("Pinova 基础拼豆材料包")).toBeVisible();
 
@@ -124,7 +127,7 @@ test("searches, favorites, and reflects product sale availability", async ({
   await expect(suggestion).toHaveAttribute("aria-selected", "true");
   await search.press("Enter");
   await expect(
-    page.getByRole("heading", { name: "“武汉城市记忆大幅套装”的商品" }),
+    page.getByRole("heading", { name: "“武汉城市记忆大幅套装”的搜索结果" }),
   ).toBeVisible();
   await expect(page.locator("article")).toHaveCount(1);
 
