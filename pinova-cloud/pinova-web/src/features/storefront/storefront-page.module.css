@@ -2,8 +2,8 @@
   --storefront-header-offset: 64px;
   min-height: 100dvh;
   overflow: clip;
-  background: var(--catalog-paper, #f4f6f2);
-  color: var(--catalog-ink, #111311);
+  background: var(--catalog-paper);
+  color: var(--catalog-ink);
 }
 
 .skipLink {
@@ -15,7 +15,7 @@
   min-height: 44px;
   align-items: center;
   border-radius: 4px;
-  background: var(--catalog-ink, #111311);
+  background: var(--catalog-ink);
   padding: 0 14px;
   color: #fff;
   font-weight: 700;
@@ -37,13 +37,13 @@
   max-width: min(420px, calc(100vw - 32px));
   align-items: center;
   border: 0;
-  border-radius: var(--catalog-radius-surface, 8px);
-  background: var(--catalog-surface, #fff);
+  border-radius: var(--catalog-radius-surface);
+  background: var(--catalog-surface);
   padding: 11px 16px 11px 14px;
   box-shadow:
-    inset 4px 0 var(--catalog-accent, #c72c59),
-    var(--catalog-shadow-float, 0 20px 56px rgb(17 19 17 / 13%));
-  color: var(--catalog-ink, #111311);
+    inset 4px 0 var(--catalog-accent),
+    var(--catalog-shadow-float);
+  color: var(--catalog-ink);
   font-size: 14px;
   line-height: 1.45;
   opacity: 0;

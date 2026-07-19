@@ -20,12 +20,17 @@
   --catalog-coral: #df654a;
   --catalog-warning: #985f00;
   --catalog-danger: #b42318;
+  --catalog-danger-soft: #f9e9e7;
   --catalog-focus: #126fbd;
+  --catalog-on-ink: #f7f9f5;
+  --catalog-on-ink-muted: #c4cbc4;
+  --catalog-on-ink-faint: #aeb6ae;
   --catalog-content-max: 1344px;
   --catalog-radius-control: 6px;
   --catalog-radius-surface: 8px;
   --catalog-shadow-subtle: 0 8px 28px rgb(17 19 17 / 5%);
   --catalog-shadow-card: 0 4px 16px rgb(17 19 17 / 6%);
+  --catalog-shadow-raise: 0 3px 10px rgb(17 19 17 / 7%);
   --catalog-shadow-soft: 0 12px 36px rgb(17 19 17 / 7%);
   --catalog-shadow-float: 0 20px 56px rgb(17 19 17 / 13%);
   --brand: var(--catalog-accent);
