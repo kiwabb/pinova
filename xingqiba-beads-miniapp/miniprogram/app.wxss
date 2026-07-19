@@ -1,0 +1,35 @@
+page {
+  --page-bg: #f9fafc;
+  --surface: #ffffff;
+  --text: #1f1e25;
+  --muted: #858189;
+  --weak: #918e95;
+  --line: #f0f1f4;
+  --border: #eceef1;
+  --primary: #c42d5d;
+  --primary-pressed: #ad244f;
+  --primary-soft: #fceff4;
+  min-height: 100%;
+  background: var(--page-bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Helvetica Neue", sans-serif;
+  font-size: 24rpx;
+}
+
+view, text, image, button, input, scroll-view, canvas { box-sizing: border-box; }
+button { width: auto; min-width: 0; margin: 0; padding: 0; line-height: inherit; }
+button::after { border: 0; }
+image { display: block; }
+
+.page { min-height: 100vh; padding: 46rpx 40rpx 180rpx; }
+.section { margin-top: 46rpx; }
+.section-head { min-height: 85rpx; display: flex; align-items: center; justify-content: space-between; gap: 23rpx; }
+.section-title { font-size: 31rpx; font-weight: 500; line-height: 1.2; }
+.section-action { min-height: 85rpx; display: flex; align-items: center; gap: 4rpx; color: var(--weak); font-size: 23rpx; font-weight: 400; }
+.card { background: var(--surface); border: 1rpx solid var(--border); border-radius: 31rpx; box-shadow: 0 12rpx 38rpx rgba(31, 30, 37, .035); }
+.muted { color: var(--muted); }
+.primary-button { width: 100% !important; min-width: 0 !important; height: 108rpx; display: flex; align-items: center; justify-content: center; gap: 10rpx; border: 1rpx solid var(--primary); border-radius: 31rpx; background: var(--primary); color: #fff; font-size: 27rpx; font-weight: 700; }
+.primary-button.button-hover { background: var(--primary-pressed); }
+.icon { width: 35rpx; height: 35rpx; flex: none; }
+.icon-small { width: 21rpx; height: 21rpx; flex: none; }
+.empty { padding: 70rpx 24rpx; color: var(--muted); text-align: center; }

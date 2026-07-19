@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.ProductSpuDetailMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.pinova.pojo.entity.ProductSpuDetail">
+        <id column="id" property="id" />
+        <result column="spu_id" property="spuId" />
+        <result column="content_schema_version" property="contentSchemaVersion" />
+        <result column="detail_document" property="detailDocument"
+                typeHandler="com.pinova.pojo.typehandler.PostgreSqlJsonbStringTypeHandler" />
+        <result column="packing_list" property="packingList" />
+        <result column="usage_instructions" property="usageInstructions" />
+        <result column="after_sales_note" property="afterSalesNote" />
+        <result column="version" property="version" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, spu_id, content_schema_version, detail_document, packing_list, usage_instructions, after_sales_note, version, created_at, created_by, updated_at, updated_by
+    </sql>
+
+</mapper>

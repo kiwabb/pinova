@@ -1,0 +1,425 @@
+.page {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr;
+  background: var(--catalog-paper);
+  color: var(--catalog-ink);
+}
+
+.skipLink {
+  padding: 10px 14px;
+  position: fixed;
+  left: 16px;
+  top: 12px;
+  z-index: 1000;
+  background: var(--catalog-ink);
+  color: #fff;
+  transform: translateY(-140%);
+}
+
+.skipLink:focus-visible {
+  transform: translateY(0);
+}
+
+.main {
+  width: 100%;
+  padding: 16px;
+  display: grid;
+  place-items: center;
+}
+
+.accountSurface {
+  width: min(100%, 1040px);
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--catalog-radius-surface, 8px);
+  display: grid;
+  background: var(--catalog-surface);
+  box-shadow: var(--catalog-shadow-float, 0 20px 56px rgb(17 19 17 / 13%));
+}
+
+.visual {
+  min-height: 148px;
+  position: relative;
+  overflow: hidden;
+  background: var(--catalog-surface-muted);
+}
+
+.visual img {
+  object-fit: cover;
+  object-position: center 54%;
+}
+
+.panel {
+  min-width: 0;
+  padding: 24px 20px 28px;
+  display: grid;
+  align-items: center;
+}
+
+.formContent,
+.memberPanel {
+  width: min(100%, 420px);
+  margin-inline: auto;
+}
+
+.modeTabs {
+  min-height: 52px;
+  padding: 4px;
+  border-radius: var(--catalog-radius-control, 6px);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  background: var(--catalog-surface-muted);
+}
+
+.modeTabs a {
+  min-height: 44px;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  color: var(--catalog-muted);
+  font-size: 14px;
+  font-weight: 720;
+  transition:
+    background var(--motion-fast),
+    color var(--motion-fast),
+    box-shadow var(--motion-fast);
+}
+
+.modeTabs a[aria-current="page"] {
+  background: var(--catalog-surface);
+  box-shadow: 0 3px 10px rgb(17 19 17 / 7%);
+  color: var(--catalog-ink);
+}
+
+.formHeading {
+  margin: 28px 0 24px;
+}
+
+.formHeading > p,
+.memberHeading > p {
+  margin: 0 0 7px;
+  color: var(--catalog-accent-strong);
+  font-size: 12px;
+  font-weight: 760;
+}
+
+.formHeading h1,
+.memberHeading h1 {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 28px;
+  font-weight: 790;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+.formHeading > span {
+  margin-top: 9px;
+  display: block;
+  color: var(--catalog-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.form {
+  display: grid;
+  gap: 16px;
+}
+
+.field {
+  min-width: 0;
+  display: grid;
+  gap: 7px;
+  color: var(--catalog-ink);
+  font-size: 13px;
+  font-weight: 690;
+}
+
+.field > span:first-child {
+  min-height: 20px;
+}
+
+.field i {
+  color: var(--catalog-muted);
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.field input {
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 13px;
+  border: 1px solid transparent;
+  border-radius: var(--catalog-radius-control, 6px);
+  outline: 0;
+  background: var(--catalog-surface-muted);
+  color: var(--catalog-ink);
+  font-size: 16px;
+  font-weight: 500;
+  transition:
+    background var(--motion-fast),
+    box-shadow var(--motion-fast);
+}
+
+.field input:hover {
+  background: color-mix(in srgb, var(--catalog-surface-muted) 72%, #fff);
+}
+
+.field input:focus-visible {
+  border-color: transparent;
+  outline: 0;
+  background: var(--catalog-surface);
+  box-shadow: 0 0 0 3px var(--catalog-focus);
+}
+
+.field input[aria-invalid="true"] {
+  background: color-mix(in srgb, var(--catalog-danger) 7%, #fff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--catalog-danger) 48%, transparent);
+}
+
+.passwordInput {
+  position: relative;
+  display: block;
+}
+
+.passwordInput input {
+  padding-right: 52px;
+}
+
+.passwordInput button {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  position: absolute;
+  right: 2px;
+  top: 2px;
+  border: 0;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  color: var(--catalog-muted);
+}
+
+.passwordInput button:hover {
+  background: rgb(17 19 17 / 5%);
+  color: var(--catalog-ink);
+}
+
+.fieldHelp,
+.fieldError {
+  min-height: 18px;
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1.45;
+}
+
+.fieldHelp {
+  color: var(--catalog-muted);
+}
+
+.fieldError {
+  color: var(--catalog-danger);
+}
+
+.submitError {
+  margin: 0;
+  padding: 11px 12px;
+  border-radius: var(--catalog-radius-control, 6px);
+  background: color-mix(in srgb, var(--catalog-danger) 8%, #fff);
+  color: var(--catalog-danger);
+  font-size: 13px;
+  font-weight: 620;
+  line-height: 1.5;
+}
+
+.primaryButton,
+.logoutButton {
+  min-height: 48px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: var(--catalog-radius-control, 6px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 760;
+  transition:
+    background var(--motion-fast),
+    color var(--motion-fast),
+    opacity var(--motion-fast),
+    transform var(--motion-fast);
+}
+
+.primaryButton {
+  margin-top: 4px;
+  background: var(--catalog-accent);
+  color: #fff;
+}
+
+.primaryButton:hover:not(:disabled) {
+  background: var(--catalog-accent-strong);
+}
+
+.primaryButton:active:not(:disabled),
+.logoutButton:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.primaryButton:disabled,
+.logoutButton:disabled {
+  opacity: 0.5;
+}
+
+.spinner {
+  animation: account-spin 800ms linear infinite;
+}
+
+.sessionLoading {
+  min-height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: var(--catalog-muted);
+  font-size: 14px;
+}
+
+.memberPanel {
+  display: grid;
+  justify-items: start;
+}
+
+.memberAvatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--catalog-accent-soft);
+  color: var(--catalog-accent-strong);
+}
+
+.memberHeading {
+  margin-top: 20px;
+}
+
+.memberActions {
+  width: 100%;
+  margin-block: 28px 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.memberActions a {
+  min-height: 64px;
+  padding: 10px 12px;
+  border-radius: var(--catalog-radius-control, 6px);
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  background: var(--catalog-surface-subtle);
+  transition:
+    background var(--motion-fast),
+    color var(--motion-fast);
+}
+
+.memberActions a:hover {
+  background: var(--catalog-surface-muted);
+  color: var(--catalog-accent-strong);
+}
+
+.memberActions span {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.memberActions strong {
+  font-size: 14px;
+}
+
+.memberActions small {
+  color: var(--catalog-muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.logoutButton {
+  margin-top: 16px;
+  background: transparent;
+  color: var(--catalog-danger);
+}
+
+.logoutButton:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--catalog-danger) 7%, transparent);
+}
+
+@keyframes account-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (min-width: 768px) {
+  .main {
+    padding: 40px 24px;
+  }
+
+  .accountSurface {
+    min-height: 620px;
+    grid-template-columns: minmax(0, 0.94fr) minmax(420px, 1.06fr);
+  }
+
+  .visual {
+    min-height: 620px;
+  }
+
+  .panel {
+    padding: 48px;
+  }
+}
+
+@media (max-width: 420px) {
+  .main {
+    padding: 10px;
+    place-items: start center;
+  }
+
+  .visual {
+    min-height: 124px;
+  }
+
+  .panel {
+    padding: 20px 16px 24px;
+  }
+
+  .formHeading {
+    margin-block: 22px 20px;
+  }
+
+  .formHeading h1,
+  .memberHeading h1 {
+    font-size: 25px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+
+  .modeTabs a,
+  .field input,
+  .primaryButton,
+  .logoutButton,
+  .memberActions a {
+    transition: none;
+  }
+}

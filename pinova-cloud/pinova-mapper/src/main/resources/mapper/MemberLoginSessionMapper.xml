@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.MemberLoginSessionMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.pinova.pojo.entity.MemberLoginSession">
+        <id column="id" property="id" />
+        <result column="member_id" property="memberId" />
+        <result column="token_hash" property="tokenHash" />
+        <result column="expires_at" property="expiresAt" />
+        <result column="last_seen_at" property="lastSeenAt" />
+        <result column="revoked_at" property="revokedAt" />
+        <result column="client_ip" property="clientIp" />
+        <result column="user_agent" property="userAgent" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, member_id, token_hash, expires_at, last_seen_at, revoked_at, client_ip, user_agent, created_at, created_by, updated_at, updated_by
+    </sql>
+
+    <select id="selectActiveByTokenHash" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM pinova.member_login_session
+        WHERE token_hash = #{tokenHash}
+          AND revoked_at IS NULL
+          AND expires_at &gt; #{now}
+        LIMIT 1
+    </select>
+
+    <update id="touchLastSeen">
+        UPDATE pinova.member_login_session
+        SET last_seen_at = #{now},
+            updated_at = #{now},
+            updated_by = member_id
+        WHERE token_hash = #{tokenHash}
+          AND revoked_at IS NULL
+          AND expires_at &gt; #{now}
+          AND last_seen_at &lt;= #{staleBefore}
+    </update>
+
+    <update id="revokeByTokenHash">
+        UPDATE pinova.member_login_session
+        SET revoked_at = #{now},
+            updated_at = #{now},
+            updated_by = member_id
+        WHERE token_hash = #{tokenHash}
+          AND revoked_at IS NULL
+    </update>
+
+</mapper>

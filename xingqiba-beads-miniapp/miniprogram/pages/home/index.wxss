@@ -1,0 +1,30 @@
+.home-page { padding-top: 46rpx; }
+.hero { min-height: 489rpx; padding: 38rpx; display: grid; grid-template-columns: minmax(0, .72fr) minmax(0, 1.28fr); align-items: center; gap: 23rpx; overflow: hidden; }
+.hero-copy { min-width: 0; display: flex; flex-direction: column; align-items: flex-start; transform: translateY(15rpx); }
+.hero-title { font-size: 42rpx; font-weight: 500; line-height: 1.2; white-space: nowrap; }
+.hero-desc { margin-top: 38rpx; color: #858189; font-size: 25rpx; font-weight: 400; line-height: 1.4; white-space: pre-line; }
+.hero-button { flex: none; width: 205rpx !important; min-width: 0 !important; max-width: 100%; height: 81rpx; margin: 54rpx 0 0; padding: 0 15rpx; display: flex; align-items: center; justify-content: center; gap: 10rpx; border: 1rpx solid #c42d5d; border-radius: 40rpx; background: #c42d5d; color: #fff; font-size: 27rpx; font-weight: 400; line-height: 1; white-space: nowrap; }
+.hero-button image { width: 35rpx; height: 35rpx; }.hero-button-pressed { background: #ad244f; }
+.hero-media { min-width: 0; height: 377rpx; position: relative; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; }
+.hero-media > image { min-width: 0; width: 100%; height: 100%; }
+.hero-media > image:first-child { border-radius: 15rpx 0 0 15rpx; }.hero-media > image:nth-child(2) { border-radius: 0 15rpx 15rpx 0; }
+.media-arrow { position: absolute; left: 50%; top: 50%; width: 77rpx; height: 77rpx; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #fff; color: #c42d5d; font-size: 38rpx; transform: translate(-50%, -50%); box-shadow: 0 15rpx 58rpx rgba(0, 0, 0, .08); }
+.media-arrow image { width: 35rpx; height: 35rpx; }
+.shortcuts { margin-top: 40rpx; display: flex; gap: 16rpx; }
+.shortcut { flex: 1 1 0; width: 0; min-width: 0 !important; min-height: 240rpx; padding: 23rpx 8rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 19rpx; border-radius: 23rpx; background: #fff; color: #1f1e25; text-align: center; overflow: hidden; }
+.shortcut-icon { width: 81rpx; height: 81rpx; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #fceff4; }
+.shortcut-icon image { width: 42rpx; height: 42rpx; }.shortcut view:last-child { min-width: 0; }
+.shortcut text, .shortcut small { display: block; white-space: nowrap; }.shortcut text { font-size: 27rpx; font-weight: 400; line-height: 1.2; }.shortcut small { margin-top: 9rpx; color: #918e95; font-size: 21rpx; font-weight: 400; line-height: 1.4; }
+.featured-section { margin-top: 48rpx; }.section-action image { width: 31rpx; height: 31rpx; }
+.featured-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16rpx; }
+.featured-card { min-width: 0; overflow: hidden; border-radius: 19rpx; }
+.featured-image { width: 100%; height: 231rpx; border-radius: 19rpx 19rpx 0 0; }
+.featured-meta { padding: 23rpx 15rpx; }.featured-meta > text { display: block; overflow: hidden; font-size: 25rpx; font-weight: 400; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+.featured-meta small { margin-top: 8rpx; display: block; overflow: hidden; color: #918e95; font-size: 21rpx; font-weight: 400; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+.featured-state { min-height: 180rpx; padding: 32rpx; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20rpx; color: #858189; font-size: 24rpx; text-align: center; }
+.featured-state button { min-width: 144rpx !important; min-height: 72rpx; padding: 0 24rpx; border: 1rpx solid #eceef1; border-radius: 24rpx; background: #fff; color: #c42d5d; font-size: 23rpx; }
+.featured-skeleton { min-height: 326rpx; padding: 0 15rpx 22rpx; pointer-events: none; }
+.featured-skeleton view { width: calc(100% + 30rpx); height: 231rpx; margin-left: -15rpx; border-radius: 19rpx 19rpx 0 0; background: #f0f1f3; }
+.featured-skeleton text, .featured-skeleton small { display: block; border-radius: 8rpx; background: #f0f1f3; }
+.featured-skeleton text { width: 76%; height: 24rpx; margin-top: 22rpx; }.featured-skeleton small { width: 54%; height: 18rpx; margin-top: 12rpx; }
+.card-pressed { opacity: .72; }

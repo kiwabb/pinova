@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.TradeOrderItemMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.pinova.pojo.entity.TradeOrderItem">
+        <id column="id" property="id" />
+        <result column="order_id" property="orderId" />
+        <result column="source_cart_item_id" property="sourceCartItemId" />
+        <result column="spu_id" property="spuId" />
+        <result column="sku_id" property="skuId" />
+        <result column="product_type_snapshot" property="productTypeSnapshot" />
+        <result column="product_name_snapshot" property="productNameSnapshot" />
+        <result column="sku_code_snapshot" property="skuCodeSnapshot" />
+        <result column="sku_spec_snapshot" property="skuSpecSnapshot" />
+        <result column="main_image_key_snapshot" property="mainImageKeySnapshot" />
+        <result column="unit_price_fen" property="unitPriceFen" />
+        <result column="quantity" property="quantity" />
+        <result column="line_amount_fen" property="lineAmountFen" />
+        <result column="discount_amount_fen" property="discountAmountFen" />
+        <result column="payable_amount_fen" property="payableAmountFen" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, order_id, source_cart_item_id, spu_id, sku_id, product_type_snapshot, product_name_snapshot, sku_code_snapshot, sku_spec_snapshot, main_image_key_snapshot, unit_price_fen, quantity, line_amount_fen, discount_amount_fen, payable_amount_fen, created_at, created_by, updated_at, updated_by
+    </sql>
+
+</mapper>

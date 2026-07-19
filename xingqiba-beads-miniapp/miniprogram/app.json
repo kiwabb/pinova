@@ -1,0 +1,41 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/gallery/index",
+    "pages/store/index",
+    "pages/profile/index",
+    "pages/member/index",
+    "pages/collection/index",
+    "pages/editor/index",
+    "pages/records/index",
+    "pages/tutorial/index"
+  ],
+  "window": {
+    "backgroundColor": "#F9FAFC",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#F9FAFC",
+    "navigationBarTitleText": "星期八",
+    "navigationBarTextStyle": "black"
+  },
+  "permission": {
+    "scope.writePhotosAlbum": {
+      "desc": "用于将生成的拼豆图纸保存到你的相册"
+    }
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#858189",
+    "selectedColor": "#C42D5D",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/home/index", "text": "首页" },
+      { "pagePath": "pages/gallery/index", "text": "图集" },
+      { "pagePath": "pages/store/index", "text": "门店" },
+      { "pagePath": "pages/profile/index", "text": "我的" }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

@@ -1,0 +1,32 @@
+<view class="page records-page">
+  <view class="records-head"><text>{{title}}</text><small wx:if="{{!loading && !error}}">已加载 {{items.length}}{{total ? ' / ' + total : ''}} 条</small></view>
+  <view wx:if="{{loading}}" class="record-state card">正在加载</view>
+  <view wx:elif="{{error}}" class="record-state error-state"><text>{{error}}</text><button bindtap="loadRecords">重试</button></view>
+  <view wx:elif="{{!items.length}}" class="record-state card">
+    <text>{{hasMore ? '当前已加载记录暂无可展示内容' : emptyText}}</text>
+    <button wx:if="{{hasMore}}" disabled="{{loadingMore}}" bindtap="loadMore">{{loadingMore ? '正在加载' : '继续加载'}}</button>
+    <button wx:elif="{{mode === 'works'}}" bindtap="goCreate">开始创作</button>
+    <button wx:elif="{{mode === 'favorites'}}" bindtap="goGallery">浏览图集</button>
+    <button wx:else bindtap="goStore">去门店看看</button>
+  </view>
+  <view wx:else class="record-list">
+    <view wx:for="{{items}}" wx:key="id" class="record-card card" data-id="{{item.id}}" bindtap="openItem" hover-class="record-pressed">
+      <image wx:if="{{mode === 'works'}}" class="record-image" src="{{item.previewUrl || item.previewFileId}}" mode="aspectFill" aria-label="{{item.title || '作品预览'}}" />
+      <image wx:elif="{{mode === 'favorites' && item.available}}" class="record-image" src="{{item.imageUrl || item.image}}" mode="aspectFill" aria-label="{{item.title || '收藏图纸'}}" />
+      <view wx:elif="{{mode === 'favorites'}}" class="record-image unavailable-image" aria-label="{{item.unavailableReason || '收藏暂时不可用'}}">
+        <image src="/assets/icons/muted/heart.svg" mode="aspectFit" />
+      </view>
+      <view wx:else class="booking-date"><b>{{item.date}}</b><small>{{item.timeSlot}}</small></view>
+      <view class="record-copy">
+        <text wx:if="{{mode !== 'bookings'}}">{{item.title}}</text>
+        <text wx:else>{{item.experienceType}}</text>
+        <small wx:if="{{mode === 'works'}}">{{item.gridSize ? item.gridSize + '×' + item.gridSize + (item.colorCount ? ' · ' + item.colorCount + ' 种颜色' : '') : (item.updatedAtText ? item.updatedAtText + ' 更新' : '云端作品')}}</small>
+        <small wx:elif="{{mode === 'favorites'}}" class="{{item.available ? '' : 'unavailable-reason'}}">{{item.available ? item.collectionTitle : item.unavailableReason}}</small>
+        <small wx:else>{{item.status === 'confirmed' ? '已确认' : item.status === 'cancelled' ? '已取消' : '待确认'}}</small>
+      </view>
+      <button wx:if="{{mode !== 'bookings' || (item.status !== 'cancelled' && item.cancellable)}}" class="remove-button" data-id="{{item.id}}" disabled="{{busyIds[item.id]}}" catchtap="removeItem">{{mode === 'works' ? '删除' : mode === 'bookings' ? '取消' : '取消收藏'}}</button>
+    </view>
+  </view>
+  <button wx:if="{{items.length && hasMore}}" class="load-more" disabled="{{loadingMore}}" bindtap="loadMore">{{loadingMore ? '正在加载' : '加载更多'}}</button>
+  <view wx:elif="{{items.length && !hasMore}}" class="records-end">已显示全部记录</view>
+</view>

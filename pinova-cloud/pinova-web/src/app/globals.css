@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+:root {
+  --catalog-paper: #f4f6f3;
+  --catalog-surface: #ffffff;
+  --catalog-surface-subtle: #fafbf9;
+  --catalog-surface-muted: #ebefeb;
+  --catalog-ink: #111311;
+  --catalog-muted: #626761;
+  --catalog-rule: #e1e5e1;
+  --catalog-rule-strong: #c7cdc7;
+  --catalog-accent: #c72c59;
+  --catalog-accent-strong: #9f1744;
+  --catalog-accent-soft: #f7e5eb;
+  --catalog-emerald: #0c715f;
+  --catalog-emerald-strong: #075347;
+  --catalog-marigold: #efbc35;
+  --catalog-blue: #2f63b7;
+  --catalog-violet: #7a59a5;
+  --catalog-coral: #df654a;
+  --catalog-warning: #985f00;
+  --catalog-danger: #b42318;
+  --catalog-focus: #126fbd;
+  --catalog-content-max: 1344px;
+  --catalog-radius-control: 6px;
+  --catalog-radius-surface: 8px;
+  --catalog-shadow-subtle: 0 8px 28px rgb(17 19 17 / 5%);
+  --catalog-shadow-card: 0 4px 16px rgb(17 19 17 / 6%);
+  --catalog-shadow-soft: 0 12px 36px rgb(17 19 17 / 7%);
+  --catalog-shadow-float: 0 20px 56px rgb(17 19 17 / 13%);
+  --brand: var(--catalog-accent);
+  --brand-strong: var(--catalog-accent-strong);
+  --brand-soft: var(--catalog-accent-soft);
+  --accent: var(--catalog-emerald);
+  --accent-strong: var(--catalog-emerald-strong);
+  --ink: var(--catalog-ink);
+  --muted: var(--catalog-muted);
+  --line: var(--catalog-rule);
+  --surface: var(--catalog-surface);
+  --surface-alt: var(--catalog-surface-muted);
+  --background: var(--catalog-paper);
+  --warning: var(--catalog-warning);
+  --danger: var(--catalog-danger);
+  --focus: var(--catalog-focus);
+  --motion-duration-fast: 160ms;
+  --motion-duration-surface: 240ms;
+  --motion-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --motion-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-fast: var(--motion-duration-fast) var(--motion-ease-standard);
+  --motion-enter: var(--motion-duration-surface) var(--motion-ease-out);
+  --font-system: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI",
+    "PingFang SC", "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  --font-mono: "SFMono-Regular", "Roboto Mono", "Cascadia Code", Consolas,
+    monospace;
+}
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-accent: var(--accent);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-surface: var(--surface);
+  --color-background: var(--background);
+  --font-sans: var(--font-system);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  min-width: 320px;
+  scroll-behavior: smooth;
+  background: var(--background);
+}
+
+body {
+  min-width: 320px;
+  min-height: 100dvh;
+  margin: 0;
+  overflow-x: hidden;
+  background: var(--catalog-paper);
+  color: var(--catalog-ink);
+  font-family: var(--font-system);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  letter-spacing: 0;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--catalog-focus);
+  outline-offset: 2px;
+}
+
+::selection {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

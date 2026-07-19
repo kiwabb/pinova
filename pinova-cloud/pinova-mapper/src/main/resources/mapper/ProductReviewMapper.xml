@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.ProductReviewMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.pinova.pojo.entity.ProductReview">
+        <id column="id" property="id" />
+        <result column="shop_id" property="shopId" />
+        <result column="member_id" property="memberId" />
+        <result column="order_id" property="orderId" />
+        <result column="order_item_id" property="orderItemId" />
+        <result column="sku_id" property="skuId" />
+        <result column="product_name_snapshot" property="productNameSnapshot" />
+        <result column="sku_spec_snapshot" property="skuSpecSnapshot" />
+        <result column="rating" property="rating" />
+        <result column="content" property="content" />
+        <result column="anonymous" property="anonymous" />
+        <result column="status" property="status" />
+        <result column="moderation_reason" property="moderationReason" />
+        <result column="moderated_at" property="moderatedAt" />
+        <result column="moderated_by" property="moderatedBy" />
+        <result column="published_at" property="publishedAt" />
+        <result column="version" property="version" />
+        <result column="deleted" property="deleted" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="deleted_by" property="deletedBy" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, shop_id, member_id, order_id, order_item_id, sku_id, product_name_snapshot, sku_spec_snapshot, rating, content, anonymous, status, moderation_reason, moderated_at, moderated_by, published_at, version, deleted, deleted_at, deleted_by, created_at, created_by, updated_at, updated_by
+    </sql>
+
+</mapper>

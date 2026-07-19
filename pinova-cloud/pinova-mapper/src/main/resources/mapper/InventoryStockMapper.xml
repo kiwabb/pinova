@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.InventoryStockMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.pinova.pojo.entity.InventoryStock">
+        <id column="id" property="id" />
+        <result column="warehouse_id" property="warehouseId" />
+        <result column="sku_id" property="skuId" />
+        <result column="on_hand_quantity" property="onHandQuantity" />
+        <result column="reserved_quantity" property="reservedQuantity" />
+        <result column="version" property="version" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, warehouse_id, sku_id, on_hand_quantity, reserved_quantity, version, created_at, created_by, updated_at, updated_by
+    </sql>
+
+</mapper>

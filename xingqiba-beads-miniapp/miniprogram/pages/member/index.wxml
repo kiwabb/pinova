@@ -1,0 +1,53 @@
+<view class="page member-page">
+  <view wx:if="{{loading}}" class="member-state card">正在加载会员信息</view>
+  <view wx:elif="{{loadError}}" class="member-state error-state"><text>{{loadError}}</text><button bindtap="loadMember">重试</button></view>
+  <block wx:else>
+  <view class="member-hero">
+    <view class="hero-top">
+      <view>
+        <text class="eyebrow">星期八会员</text>
+        <view class="level-line"><text>{{currentCode}}</text><small>{{currentTitle}}</small></view>
+      </view>
+      <view class="points"><b>{{growth}}</b><small>成长值</small></view>
+    </view>
+    <view class="progress-track"><view style="width: {{progress}}%;"></view></view>
+    <view class="progress-copy">
+      <text wx:if="{{!bound}}">绑定手机号后开启会员成长</text>
+      <text wx:elif="{{remaining > 0}}">再获得 {{remaining}} 成长值升级 {{nextCode}}</text>
+      <text wx:else>已解锁全部会员等级</text>
+      <text>{{progress}}%</text>
+    </view>
+  </view>
+
+  <view class="section-head compact-head">
+    <text class="section-title">会员等级</text>
+    <text class="section-note">V1–V4</text>
+  </view>
+  <view class="tier-row">
+    <button wx:for="{{tiers}}" wx:key="code" class="tier-item {{selectedIndex === index ? 'selected' : ''}}" data-index="{{index}}" bindtap="selectTier" hover-class="tier-pressed">
+      <text>{{item.code}}</text>
+      <small>{{item.title}}</small>
+      <i>{{item.status}}</i>
+    </button>
+  </view>
+
+  <view wx:if="{{selectedTier}}" class="benefit-card card">
+    <view class="benefit-head">
+      <view><text>{{selectedTier.code}} {{selectedTier.title}}</text><small>{{selectedTier.description}}</small></view>
+      <text class="status-tag">{{selectedTier.status}}</text>
+    </view>
+    <view class="benefit-list">
+      <view wx:for="{{selectedTier.benefits}}" wx:key="*this"><text class="check">✓</text><text>{{item}}</text></view>
+    </view>
+  </view>
+
+  <view class="rule-card">
+    <text>成长说明</text>
+    <view class="rule-line"><i></i><small>{{bindRewardText}}</small></view>
+    <view class="rule-line"><i></i><small>{{workRewardText}}</small></view>
+    <small class="rule-note">{{configStatus === 'draft' ? '当前规则为内测配置，正式发布前可调整。' : '等级、积分与权益以当前发布配置为准。'}}</small>
+  </view>
+
+  <button wx:if="{{!bound}}" class="primary-button bind-action" bindtap="goBind" hover-class="button-hover">绑定手机号，开启 V1 会员</button>
+  </block>
+</view>

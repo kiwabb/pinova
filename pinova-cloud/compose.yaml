@@ -1,0 +1,64 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: pinova-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${PINOVA_DB_NAME:-pinova}
+      POSTGRES_USER: ${PINOVA_DB_USERNAME:-pinova}
+      POSTGRES_PASSWORD: ${PINOVA_DB_PASSWORD:?PINOVA_DB_PASSWORD is required}
+    ports:
+      - "127.0.0.1:${PINOVA_DB_PORT:-15432}:5432"
+    volumes:
+      - pinova-postgres-data:/var/lib/postgresql/data
+      - ./database/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  minio:
+    image: pinova/minio:2025-09-07
+    build:
+      context: ./infra/minio
+      pull: false
+    container_name: pinova-minio
+    restart: unless-stopped
+    entrypoint: ["minio"]
+    command: ["server", "/data", "--console-address", ":9001"]
+    environment:
+      MINIO_ROOT_USER: ${PINOVA_MINIO_ROOT_USER:-pinova}
+      MINIO_ROOT_PASSWORD: ${PINOVA_MINIO_ROOT_PASSWORD:?PINOVA_MINIO_ROOT_PASSWORD is required}
+      PINOVA_MINIO_BUCKET: ${PINOVA_MINIO_BUCKET:-pinova-public}
+    ports:
+      - "127.0.0.1:${PINOVA_MINIO_API_PORT:-19000}:9000"
+      - "127.0.0.1:${PINOVA_MINIO_CONSOLE_PORT:-19001}:9001"
+    volumes:
+      - pinova-minio-data:/data
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  minio-init:
+    image: pinova/minio:2025-09-07
+    depends_on:
+      minio:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    environment:
+      MINIO_ROOT_USER: ${PINOVA_MINIO_ROOT_USER:-pinova}
+      MINIO_ROOT_PASSWORD: ${PINOVA_MINIO_ROOT_PASSWORD:?PINOVA_MINIO_ROOT_PASSWORD is required}
+      MINIO_BUCKET: ${PINOVA_MINIO_BUCKET:-pinova-public}
+    command:
+      - |
+        mc alias set local http://minio:9000 "$${MINIO_ROOT_USER}" "$${MINIO_ROOT_PASSWORD}"
+        mc mb --ignore-existing "local/$${MINIO_BUCKET}"
+        mc anonymous set download "local/$${MINIO_BUCKET}"
+
+volumes:
+  pinova-postgres-data:
+  pinova-minio-data:

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.AdminPermissionMapper">
+    <select id="selectCodesByAccountId" resultType="string">
+        SELECT DISTINCT permission.permission_code
+        FROM pinova.admin_account_role account_role
+        JOIN pinova.admin_role role
+          ON role.id = account_role.role_id AND role.deleted = false
+        JOIN pinova.admin_role_permission role_permission
+          ON role_permission.role_id = role.id
+        JOIN pinova.admin_permission permission
+          ON permission.id = role_permission.permission_id AND permission.deleted = false
+        WHERE account_role.account_id = #{accountId}
+        ORDER BY permission.permission_code
+    </select>
+</mapper>
+

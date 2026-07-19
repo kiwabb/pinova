@@ -1,0 +1,16 @@
+<view class="page tutorial-page">
+  <view class="tutorial-head"><text>{{title}}</text><small>{{subtitle}}</small></view>
+  <view wx:if="{{loading}}" class="tutorial-state"><text>正在加载教程</text></view>
+  <view wx:elif="{{loadError}}" class="tutorial-state error"><text>{{loadError}}</text><button bindtap="retry">重新加载</button></view>
+  <view wx:else class="guide-list">
+    <view wx:for="{{sections}}" wx:key="id" class="guide card {{activeId === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="selectSection">
+      <image src="{{item.image}}" mode="aspectFill" />
+      <view class="guide-head"><view><text>{{index + 1}}. {{item.title}}</text><small>{{item.duration}}</small></view><text class="guide-toggle">{{activeId === item.id ? '收起' : '展开'}}</text></view>
+      <view wx:if="{{activeId === item.id}}" class="steps">
+        <view wx:for="{{item.steps}}" wx:for-item="step" wx:key="*this"><b>{{index + 1}}</b><text>{{step}}</text></view>
+      </view>
+    </view>
+  </view>
+  <view wx:if="{{!loading && !loadError}}" class="safety-note"><text>安全提醒</text><small>{{safetyNote}}</small></view>
+  <button wx:if="{{!loading && !loadError}}" class="primary-button" bindtap="startCreating" hover-class="button-hover">开始空白创作</button>
+</view>

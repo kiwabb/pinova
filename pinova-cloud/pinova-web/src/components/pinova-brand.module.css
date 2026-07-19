@@ -1,0 +1,72 @@
+.brand {
+  min-width: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #111311;
+}
+
+.mark {
+  width: 31px;
+  height: 34px;
+  flex: 0 0 auto;
+  overflow: visible;
+}
+
+.nova {
+  color: #c72c59;
+}
+
+.type {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.type strong {
+  font-size: 19px;
+  font-weight: 820;
+  line-height: 0.9;
+}
+
+.type small {
+  overflow: hidden;
+  color: #626761;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.light {
+  color: #f7f9f5;
+}
+
+.light .type small {
+  color: #aeb6ae;
+}
+
+.light .nova {
+  color: #efbc35;
+}
+
+@media (max-width: 479px) {
+  .brand {
+    gap: 7px;
+  }
+
+  .mark {
+    width: 28px;
+    height: 31px;
+  }
+
+  .type strong {
+    font-size: 18px;
+  }
+
+  .type small {
+    display: none;
+  }
+}

@@ -1,0 +1,22 @@
+<view class="page profile-page">
+  <view class="profile-head card">
+    <view class="avatar"><image src="/assets/icons/primary/user-round.svg" /></view>
+    <view class="identity"><text>微信用户</text><small>{{bound ? maskedPhone : '手机号未绑定'}}</small></view>
+    <button wx:if="{{bound}}" open-type="getPhoneNumber" bindgetphonenumber="bindPhone" loading="{{binding}}" disabled="{{binding}}">{{binding ? '更新中' : '更换'}}</button>
+    <button wx:else open-type="getPhoneNumber" bindgetphonenumber="bindPhone" loading="{{binding}}" disabled="{{binding}}">{{binding ? '绑定中' : '去绑定'}}</button>
+  </view>
+  <view wx:if="{{loadError}}" class="load-error"><text>{{loadError}}</text><button bindtap="loadProfile">重试</button></view>
+  <view class="member-strip" bindtap="openMember" hover-class="member-strip-pressed">
+    <view><text>星期八会员</text><small>{{bound ? memberLevel + ' 会员' : '查看 V1–V4 会员体系'}}</small></view>
+    <view class="member-summary"><text>{{points}} 积分</text><image src="/assets/icons/text/chevron-right.svg" /></view>
+  </view>
+  <view class="metrics card"><view><b>{{favorites}}</b><text>收藏</text></view><view><b>{{works}}</b><text>作品</text></view><view><b>{{bookings}}</b><text>预约</text></view></view>
+  <view class="menu card">
+    <button bindtap="openBookings"><text>我的预约</text><image src="/assets/icons/text/chevron-right.svg" /></button>
+    <button bindtap="openWorks"><text>我的作品</text><image src="/assets/icons/text/chevron-right.svg" /></button>
+    <button bindtap="openFavorites"><text>我的收藏</text><image src="/assets/icons/text/chevron-right.svg" /></button>
+    <button bindtap="openMember"><text>会员权益</text><image src="/assets/icons/text/chevron-right.svg" /></button>
+    <button bindtap="openStore"><text>联系门店</text><image src="/assets/icons/text/chevron-right.svg" /></button>
+  </view>
+  <button wx:if="{{!bound}}" class="primary-button bind-button" open-type="getPhoneNumber" bindgetphonenumber="bindPhone" loading="{{binding}}" disabled="{{binding}}" hover-class="button-hover">绑定手机号，开启会员服务</button>
+</view>

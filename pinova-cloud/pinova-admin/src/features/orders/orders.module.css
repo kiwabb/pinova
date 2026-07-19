@@ -1,0 +1,68 @@
+.orderWorkspace,
+.orderDetail {
+  min-width: 0;
+}
+
+.filterBar {
+  display: grid;
+  grid-template-columns: minmax(180px, 1.2fr) minmax(140px, 0.8fr) minmax(190px, 1fr) minmax(190px, 1fr) auto;
+  gap: 12px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.filterBar :global(.ant-form-item) {
+  margin-bottom: 0;
+}
+
+.filterActions {
+  min-width: 160px;
+}
+
+.queryError {
+  margin-bottom: 16px;
+}
+
+.numericCell {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.orderDetail {
+  display: grid;
+  gap: 30px;
+}
+
+.orderDetail > section {
+  min-width: 0;
+}
+
+.orderDetail h2:global(.ant-typography) {
+  margin: 0 0 12px;
+  font-size: 17px;
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  min-height: 44px;
+  font-weight: 600;
+}
+
+@media (max-width: 1199px) {
+  .filterBar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 575px) {
+  .filterBar {
+    grid-template-columns: 1fr;
+  }
+
+  .filterActions {
+    min-width: 0;
+  }
+}

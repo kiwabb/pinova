@@ -1,0 +1,36 @@
+<view class="page gallery-page">
+  <view class="search card">
+    <image src="/assets/icons/muted/search.svg" />
+    <input aria-label="搜索图集" placeholder="搜索图集或系列" confirm-type="search" bindinput="search" />
+  </view>
+  <scroll-view class="level-filters" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="level-row">
+      <button wx:for="{{memberLevels}}" wx:key="*this" class="level-chip {{activeLevel === item ? 'active' : ''}}" data-value="{{item}}" bindtap="selectLevel">{{item}}</button>
+    </view>
+  </scroll-view>
+  <scroll-view class="filters" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="filter-row">
+      <button wx:for="{{categories}}" wx:key="*this" class="chip {{active === item ? 'active' : ''}}" data-value="{{item}}" bindtap="selectCategory">{{item}}</button>
+    </view>
+  </scroll-view>
+  <view wx:if="{{loading}}" class="empty card">正在加载图集</view>
+  <view wx:elif="{{loadError}}" class="empty error-state card"><text>{{loadError}}</text><button bindtap="loadCollections">重试</button></view>
+  <view wx:elif="{{list.length}}" class="collection-grid">
+    <button wx:for="{{list}}" wx:key="id" class="collection card" data-id="{{item.id}}" bindtap="openCollection" hover-class="collection-pressed">
+      <view class="cover" style="background: {{item.background}}">
+        <view wx:for="{{item.images}}" wx:for-item="image" wx:key="*this" class="cover-cell"><image src="{{image}}" mode="aspectFill" /></view>
+        <text wx:if="{{item.level !== '公开'}}" class="level-badge">{{item.level}}</text>
+      </view>
+      <view class="collection-info">
+        <view class="collection-copy">
+          <view class="title-line"><text>{{item.title}}</text></view>
+          <small>{{item.description}} · {{item.count}} 张</small>
+        </view>
+        <image class="chevron" src="/assets/icons/text/chevron-right.svg" />
+      </view>
+    </button>
+  </view>
+  <view wx:else class="empty card">没有找到图集</view>
+  <button wx:if="{{allCollections.length && hasMore}}" class="load-more" disabled="{{loadingMore}}" bindtap="loadMore">{{loadingMore ? '正在加载' : '加载更多图集'}}</button>
+  <view wx:elif="{{allCollections.length && !hasMore}}" class="list-end">已加载全部 {{total}} 个图集</view>
+</view>

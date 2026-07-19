@@ -1,0 +1,26 @@
+# Dependencies and generated packages
+node_modules/
+miniprogram_npm/
+
+# Build and test output
+dist/
+coverage/
+*.tsbuildinfo
+*.log
+
+# Local tool state
+.DS_Store
+.cache/
+.tmp/
+.cloudbase/
+project.private.config.json
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt

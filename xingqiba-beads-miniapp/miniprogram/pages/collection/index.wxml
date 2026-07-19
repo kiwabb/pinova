@@ -1,0 +1,29 @@
+<view class="page detail-page">
+  <view wx:if="{{loading}}" class="detail-state card">正在加载系列</view>
+  <view wx:elif="{{loadError}}" class="detail-state error-state card"><text>{{loadError}}</text><button bindtap="retry">重试</button></view>
+  <block wx:elif="{{collection}}">
+  <view class="summary card">
+    <view class="summary-copy">
+      <view class="summary-title"><text>{{collection.title}}</text></view>
+      <text class="summary-desc">{{collection.description}}</text>
+    </view>
+    <view class="total">{{collection.count}}<small>张</small></view>
+  </view>
+  <view class="toolbar">
+    <text>{{!sortApplied ? '按推荐顺序' : sortAscending ? '按名称升序' : '按名称降序'}}</text>
+    <button bindtap="sort"><image src="/assets/icons/primary/arrow-down-wide-narrow.svg" /><text>切换</text></button>
+  </view>
+  <view class="pattern-grid">
+    <view wx:for="{{items}}" wx:key="id" class="pattern card" data-index="{{index}}" bindtap="openPattern" hover-class="pattern-pressed">
+      <view class="pattern-media">
+        <image class="pattern-art" src="{{item.image}}" mode="aspectFill" />
+        <text wx:if="{{item.level !== '公开'}}" class="pattern-level">{{item.level}}</text>
+        <button class="favorite-button {{favoriteIds[item.id] ? 'active' : ''}}" aria-label="{{favoriteIds[item.id] ? '取消收藏' : '收藏图纸'}}" disabled="{{favoriteBusyIds[item.id]}}" data-index="{{index}}" catchtap="toggleFavorite">
+          <image src="{{favoriteIds[item.id] ? '/assets/icons/primary/heart.svg' : '/assets/icons/muted/heart.svg'}}" />
+        </button>
+      </view>
+      <text>{{item.name}}</text>
+    </view>
+  </view>
+  </block>
+</view>

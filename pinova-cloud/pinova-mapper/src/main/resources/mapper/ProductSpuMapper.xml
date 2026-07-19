@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.ProductSpuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.pinova.pojo.entity.ProductSpu">
+        <id column="id" property="id" />
+        <result column="shop_id" property="shopId" />
+        <result column="category_id" property="categoryId" />
+        <result column="spu_code" property="spuCode" />
+        <result column="name" property="name" />
+        <result column="summary" property="summary" />
+        <result column="product_type" property="productType" />
+        <result column="main_image_key" property="mainImageKey" />
+        <result column="status" property="status" />
+        <result column="sort_order" property="sortOrder" />
+        <result column="published_at" property="publishedAt" />
+        <result column="off_shelf_at" property="offShelfAt" />
+        <result column="version" property="version" />
+        <result column="deleted" property="deleted" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="deleted_by" property="deletedBy" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, shop_id, category_id, spu_code, name, summary, product_type, main_image_key, status, sort_order, published_at, off_shelf_at, version, deleted, deleted_at, deleted_by, created_at, created_by, updated_at, updated_by
+    </sql>
+
+    <sql id="Published_Product_Where">
+        status = 2
+        AND deleted = false
+        <if test="categoryIds != null">
+            AND category_id IN
+            <foreach collection="categoryIds" item="categoryId" open="(" separator="," close=")">
+                #{categoryId}
+            </foreach>
+        </if>
+    </sql>
+
+    <select id="selectPublishedProducts" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM pinova.product_spu
+        WHERE <include refid="Published_Product_Where" />
+        ORDER BY sort_order ASC, id ASC
+        LIMIT #{limit} OFFSET #{offset}
+    </select>
+
+    <select id="countPublishedProducts" resultType="long">
+        SELECT count(*)
+        FROM pinova.product_spu
+        WHERE <include refid="Published_Product_Where" />
+    </select>
+
+</mapper>

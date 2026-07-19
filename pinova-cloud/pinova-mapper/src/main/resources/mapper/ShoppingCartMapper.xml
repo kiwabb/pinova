@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.ShoppingCartMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.pinova.pojo.entity.ShoppingCart">
+        <id column="id" property="id" />
+        <result column="member_id" property="memberId" />
+        <result column="guest_token_hash" property="guestTokenHash" />
+        <result column="status" property="status" />
+        <result column="merged_into_cart_id" property="mergedIntoCartId" />
+        <result column="expires_at" property="expiresAt" />
+        <result column="last_activity_at" property="lastActivityAt" />
+        <result column="closed_at" property="closedAt" />
+        <result column="version" property="version" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, member_id, guest_token_hash, status, merged_into_cart_id, expires_at, last_activity_at, closed_at, version, created_at, created_by, updated_at, updated_by
+    </sql>
+
+</mapper>

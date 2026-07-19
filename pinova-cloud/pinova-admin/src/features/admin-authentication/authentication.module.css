@@ -1,0 +1,57 @@
+.authPage {
+  display: grid;
+  min-height: 100vh;
+  min-height: 100dvh;
+  padding: 24px;
+  place-items: center;
+  background: #f3f5f4;
+}
+
+.authPanel {
+  width: min(100%, 420px);
+  padding: 32px;
+  border: 1px solid #dce1de;
+  border-radius: 8px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(23, 26, 24, 0.08);
+}
+
+.authPanel h1:global(.ant-typography) {
+  margin: 22px 0 24px;
+  font-size: 26px;
+}
+
+.brandLine {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+}
+
+.brandMark {
+  display: inline-grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 6px;
+  background: #c72c59;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.authAlert {
+  margin-bottom: 20px;
+}
+
+@media (max-width: 575px) {
+  .authPage {
+    padding: 12px;
+    place-items: start center;
+  }
+
+  .authPanel {
+    margin-top: 8vh;
+    padding: 24px 20px;
+  }
+}

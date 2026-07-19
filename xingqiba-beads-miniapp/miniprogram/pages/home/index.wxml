@@ -1,0 +1,50 @@
+<view class="page home-page">
+  <view class="hero card">
+    <view class="hero-copy">
+      <text class="hero-title">照片转图纸</text>
+      <text class="hero-desc">上传照片\n自动生成拼豆图纸</text>
+      <button class="hero-button" bindtap="choosePhoto" hover-class="hero-button-pressed">
+        <image src="/assets/icons/white/image.svg" />
+        <text>选择照片</text>
+      </button>
+    </view>
+    <view class="hero-media">
+      <image src="/assets/reference/hero-photo.jpg" mode="aspectFill" />
+      <image src="/assets/reference/hero-beads.jpg" mode="aspectFill" />
+      <view class="media-arrow"><image src="/assets/icons/primary/arrow-right.svg" /></view>
+    </view>
+  </view>
+
+  <view class="shortcuts">
+    <button class="shortcut card" bindtap="openEditor" hover-class="card-pressed">
+      <view class="shortcut-icon"><image src="/assets/icons/primary/pencil.svg" /></view>
+      <view><text>空白创作</text><small>自由设计</small></view>
+    </button>
+    <button class="shortcut card" bindtap="openTutorial" hover-class="card-pressed">
+      <view class="shortcut-icon"><image src="/assets/icons/primary/book-open.svg" /></view>
+      <view><text>新手教程</text><small>从入门到精通</small></view>
+    </button>
+    <button class="shortcut card" bindtap="openStore" hover-class="card-pressed">
+      <view class="shortcut-icon"><image src="/assets/icons/primary/map-pin.svg" /></view>
+      <view><text>到店体验</text><small>查找线下门店</small></view>
+    </button>
+  </view>
+
+  <view class="section featured-section">
+    <view class="section-head">
+      <text class="section-title">精选图集</text>
+      <view class="section-action" bindtap="openGallery"><text>查看更多</text><image src="/assets/icons/muted/chevron-right.svg" /></view>
+    </view>
+    <view wx:if="{{featuredLoading}}" class="featured-grid" aria-label="正在加载精选图集">
+      <view wx:for="{{featuredSkeletons}}" wx:key="*this" class="featured-card featured-skeleton card"><view></view><text></text><small></small></view>
+    </view>
+    <view wx:elif="{{featuredError}}" class="featured-state card"><text>{{featuredError}}</text><button bindtap="loadFeatured">重试</button></view>
+    <view wx:elif="{{featured.length}}" class="featured-grid">
+      <view wx:for="{{featured}}" wx:key="id" class="featured-card card" data-id="{{item.id}}" bindtap="openCollection" hover-class="card-pressed">
+        <image class="featured-image" src="{{item.images[0]}}" mode="aspectFill" />
+        <view class="featured-meta"><text>{{item.title}}</text><small>{{item.meta}}</small></view>
+      </view>
+    </view>
+    <view wx:else class="featured-state card"><text>暂无已发布图集</text><button bindtap="openGallery">浏览图集</button></view>
+  </view>
+</view>

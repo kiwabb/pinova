@@ -1,0 +1,38 @@
+<view class="page store-page">
+  <view class="store-visual card"><image src="{{photos[0] || '/assets/store/studio-wide.jpg'}}" mode="aspectFill" /></view>
+  <view class="store-body">
+    <text class="store-name">{{storeName}}</text>
+    <view class="store-facts">
+      <view><image src="/assets/icons/muted/map-pin.svg" /><text>{{addressText}}</text></view>
+      <view><image src="/assets/icons/muted/clock-3.svg" /><text>{{businessHours}}</text></view>
+    </view>
+    <view class="store-actions"><button bindtap="navigate">导航</button><button bindtap="call">电话</button><button open-type="share">分享</button></view>
+  </view>
+  <view wx:if="{{loadError}}" class="store-error"><text>{{loadError}}</text><button bindtap="loadStore">重试</button></view>
+  <view wx:if="{{booked}}" class="booking-summary"><image src="/assets/icons/green/circle-check.svg" /><view><b>{{bookingStatus === 'confirmed' ? '已确认' : '待门店确认'}} · {{bookingType}}</b><small>{{bookingDate}} · {{bookingTime}}</small></view><button disabled="{{bookingCancelling}}" loading="{{bookingCancelling}}" bindtap="cancelBooking">{{bookingCancelling ? '取消中' : '取消'}}</button></view>
+  <button class="primary-button booking" disabled="{{loading || !bookingEnabled}}" bindtap="book" hover-class="button-hover"><image src="/assets/icons/white/calendar-check.svg" /><text>{{bookingEnabled ? '预约到店' : '暂停线上预约'}}</text></button>
+
+  <view class="gallery-section">
+    <view class="gallery-head"><text>店内实景</text><small>{{photos.length}} 张</small></view>
+    <view class="photo-grid"><image wx:for="{{photos}}" wx:key="*this" src="{{item}}" data-src="{{item}}" bindtap="preview" mode="aspectFill" /></view>
+  </view>
+</view>
+
+<view wx:if="{{showBooking}}" class="modal-layer" bindtap="closeBooking">
+  <view class="sheet" catchtap="noop">
+    <view class="sheet-head"><text>预约到店</text><button aria-label="关闭" bindtap="closeBooking"><image src="/assets/icons/text/x.svg" /></button></view>
+    <view class="field"><text>到店日期</text><picker mode="date" value="{{bookingDate}}" start="{{minDate}}" end="{{maxDate}}" bindchange="changeDate"><view class="picker-value">{{bookingDate}}<text>›</text></view></picker></view>
+    <view class="field"><text>体验类型</text><view class="choice-row"><button wx:for="{{experienceTypes}}" wx:key="*this" class="choice {{bookingType === item ? 'active' : ''}}" data-value="{{item}}" bindtap="selectType">{{item}}</button></view></view>
+    <view class="field"><text>到店时段</text>
+      <view wx:if="{{availabilityLoading}}" class="slot-state">正在查询剩余名额</view>
+      <view wx:elif="{{availabilityError}}" class="slot-state error"><text>{{availabilityError}}</text><button bindtap="retryAvailability">重试</button></view>
+      <view wx:elif="{{availability.length}}" class="slot-grid">
+        <button wx:for="{{availability}}" wx:key="timeSlot" class="slot-choice {{bookingTime === item.timeSlot ? 'active' : ''}}" data-value="{{item.timeSlot}}" disabled="{{item.full}}" bindtap="selectTime"><text>{{item.timeSlot}}</text><small>{{item.full ? '已约满' : '余 ' + item.remaining + ' 位'}}</small></button>
+      </view>
+      <view wx:else class="slot-state">当前日期暂无可预约时段</view>
+    </view>
+    <view wx:if="{{phoneRequired}}" class="inline-phone-bind"><view><text>绑定手机号后继续预约</text><small>仅用于门店确认和到店联系</small></view><button open-type="getPhoneNumber" bindgetphonenumber="bindPhoneAndBook" loading="{{bindingPhone}}" disabled="{{bindingPhone}}">{{bindingPhone ? '绑定中' : '立即绑定'}}</button></view>
+    <text wx:if="{{bookingError}}" class="booking-error">{{bookingError}}</text>
+    <button class="primary-button" disabled="{{bookingSubmitting || availabilityLoading || !bookingTime || phoneRequired}}" loading="{{bookingSubmitting}}" bindtap="confirmBooking">{{phoneRequired ? '请先绑定手机号' : bookingSubmitting ? '正在提交' : '确认预约'}}</button>
+  </view>
+</view>

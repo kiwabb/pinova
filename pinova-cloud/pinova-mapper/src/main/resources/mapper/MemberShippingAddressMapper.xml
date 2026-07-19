@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.MemberShippingAddressMapper">
+
+    <resultMap id="BaseResultMap" type="com.pinova.pojo.entity.MemberShippingAddress">
+        <id column="id" property="id" />
+        <result column="member_id" property="memberId" />
+        <result column="receiver_name" property="receiverName" />
+        <result column="receiver_mobile" property="receiverMobile" />
+        <result column="country_code" property="countryCode" />
+        <result column="province_code" property="provinceCode" />
+        <result column="province_name" property="provinceName" />
+        <result column="city_code" property="cityCode" />
+        <result column="city_name" property="cityName" />
+        <result column="district_code" property="districtCode" />
+        <result column="district_name" property="districtName" />
+        <result column="detail_address" property="detailAddress" />
+        <result column="postal_code" property="postalCode" />
+        <result column="label" property="label" />
+        <result column="is_default" property="defaultAddress" />
+        <result column="version" property="version" />
+        <result column="deleted" property="deleted" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="deleted_by" property="deletedBy" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, member_id, receiver_name, receiver_mobile, country_code,
+        province_code, province_name, city_code, city_name, district_code,
+        district_name, detail_address, postal_code, label, is_default,
+        version, deleted, deleted_at, deleted_by, created_at, created_by,
+        updated_at, updated_by
+    </sql>
+
+    <select id="selectActiveByIdForUpdate" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM pinova.member_shipping_address
+        WHERE id = #{addressId}
+          AND member_id = #{memberId}
+          AND deleted = false
+        FOR UPDATE
+    </select>
+
+    <update id="clearDefaultAddresses">
+        UPDATE pinova.member_shipping_address
+        SET is_default = false,
+            version = version + 1,
+            updated_at = CURRENT_TIMESTAMP,
+            updated_by = #{operatorId}
+        WHERE member_id = #{memberId}
+          AND is_default = true
+          AND deleted = false
+        <if test="excludedAddressId != null">
+          AND id &lt;&gt; #{excludedAddressId}
+        </if>
+    </update>
+
+    <update id="updateActiveAddress" parameterType="com.pinova.pojo.entity.MemberShippingAddress">
+        UPDATE pinova.member_shipping_address
+        SET receiver_name = #{receiverName},
+            receiver_mobile = #{receiverMobile},
+            country_code = #{countryCode},
+            province_code = #{provinceCode},
+            province_name = #{provinceName},
+            city_code = #{cityCode},
+            city_name = #{cityName},
+            district_code = #{districtCode},
+            district_name = #{districtName},
+            detail_address = #{detailAddress},
+            postal_code = #{postalCode},
+            label = #{label},
+            is_default = #{defaultAddress},
+            version = version + 1,
+            updated_at = CURRENT_TIMESTAMP,
+            updated_by = #{updatedBy}
+        WHERE id = #{id}
+          AND member_id = #{memberId}
+          AND version = #{version}
+          AND deleted = false
+    </update>
+
+    <update id="setDefaultActiveAddress">
+        UPDATE pinova.member_shipping_address
+        SET is_default = true,
+            version = version + 1,
+            updated_at = CURRENT_TIMESTAMP,
+            updated_by = #{operatorId}
+        WHERE id = #{addressId}
+          AND member_id = #{memberId}
+          AND version = #{version}
+          AND deleted = false
+    </update>
+
+    <update id="softDeleteActiveAddress">
+        UPDATE pinova.member_shipping_address
+        SET is_default = false,
+            deleted = true,
+            deleted_at = CURRENT_TIMESTAMP,
+            deleted_by = #{operatorId},
+            version = version + 1,
+            updated_at = CURRENT_TIMESTAMP,
+            updated_by = #{operatorId}
+        WHERE id = #{addressId}
+          AND member_id = #{memberId}
+          AND version = #{version}
+          AND deleted = false
+    </update>
+
+    <update id="promoteLatestActiveAddress">
+        UPDATE pinova.member_shipping_address
+        SET is_default = true,
+            version = version + 1,
+            updated_at = CURRENT_TIMESTAMP,
+            updated_by = #{operatorId}
+        WHERE id = (
+            SELECT id
+            FROM pinova.member_shipping_address
+            WHERE member_id = #{memberId}
+              AND deleted = false
+            ORDER BY updated_at DESC, id DESC
+            LIMIT 1
+        )
+    </update>
+
+</mapper>

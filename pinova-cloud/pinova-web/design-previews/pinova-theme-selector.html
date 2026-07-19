@@ -1,0 +1,897 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:," />
+    <title>PINOVA 商城视觉稿</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --canvas: #f5f7f5;
+        --surface: #ffffff;
+        --ink: #182019;
+        --muted: #657066;
+        --raspberry: #d72d63;
+        --raspberry-dark: #a91d4a;
+        --mint: #8ecbb9;
+        --yellow: #f2cc52;
+        --blue: #9bb7e5;
+        --peach: #ef987c;
+        --forest: #203c30;
+        --content: 1360px;
+        --font-sans: "Helvetica Neue", "PingFang SC", "Noto Sans SC", Arial,
+          sans-serif;
+        --font-serif: "Songti SC", "Noto Serif SC", Georgia, serif;
+        --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      }
+
+      * {
+        box-sizing: border-box;
+        letter-spacing: 0;
+      }
+
+      html {
+        min-width: 320px;
+        background: var(--canvas);
+        scroll-behavior: smooth;
+      }
+
+      body {
+        min-width: 320px;
+        min-height: 100dvh;
+        margin: 0;
+        overflow-x: hidden;
+        background: var(--canvas);
+        color: var(--ink);
+        font-family: var(--font-sans);
+        text-rendering: optimizeLegibility;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      a:focus-visible {
+        outline: 3px solid #126fbd;
+        outline-offset: 4px;
+      }
+
+      img {
+        display: block;
+        max-width: 100%;
+      }
+
+      .skipLink {
+        position: absolute;
+        top: -48px;
+        left: 16px;
+        z-index: 10;
+        padding: 12px 16px;
+        background: var(--surface);
+        color: var(--ink);
+      }
+
+      .skipLink:focus {
+        top: 16px;
+      }
+
+      .siteHeader {
+        min-height: 74px;
+        display: grid;
+        grid-template-columns: minmax(190px, 1fr) auto minmax(190px, 1fr);
+        align-items: center;
+        gap: 28px;
+        padding: 0 max(28px, calc((100vw - var(--content)) / 2));
+        background: var(--surface);
+      }
+
+      .brand {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        width: fit-content;
+      }
+
+      .brand svg {
+        width: 35px;
+        height: 35px;
+        flex: 0 0 auto;
+      }
+
+      .brand strong {
+        font-size: 23px;
+        font-weight: 820;
+        line-height: 1;
+      }
+
+      .primaryNav,
+      .headerTools {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+        font-size: 14px;
+        font-weight: 620;
+      }
+
+      .primaryNav {
+        justify-content: center;
+      }
+
+      .headerTools {
+        justify-content: flex-end;
+      }
+
+      .headerTools b {
+        min-width: 22px;
+        min-height: 22px;
+        display: inline-grid;
+        place-items: center;
+        margin-left: -20px;
+        border-radius: 50%;
+        background: var(--raspberry);
+        color: #fff;
+        font-size: 11px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .hero {
+        position: relative;
+        min-height: 700px;
+        overflow: hidden;
+        isolation: isolate;
+        background: #1e211f;
+        color: #fff;
+      }
+
+      .hero picture,
+      .hero picture::after {
+        position: absolute;
+        inset: 0;
+      }
+
+      .hero picture::after {
+        background: rgba(10, 12, 10, 0.18);
+        content: "";
+      }
+
+      .hero picture img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+      }
+
+      .heroInner {
+        position: relative;
+        z-index: 1;
+        width: min(calc(100% - 56px), var(--content));
+        min-height: 700px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        align-items: flex-start;
+        padding: 86px 0 52px;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: 94px;
+        font-weight: 830;
+        line-height: 0.86;
+      }
+
+      .heroStatement {
+        max-width: 560px;
+        margin: 26px 0 0;
+        font-family: var(--font-serif);
+        font-size: 34px;
+        font-weight: 500;
+        line-height: 1.28;
+      }
+
+      .heroBottom {
+        width: min(100%, 680px);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 18px 24px;
+        margin-top: 32px;
+      }
+
+      .heroDescription {
+        flex: 0 0 100%;
+        max-width: 500px;
+        margin: 0;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 16px;
+        line-height: 1.65;
+      }
+
+      .primaryAction {
+        min-height: 50px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 22px;
+        border-radius: 6px;
+        background: var(--raspberry);
+        color: #fff;
+        font-size: 15px;
+        font-weight: 720;
+        transition:
+          background-color 180ms ease,
+          transform 180ms var(--ease);
+      }
+
+      .primaryAction:hover {
+        background: var(--raspberry-dark);
+        transform: translateY(-2px);
+      }
+
+      .heroFeature {
+        min-width: 250px;
+        padding: 0;
+        color: #fff;
+      }
+
+      .heroFeature span,
+      .productCategory {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: 13px;
+      }
+
+      .productCategory {
+        color: var(--muted);
+      }
+
+      .heroFeature strong {
+        display: block;
+        margin-top: 7px;
+        font-size: 17px;
+        line-height: 1.35;
+      }
+
+      .heroFeature b {
+        display: block;
+        margin-top: 14px;
+        color: #ff9dbd;
+        font-size: 18px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .explore {
+        padding: 100px max(28px, calc((100vw - var(--content)) / 2));
+        background: var(--canvas);
+      }
+
+      .sectionIntro {
+        display: grid;
+        grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        align-items: end;
+        gap: 56px;
+        margin-bottom: 58px;
+      }
+
+      .sectionIntro h2 {
+        margin: 0;
+        font-family: var(--font-serif);
+        font-size: 48px;
+        font-weight: 500;
+        line-height: 1.15;
+      }
+
+      .sectionIntro p {
+        max-width: 490px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.75;
+      }
+
+      .pathGrid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 46px;
+      }
+
+      .path {
+        min-height: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+      }
+
+      .path i {
+        width: 34px;
+        height: 34px;
+        margin-bottom: 26px;
+        border-radius: 50%;
+        background: currentColor;
+      }
+
+      .path:nth-child(1) { color: #c42d5b; }
+      .path:nth-child(2) { color: #2a846d; }
+      .path:nth-child(3) { color: #a26e00; }
+      .path:nth-child(4) { color: #3863b5; }
+
+      .path strong {
+        color: var(--ink);
+        font-size: 19px;
+      }
+
+      .path span {
+        margin-top: 8px;
+        color: rgba(24, 32, 25, 0.68);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .collection {
+        padding: 104px max(28px, calc((100vw - var(--content)) / 2)) 112px;
+        background: var(--surface);
+      }
+
+      .collectionHeader {
+        display: flex;
+        align-items: end;
+        justify-content: space-between;
+        gap: 36px;
+        margin-bottom: 42px;
+      }
+
+      .collectionHeader h2 {
+        margin: 0;
+        font-size: 46px;
+        font-weight: 780;
+        line-height: 1.1;
+      }
+
+      .collectionHeader p {
+        max-width: 440px;
+        margin: 0;
+        color: var(--muted);
+        font-size: 16px;
+        line-height: 1.7;
+      }
+
+      .productGrid {
+        display: grid;
+        grid-template-columns: 1.12fr 0.94fr 0.94fr;
+        gap: 22px;
+      }
+
+      .product {
+        min-width: 0;
+      }
+
+      .productMedia {
+        aspect-ratio: 4 / 5;
+        overflow: hidden;
+        border-radius: 8px;
+      }
+
+      .product:nth-child(1) .productMedia { background: #f3dce6; }
+      .product:nth-child(2) .productMedia { background: #e5f0eb; }
+      .product:nth-child(3) .productMedia { background: #f6edcf; }
+
+      .productMedia img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 300ms var(--ease);
+      }
+
+      .product:hover .productMedia img {
+        transform: scale(1.015);
+      }
+
+      .product:nth-child(3) .productMedia img {
+        object-fit: contain;
+      }
+
+      .productBody {
+        padding: 18px 4px 0;
+      }
+
+      .productBody h3 {
+        margin: 7px 0 0;
+        font-size: 19px;
+        font-weight: 720;
+        line-height: 1.35;
+      }
+
+      .productFooter {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-top: 16px;
+      }
+
+      .productPrice {
+        color: var(--raspberry);
+        font-size: 18px;
+        font-weight: 760;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .productFooter span:last-child {
+        color: var(--ink);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .studio {
+        min-height: 560px;
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(360px, 0.85fr);
+        background: var(--forest);
+        color: #fff;
+      }
+
+      .studioMedia {
+        min-height: 560px;
+      }
+
+      .studioMedia img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .studioCopy {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        padding: 76px clamp(36px, 6vw, 110px);
+      }
+
+      .studioCopy h2 {
+        margin: 0;
+        font-family: var(--font-serif);
+        font-size: 46px;
+        font-weight: 500;
+        line-height: 1.18;
+      }
+
+      .studioCopy p {
+        max-width: 360px;
+        margin: 22px 0 30px;
+        color: rgba(255, 255, 255, 0.76);
+        font-size: 16px;
+        line-height: 1.75;
+      }
+
+      .studioCopy a {
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        padding: 0 20px;
+        border-radius: 6px;
+        background: var(--yellow);
+        color: var(--ink);
+        font-size: 14px;
+        font-weight: 750;
+      }
+
+      .siteFooter {
+        min-height: 148px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 28px;
+        padding: 32px max(28px, calc((100vw - var(--content)) / 2));
+        background: var(--canvas);
+      }
+
+      .footerBrand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .footerBrand svg {
+        width: 26px;
+        height: 26px;
+      }
+
+      .footerBrand strong {
+        font-size: 18px;
+      }
+
+      .siteFooter p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .reveal {
+        opacity: 0;
+        transform: translateY(12px);
+        transition:
+          opacity 320ms var(--ease),
+          transform 320ms var(--ease);
+      }
+
+      .reveal.isVisible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @media (max-width: 960px) {
+        .siteHeader {
+          grid-template-columns: 1fr auto;
+          padding-inline: 22px;
+        }
+
+        .primaryNav {
+          display: none;
+        }
+
+        .hero,
+        .heroInner {
+          min-height: 640px;
+        }
+
+        .hero h1 {
+          font-size: 76px;
+        }
+
+        .heroStatement {
+          font-size: 30px;
+        }
+
+        .pathGrid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .productGrid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .product:nth-child(1) {
+          grid-column: 1 / -1;
+        }
+
+        .product:nth-child(1) .productMedia {
+          aspect-ratio: 16 / 10;
+        }
+
+        .studio {
+          grid-template-columns: 1fr;
+        }
+
+        .studioMedia {
+          min-height: 420px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .siteHeader {
+          min-height: 64px;
+          padding-inline: 15px;
+        }
+
+        .brand svg {
+          width: 30px;
+          height: 30px;
+        }
+
+        .brand strong {
+          font-size: 20px;
+        }
+
+        .headerTools {
+          gap: 12px;
+          font-size: 13px;
+        }
+
+        .headerTools span:first-child {
+          display: none;
+        }
+
+        .hero,
+        .heroInner {
+          min-height: 638px;
+        }
+
+        .hero picture img {
+          object-position: center;
+        }
+
+        .heroInner {
+          width: calc(100% - 30px);
+          padding: 42px 0 26px;
+        }
+
+        .hero h1 {
+          font-size: 58px;
+        }
+
+        .heroStatement {
+          max-width: 310px;
+          margin-top: 18px;
+          font-size: 27px;
+          line-height: 1.22;
+        }
+
+        .heroBottom {
+          width: 100%;
+          display: flex;
+          gap: 14px 18px;
+          margin-top: 24px;
+        }
+
+        .heroDescription {
+          font-size: 14px;
+        }
+
+        .primaryAction {
+          padding: 0 16px;
+          font-size: 14px;
+        }
+
+        .heroFeature {
+          flex: 0 0 100%;
+          min-width: 0;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: baseline;
+          gap: 4px 12px;
+          padding: 0;
+        }
+
+        .heroFeature span {
+          flex: 0 0 100%;
+          font-size: 11px;
+        }
+
+        .heroFeature strong {
+          margin: 0;
+          font-size: 14px;
+        }
+
+        .heroFeature b {
+          margin: 0;
+          font-size: 15px;
+        }
+
+        .explore,
+        .collection {
+          padding: 64px 15px;
+        }
+
+        .sectionIntro {
+          grid-template-columns: 1fr;
+          gap: 16px;
+          margin-bottom: 30px;
+        }
+
+        .sectionIntro h2,
+        .collectionHeader h2,
+        .studioCopy h2 {
+          font-size: 34px;
+        }
+
+        .sectionIntro p,
+        .collectionHeader p {
+          font-size: 15px;
+        }
+
+        .pathGrid {
+          gap: 30px 18px;
+        }
+
+        .path {
+          min-height: 126px;
+          padding: 0;
+        }
+
+        .path strong {
+          font-size: 16px;
+        }
+
+        .path span {
+          font-size: 12px;
+        }
+
+        .collectionHeader {
+          display: grid;
+          gap: 14px;
+          margin-bottom: 28px;
+        }
+
+        .productGrid {
+          grid-template-columns: 1fr;
+          gap: 36px;
+        }
+
+        .product:nth-child(1) .productMedia {
+          aspect-ratio: 4 / 5;
+        }
+
+        .studio {
+          min-height: 0;
+        }
+
+        .studioMedia {
+          min-height: 320px;
+        }
+
+        .studioCopy {
+          padding: 58px 24px 68px;
+        }
+
+        .studioCopy p {
+          font-size: 15px;
+        }
+
+        .siteFooter {
+          min-height: 128px;
+          display: grid;
+          gap: 14px;
+          padding: 32px 15px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        html {
+          scroll-behavior: auto;
+        }
+
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          transition-duration: 0.01ms !important;
+        }
+
+        .reveal {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <a class="skipLink" href="#main-content">跳到主要内容</a>
+    <header class="siteHeader">
+      <a class="brand" href="#main-content" aria-label="PINOVA 首页">
+        <svg viewBox="0 0 36 36" aria-hidden="true">
+          <circle cx="7" cy="6" r="3.2" fill="#d72d63" />
+          <circle cx="7" cy="14" r="3.2" fill="#8ecbb9" />
+          <circle cx="7" cy="22" r="3.2" fill="#f2cc52" />
+          <circle cx="7" cy="30" r="3.2" fill="#203c30" />
+          <circle cx="15" cy="6" r="3.2" fill="#203c30" />
+          <circle cx="23" cy="6" r="3.2" fill="#203c30" />
+          <circle cx="27" cy="12" r="3.2" fill="#203c30" />
+          <circle cx="23" cy="18" r="3.2" fill="#203c30" />
+          <circle cx="15" cy="18" r="3.2" fill="#203c30" />
+          <circle cx="31" cy="4" r="2.6" fill="#ef987c" />
+        </svg>
+        <strong>PINOVA</strong>
+      </a>
+      <nav class="primaryNav" aria-label="主要导航">
+        <span>材料</span><span>图纸</span><span>成品</span><span>到店</span>
+      </nav>
+      <div class="headerTools"><span>搜索</span><span>购物袋</span><b>0</b></div>
+    </header>
+
+    <main id="main-content">
+      <section class="hero" aria-labelledby="hero-title">
+        <picture>
+          <source media="(max-width: 600px)" srcset="../src/assets/storefront/pinova-atelier-hero-mobile.webp" />
+          <img src="../src/assets/storefront/pinova-atelier-hero.webp" alt="桌面上的武汉主题拼豆作品、彩色材料和镊子" />
+        </picture>
+        <div class="heroInner">
+          <h1 id="hero-title">PINOVA</h1>
+          <p class="heroStatement">把喜欢的颜色，拼成带得走的东西。</p>
+          <div class="heroBottom">
+            <p class="heroDescription">从第一盒拼豆，到一张真正想完成的图纸。材料、颜色和时间，都在这里慢慢选。</p>
+            <a class="primaryAction" href="#collection">浏览本周材料</a>
+            <div class="heroFeature">
+              <span>本周主推</span>
+              <strong>武汉城市记忆大幅套装</strong>
+              <b>¥89.90</b>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="explore reveal" aria-labelledby="explore-title">
+        <div class="sectionIntro">
+          <h2 id="explore-title">今天想从哪里开始？</h2>
+          <p>先选你想完成的事，再找到刚好够用的材料。分类是入口，不是另一层需要理解的界面。</p>
+        </div>
+        <div class="pathGrid">
+          <article class="path"><i aria-hidden="true"></i><strong>第一次尝试</strong><span>一盒材料，直接开拼</span></article>
+          <article class="path"><i aria-hidden="true"></i><strong>按色号补充</strong><span>把缺的那一颗补齐</span></article>
+          <article class="path"><i aria-hidden="true"></i><strong>从图纸开始</strong><span>先决定你想做什么</span></article>
+          <article class="path"><i aria-hidden="true"></i><strong>一起完成</strong><span>给创作留出相处时间</span></article>
+        </div>
+      </section>
+
+      <section class="collection reveal" id="collection" aria-labelledby="collection-title">
+        <div class="collectionHeader">
+          <h2 id="collection-title">这周，拼点喜欢的</h2>
+          <p>从一颗补充豆到一套完整材料，按这次真正想完成的作品慢慢挑。</p>
+        </div>
+        <div class="productGrid">
+          <article class="product">
+            <div class="productMedia"><img src="../src/assets/storefront/photo-to-pattern.webp" alt="48 色基础拼豆套装" /></div>
+            <div class="productBody">
+              <span class="productCategory">第一次尝试</span>
+              <h3>48 色基础拼豆套装</h3>
+              <div class="productFooter"><strong class="productPrice">¥59.90</strong><span>加入购物袋</span></div>
+            </div>
+          </article>
+          <article class="product">
+            <div class="productMedia"><img src="../src/assets/storefront/parent-child.webp" alt="花园小屋亲子材料包" /></div>
+            <div class="productBody">
+              <span class="productCategory">亲子共创</span>
+              <h3>花园小屋亲子材料包</h3>
+              <div class="productFooter"><strong class="productPrice">¥45.90</strong><span>加入购物袋</span></div>
+            </div>
+          </article>
+          <article class="product">
+            <div class="productMedia"><img src="../src/assets/storefront/wuhan-kit.webp" alt="Pinova 基础拼豆材料包" /></div>
+            <div class="productBody">
+              <span class="productCategory">基础材料</span>
+              <h3>Pinova 基础拼豆材料包</h3>
+              <div class="productFooter"><strong class="productPrice">¥29.90</strong><span>加入购物袋</span></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="studio reveal" id="story" aria-labelledby="studio-title">
+        <div class="studioMedia"><img src="../src/assets/storefront/couple-cups.webp" alt="两个人一起完成拼豆杯垫" /></div>
+        <div class="studioCopy">
+          <h2 id="studio-title">一起完成，比完成更重要。</h2>
+          <p>不需要复杂的规则。选好颜色，坐下来，慢慢把手边的小东西拼成只属于今天的记忆。</p>
+          <a href="#collection">看看适合一起完成的材料</a>
+        </div>
+      </section>
+    </main>
+
+    <footer class="siteFooter">
+      <div class="footerBrand">
+        <svg viewBox="0 0 36 36" aria-hidden="true">
+          <circle cx="7" cy="6" r="3.2" fill="#d72d63" /><circle cx="7" cy="14" r="3.2" fill="#8ecbb9" />
+          <circle cx="7" cy="22" r="3.2" fill="#f2cc52" /><circle cx="7" cy="30" r="3.2" fill="#203c30" />
+          <circle cx="15" cy="6" r="3.2" fill="#203c30" /><circle cx="23" cy="6" r="3.2" fill="#203c30" />
+          <circle cx="27" cy="12" r="3.2" fill="#203c30" /><circle cx="23" cy="18" r="3.2" fill="#203c30" />
+          <circle cx="15" cy="18" r="3.2" fill="#203c30" /><circle cx="31" cy="4" r="2.6" fill="#ef987c" />
+        </svg>
+        <strong>PINOVA</strong>
+      </div>
+      <p>拼豆创作材料与图纸</p>
+    </footer>
+
+    <script>
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const sections = document.querySelectorAll(".reveal");
+
+      if (reduceMotion || !("IntersectionObserver" in window)) {
+        sections.forEach((section) => section.classList.add("isVisible"));
+      } else {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              entry.target.classList.add("isVisible");
+              observer.unobserve(entry.target);
+            });
+          },
+          { threshold: 0.12 },
+        );
+        sections.forEach((section) => observer.observe(section));
+      }
+    </script>
+  </body>
+</html>

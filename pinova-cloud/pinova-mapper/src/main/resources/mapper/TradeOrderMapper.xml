@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.TradeOrderMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.pinova.pojo.entity.TradeOrder">
+        <id column="id" property="id" />
+        <result column="order_no" property="orderNo" />
+        <result column="checkout_no" property="checkoutNo" />
+        <result column="request_hash" property="requestHash" />
+        <result column="member_id" property="memberId" />
+        <result column="shop_id" property="shopId" />
+        <result column="source_cart_id" property="sourceCartId" />
+        <result column="fulfillment_type" property="fulfillmentType" />
+        <result column="currency_code" property="currencyCode" />
+        <result column="goods_amount_fen" property="goodsAmountFen" />
+        <result column="discount_amount_fen" property="discountAmountFen" />
+        <result column="shipping_amount_fen" property="shippingAmountFen" />
+        <result column="payable_amount_fen" property="payableAmountFen" />
+        <result column="paid_amount_fen" property="paidAmountFen" />
+        <result column="buyer_remark" property="buyerRemark" />
+        <result column="status" property="status" />
+        <result column="submitted_at" property="submittedAt" />
+        <result column="payment_expires_at" property="paymentExpiresAt" />
+        <result column="paid_at" property="paidAt" />
+        <result column="fulfillment_started_at" property="fulfillmentStartedAt" />
+        <result column="completed_at" property="completedAt" />
+        <result column="closed_at" property="closedAt" />
+        <result column="close_reason_code" property="closeReasonCode" />
+        <result column="close_reason" property="closeReason" />
+        <result column="version" property="version" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, order_no, checkout_no, request_hash, member_id, shop_id, source_cart_id, fulfillment_type, currency_code, goods_amount_fen, discount_amount_fen, shipping_amount_fen, payable_amount_fen, paid_amount_fen, buyer_remark, status, submitted_at, payment_expires_at, paid_at, fulfillment_started_at, completed_at, closed_at, close_reason_code, close_reason, version, created_at, created_by, updated_at, updated_by
+    </sql>
+
+</mapper>

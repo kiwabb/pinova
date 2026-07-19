@@ -1,0 +1,48 @@
+<view class="editor-page">
+  <view class="toolbar">
+    <button aria-label="撤销" disabled="{{!hasUndo}}" bindtap="undo"><image src="/assets/icons/text/undo-2.svg" /></button>
+    <button aria-label="重做" disabled="{{!hasRedo}}" bindtap="redo"><image src="/assets/icons/text/redo-2.svg" /></button>
+    <button aria-label="清空" disabled="{{workLoading || workLoadError}}" bindtap="clear"><image src="/assets/icons/text/eraser.svg" /></button>
+    <button aria-label="图纸设置" disabled="{{workLoading || workLoadError}}" class="{{showSettings ? 'active' : ''}}" bindtap="toggleSettings"><image src="/assets/icons/text/sliders-horizontal.svg" /></button>
+    <view class="spacer" />
+    <button aria-label="导出图纸" disabled="{{exporting || converting || workLoading || workLoadError}}" bindtap="exportImage"><image src="/assets/icons/text/download.svg" /></button>
+    <button aria-label="保存作品" disabled="{{saving || converting || workLoading || workLoadError}}" bindtap="save"><image src="/assets/icons/text/save.svg" /></button>
+  </view>
+
+  <view wx:if="{{showSettings}}" class="settings-panel card">
+    <view class="setting-row"><text>网格尺寸</text><view class="segments"><button wx:for="{{[16,24,32,48]}}" wx:key="*this" class="{{gridSize === item ? 'active' : ''}}" data-value="{{item}}" bindtap="selectGridSize">{{item}}</button></view></view>
+    <view wx:if="{{hasSourceImage}}" class="setting-row"><text>颜色数量</text><view class="segments compact"><button wx:for="{{[6,8,12]}}" wx:key="*this" class="{{colorCount === item ? 'active' : ''}}" data-value="{{item}}" bindtap="selectColorCount">{{item}} 色</button></view></view>
+    <view class="setting-row"><text>图纸样式</text><view class="segments compact"><button class="{{previewMode === 'beads' ? 'active' : ''}}" data-value="beads" bindtap="selectPreviewMode">圆豆</button><button class="{{previewMode === 'grid' ? 'active' : ''}}" data-value="grid" bindtap="selectPreviewMode">方格</button></view></view>
+    <block wx:if="{{hasSourceImage}}">
+      <view class="setting-row"><text>照片适配</text><view class="segments compact"><button class="{{fitMode === 'cover' ? 'active' : ''}}" data-value="cover" bindtap="selectFitMode">填满裁剪</button><button class="{{fitMode === 'contain' ? 'active' : ''}}" data-value="contain" bindtap="selectFitMode">完整显示</button></view></view>
+      <view wx:if="{{fitMode === 'cover'}}" class="slider-field"><view><text>水平位置</text><small>{{cropX}}</small></view><slider min="-100" max="100" step="1" value="{{cropX}}" activeColor="#C42D5D" backgroundColor="#E9E9EC" block-size="20" bindchange="changeCropX" /></view>
+      <view wx:if="{{fitMode === 'cover'}}" class="slider-field"><view><text>垂直位置</text><small>{{cropY}}</small></view><slider min="-100" max="100" step="1" value="{{cropY}}" activeColor="#C42D5D" backgroundColor="#E9E9EC" block-size="20" bindchange="changeCropY" /></view>
+      <view class="slider-field"><view><text>亮度</text><small>{{brightness}}</small></view><slider min="-50" max="50" step="1" value="{{brightness}}" activeColor="#C42D5D" backgroundColor="#E9E9EC" block-size="20" bindchange="changeBrightness" /></view>
+      <view class="slider-field"><view><text>对比度</text><small>{{contrast}}</small></view><slider min="-50" max="50" step="1" value="{{contrast}}" activeColor="#C42D5D" backgroundColor="#E9E9EC" block-size="20" bindchange="changeContrast" /></view>
+      <button class="apply-button" disabled="{{converting}}" bindtap="applyImageSettings">{{converting ? '正在生成' : '应用照片设置'}}</button>
+    </block>
+  </view>
+
+  <view class="title-field card"><text>作品名称</text><input value="{{title}}" maxlength="40" disabled="{{workLoading || workLoadError}}" placeholder="输入作品名称" bindinput="inputTitle" /></view>
+  <view class="canvas-card card">
+    <canvas type="2d" id="beadCanvas" bindtouchstart="startPaint" catchtouchmove="movePaint" bindtouchend="endPaint" bindtouchcancel="endPaint" />
+    <view wx:if="{{workLoading}}" class="canvas-status"><text>正在加载云端作品</text><small>请稍候</small></view>
+    <view wx:elif="{{workLoadError}}" class="canvas-status error"><text>{{workLoadError}}</text><small>原作品尚未载入，不会覆盖云端内容</small><button bindtap="retryLoadWork">重新加载</button></view>
+    <view wx:elif="{{converting}}" class="canvas-status"><text>正在生成 {{gridSize}}×{{gridSize}} 图纸</text><small>照片仅在本机处理</small></view>
+    <view wx:elif="{{convertError}}" class="canvas-status error"><text>{{convertError}}</text><button bindtap="convertSourceImage">重试</button></view>
+  </view>
+  <scroll-view class="palette" scroll-x enhanced show-scrollbar="{{false}}"><view class="palette-row"><button wx:for="{{palette}}" wx:key="*this" aria-label="选择颜色 {{item}}" disabled="{{workLoading || workLoadError}}" class="swatch {{activeColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="chooseColor" /></view></scroll-view>
+  <view class="editor-meta"><text>{{gridSize}}×{{gridSize}} · {{colorStats.length}} 种颜色</text><button bindtap="toggleStats">{{showStats ? '收起用量' : '查看用量'}}</button></view>
+  <view wx:if="{{showStats}}" class="stats-panel card"><view wx:for="{{colorStats}}" wx:key="hex" class="stat-row"><i style="background: {{item.hex}}" /><view><text>{{item.name}}</text><small>{{item.code}} · {{item.percent}}%</small></view><b>{{item.count}} 颗</b></view></view>
+  <text class="tip">{{hasSourceImage ? '照片已在本机转换，可继续调色和绘制；原照片不会主动上传。' : '点击或拖动画布进行绘制，修改会在保存作品时同步到云端。'}}</text>
+</view>
+
+<view wx:if="{{showPhoneBinding}}" class="phone-modal" bindtap="closePhoneBinding">
+  <view class="phone-sheet" catchtap="noop">
+    <view class="phone-sheet-icon"><image src="/assets/icons/primary/user-round.svg" /></view>
+    <text class="phone-sheet-title">绑定后保存云端</text>
+    <text class="phone-sheet-copy">用于同步作品、累计会员积分，并在其他设备继续编辑。</text>
+    <button class="phone-bind-button" open-type="getPhoneNumber" bindgetphonenumber="bindPhoneAndSave" loading="{{bindingPhone}}" disabled="{{bindingPhone}}">{{bindingPhone ? '正在绑定' : '授权手机号并继续保存'}}</button>
+    <button class="phone-cancel-button" disabled="{{bindingPhone}}" bindtap="closePhoneBinding">暂不绑定</button>
+  </view>
+</view>

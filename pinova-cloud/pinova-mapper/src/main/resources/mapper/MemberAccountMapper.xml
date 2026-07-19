@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.MemberAccountMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.pinova.pojo.entity.MemberAccount">
+        <id column="id" property="id" />
+        <result column="member_no" property="memberNo" />
+        <result column="username" property="username" />
+        <result column="mobile" property="mobile" />
+        <result column="email" property="email" />
+        <result column="password_hash" property="passwordHash" />
+        <result column="nickname" property="nickname" />
+        <result column="avatar_url" property="avatarUrl" />
+        <result column="status" property="status" />
+        <result column="last_login_at" property="lastLoginAt" />
+        <result column="last_login_ip" property="lastLoginIp" />
+        <result column="password_changed_at" property="passwordChangedAt" />
+        <result column="version" property="version" />
+        <result column="deleted" property="deleted" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="deleted_by" property="deletedBy" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, member_no, username, mobile, email, password_hash, nickname, avatar_url, status, last_login_at, last_login_ip, password_changed_at, version, deleted, deleted_at, deleted_by, created_at, created_by, updated_at, updated_by
+    </sql>
+
+    <select id="selectLoginByUsername" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM pinova.member_account
+        WHERE lower(username) = lower(#{username})
+          AND deleted = false
+        LIMIT 1
+    </select>
+
+    <select id="selectLoginByMobile" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM pinova.member_account
+        WHERE mobile = #{mobile}
+          AND deleted = false
+        LIMIT 1
+    </select>
+
+    <select id="selectLoginByEmail" resultMap="BaseResultMap">
+        SELECT <include refid="Base_Column_List" />
+        FROM pinova.member_account
+        WHERE lower(email) = lower(#{email})
+          AND deleted = false
+        LIMIT 1
+    </select>
+
+    <update id="updateLastLogin">
+        UPDATE pinova.member_account
+        SET last_login_at = #{loginAt},
+            last_login_ip = #{loginIp},
+            updated_at = #{loginAt},
+            updated_by = id,
+            version = version + 1
+        WHERE id = #{memberId}
+          AND status = 1
+          AND deleted = false
+    </update>
+
+</mapper>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.AdminRoleMapper">
+    <select id="selectIdByCode" resultType="long">
+        SELECT id FROM pinova.admin_role
+        WHERE role_code = #{roleCode} AND deleted = false
+        LIMIT 1
+    </select>
+</mapper>
+

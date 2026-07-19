@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.pinova.mapper.ProductSkuMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.pinova.pojo.entity.ProductSku">
+        <id column="id" property="id" />
+        <result column="spu_id" property="spuId" />
+        <result column="sku_code" property="skuCode" />
+        <result column="spec_summary" property="specSummary" />
+        <result column="sale_price_fen" property="salePriceFen" />
+        <result column="inventory_mode" property="inventoryMode" />
+        <result column="main_image_key" property="mainImageKey" />
+        <result column="barcode" property="barcode" />
+        <result column="status" property="status" />
+        <result column="sort_order" property="sortOrder" />
+        <result column="version" property="version" />
+        <result column="deleted" property="deleted" />
+        <result column="deleted_at" property="deletedAt" />
+        <result column="deleted_by" property="deletedBy" />
+        <result column="created_at" property="createdAt" />
+        <result column="created_by" property="createdBy" />
+        <result column="updated_at" property="updatedAt" />
+        <result column="updated_by" property="updatedBy" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, spu_id, sku_code, spec_summary, sale_price_fen, inventory_mode, main_image_key, barcode, status, sort_order, version, deleted, deleted_at, deleted_by, created_at, created_by, updated_at, updated_by
+    </sql>
+
+    <select id="selectSaleSnapshots" resultType="com.pinova.mapper.model.ProductSaleSnapshot">
+        SELECT
+            sku.spu_id AS "spuId",
+            min(sku.sale_price_fen) AS "priceFen",
+            CASE
+                WHEN bool_or(sku.inventory_mode = 2) THEN 'in_stock'
+                WHEN coalesce(sum(
+                    CASE
+                        WHEN sku.inventory_mode = 1 AND warehouse.id IS NOT NULL
+                            THEN greatest(stock.on_hand_quantity - stock.reserved_quantity, 0)
+                        ELSE 0
+                    END
+                ), 0) &gt; #{lowStockThreshold} THEN 'in_stock'
+                WHEN coalesce(sum(
+                    CASE
+                        WHEN sku.inventory_mode = 1 AND warehouse.id IS NOT NULL
+                            THEN greatest(stock.on_hand_quantity - stock.reserved_quantity, 0)
+                        ELSE 0
+                    END
+                ), 0) &gt; 0 THEN 'low_stock'
+                WHEN bool_or(sku.inventory_mode = 1) THEN 'sold_out'
+                ELSE NULL
+            END AS "stock"
+        FROM pinova.product_sku sku
+        LEFT JOIN pinova.inventory_stock stock ON stock.sku_id = sku.id
+        LEFT JOIN pinova.warehouse warehouse
+            ON warehouse.id = stock.warehouse_id
+           AND warehouse.status = 1
+           AND warehouse.deleted = false
+        WHERE sku.spu_id IN
+        <foreach collection="spuIds" item="spuId" open="(" separator="," close=")">
+            #{spuId}
+        </foreach>
+          AND sku.status = 1
+          AND sku.deleted = false
+        GROUP BY sku.spu_id
+    </select>
+
+    <select id="selectSkuSaleSnapshots" resultType="com.pinova.mapper.model.ProductSkuSaleSnapshot">
+        SELECT
+            sku.id AS "skuId",
+            sku.sale_price_fen AS "priceFen",
+            CASE
+                WHEN sku.inventory_mode = 2 THEN 'in_stock'
+                WHEN sku.inventory_mode = 1 AND coalesce(sum(
+                    CASE
+                        WHEN warehouse.id IS NOT NULL
+                            THEN greatest(stock.on_hand_quantity - stock.reserved_quantity, 0)
+                        ELSE 0
+                    END
+                ), 0) &gt; #{lowStockThreshold} THEN 'in_stock'
+                WHEN sku.inventory_mode = 1 AND coalesce(sum(
+                    CASE
+                        WHEN warehouse.id IS NOT NULL
+                            THEN greatest(stock.on_hand_quantity - stock.reserved_quantity, 0)
+                        ELSE 0
+                    END
+                ), 0) &gt; 0 THEN 'low_stock'
+                WHEN sku.inventory_mode = 1 THEN 'sold_out'
+                ELSE NULL
+            END AS "stock"
+        FROM pinova.product_sku sku
+        LEFT JOIN pinova.inventory_stock stock ON stock.sku_id = sku.id
+        LEFT JOIN pinova.warehouse warehouse
+            ON warehouse.id = stock.warehouse_id
+           AND warehouse.status = 1
+           AND warehouse.deleted = false
+        WHERE sku.spu_id = #{spuId}
+          AND sku.status = 1
+          AND sku.deleted = false
+        GROUP BY sku.id, sku.sale_price_fen, sku.inventory_mode, sku.sort_order
+        ORDER BY sku.sort_order ASC, sku.id ASC
+    </select>
+
+</mapper>

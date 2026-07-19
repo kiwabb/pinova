@@ -1,0 +1,40 @@
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+vite.config.js
+vite.config.d.ts
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+*.log
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Operating system and editor state
+.DS_Store
+.cache/
+.tmp/
+
+# Other projects and design archives stored beside this app
+prototype/
+output/
+tmp/
+参考/
+xingqiba-*-prompts.md
+
+# PINOVA generated files
+pinova-cloud/.git-pinova-cloud-backup/
+pinova-cloud/pinova-admin/.playwright-cli/
+pinova-cloud/pinova-admin/dist/
+pinova-cloud/pinova-web/.next/
+pinova-cloud/pinova-web/.playwright-cli/
+pinova-cloud/pinova-web/output/
+miniapp/.swc/
+miniapp/artifacts/
+miniapp/dist/
