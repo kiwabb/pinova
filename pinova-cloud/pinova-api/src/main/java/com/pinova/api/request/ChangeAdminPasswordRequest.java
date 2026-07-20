@@ -1,5 +1,10 @@
 package com.pinova.api.request;
 
-public record ChangeAdminPasswordRequest(String currentPassword, String newPassword, String confirmPassword) {
-}
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 
+public record ChangeAdminPasswordRequest(
+        @NotEmpty @Size(max = 72) String currentPassword,
+        @NotEmpty @Size(max = 72) String newPassword,
+        @NotEmpty @Size(max = 72) String confirmPassword) {
+}

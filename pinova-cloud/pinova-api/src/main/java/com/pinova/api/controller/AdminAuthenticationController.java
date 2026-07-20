@@ -7,8 +7,6 @@ import com.pinova.api.response.AdminCsrfTokenResponse;
 import com.pinova.api.response.AuthenticatedAdminResponse;
 import com.pinova.api.web.CurrentAdminResolver;
 import com.pinova.common.api.ApiResponse;
-import com.pinova.common.error.BusinessException;
-import com.pinova.common.error.CommonErrorCode;
 import com.pinova.service.AdminAuthenticationService;
 import com.pinova.service.command.ChangeAdminPasswordCommand;
 import com.pinova.service.command.LoginAdminCommand;
@@ -16,6 +14,7 @@ import com.pinova.service.model.AdminLoginResult;
 import com.pinova.service.model.AuthenticatedAdminResult;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -54,12 +53,9 @@ public class AdminAuthenticationController {
 
     @PostMapping("/login")
     public ApiResponse<AuthenticatedAdminResponse> login(
-            @RequestBody LoginAdminRequest request,
+            @Valid @RequestBody LoginAdminRequest request,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse) {
-        if (request == null) {
-            throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "登录请求体不能为空");
-        }
         AdminLoginResult result = authenticationService.login(new LoginAdminCommand(
                 request.username(), request.password(), resolveRemoteAddress(servletRequest),
                 servletRequest.getHeader(HttpHeaders.USER_AGENT)));
@@ -76,12 +72,9 @@ public class AdminAuthenticationController {
 
     @PutMapping("/password")
     public ApiResponse<Void> changePassword(
-            @RequestBody ChangeAdminPasswordRequest request,
+            @Valid @RequestBody ChangeAdminPasswordRequest request,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse) {
-        if (request == null) {
-            throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "修改密码请求体不能为空");
-        }
         AuthenticatedAdminResult admin = currentAdminResolver.requireCurrentAdmin(servletRequest);
         authenticationService.changePassword(new ChangeAdminPasswordCommand(
                 admin.id(), request.currentPassword(), request.newPassword(), request.confirmPassword()));
@@ -109,4 +102,3 @@ public class AdminAuthenticationController {
         }
     }
 }
-

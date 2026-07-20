@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -61,7 +62,7 @@ public class ShoppingCartController {
     @Operation(summary = "加入当前游客购物车")
     @PostMapping("/current/items")
     public ApiResponse<ShoppingCartResponse> addItem(
-            @RequestBody AddShoppingCartItemRequest request,
+            @Valid @RequestBody AddShoppingCartItemRequest request,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse) {
         String token = resolveOrIssueGuestToken(servletRequest, servletResponse);
@@ -73,7 +74,7 @@ public class ShoppingCartController {
     @PatchMapping("/current/items/{itemId}")
     public ApiResponse<ShoppingCartResponse> updateItem(
             @PathVariable Long itemId,
-            @RequestBody UpdateShoppingCartItemRequest request,
+            @Valid @RequestBody UpdateShoppingCartItemRequest request,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse) {
         String token = resolveOrIssueGuestToken(servletRequest, servletResponse);

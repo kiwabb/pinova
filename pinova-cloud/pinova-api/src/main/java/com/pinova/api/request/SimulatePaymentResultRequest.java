@@ -1,4 +1,6 @@
 package com.pinova.api.request;
 
-public record SimulatePaymentResultRequest(String outcome) {
+import jakarta.validation.constraints.NotBlank;
+
+public record SimulatePaymentResultRequest(@NotBlank String outcome) {
 }

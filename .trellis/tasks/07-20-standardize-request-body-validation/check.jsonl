@@ -1,0 +1,4 @@
+{"file":".trellis/spec/backend/index.md","reason":"Verify backend boundary and error response conventions."}
+{"file":".trellis/spec/backend/trade-order-contract.md","reason":"Verify order submission semantics remain intact."}
+{"file":".trellis/spec/backend/payment-contract.md","reason":"Verify payment flow semantics remain intact."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Verify all repeated manual request-body checks were removed."}

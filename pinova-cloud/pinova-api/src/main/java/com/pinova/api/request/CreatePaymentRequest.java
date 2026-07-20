@@ -1,4 +1,6 @@
 package com.pinova.api.request;
 
-public record CreatePaymentRequest(String checkoutNo) {
+import jakarta.validation.constraints.NotBlank;
+
+public record CreatePaymentRequest(@NotBlank String checkoutNo) {
 }

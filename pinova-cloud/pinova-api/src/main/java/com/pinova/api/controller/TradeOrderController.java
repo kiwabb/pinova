@@ -9,8 +9,6 @@ import com.pinova.api.request.SubmitOrderRequest;
 import com.pinova.api.response.SubmittedCheckoutResponse;
 import com.pinova.api.web.CurrentMemberResolver;
 import com.pinova.common.api.ApiResponse;
-import com.pinova.common.error.BusinessException;
-import com.pinova.common.error.CommonErrorCode;
 import com.pinova.service.MemberOrderQueryService;
 import com.pinova.service.TradeOrderService;
 import com.pinova.service.command.SubmitOrderCommand;
@@ -19,6 +17,7 @@ import com.pinova.service.query.MemberOrderListQuery;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -73,12 +72,9 @@ public class TradeOrderController {
     public ApiResponse<SubmittedCheckoutResponse> submitOrder(
             @RequestHeader(value = "Idempotency-Key", required = false) String idempotencyKey,
             @CookieValue(value = CART_TOKEN_COOKIE, required = false) String guestCartToken,
-            @RequestBody(required = false) SubmitOrderRequest body,
+            @Valid @RequestBody SubmitOrderRequest body,
             HttpServletRequest request) {
         Long memberId = currentMemberResolver.requireCurrentMemberId(request);
-        if (body == null) {
-            throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "订单请求体不能为空");
-        }
         return ApiResponse.success(responseAssembler.toSubmittedCheckoutResponse(
                 tradeOrderService.submitOrder(toCommand(memberId, guestCartToken, idempotencyKey, body))));
     }
@@ -88,9 +84,9 @@ public class TradeOrderController {
             String guestCartToken,
             String idempotencyKey,
             SubmitOrderRequest request) {
-        List<SubmitOrderLineCommand> items = request.items() == null
-                ? null
-                : request.items().stream().map(TradeOrderController::toLineCommand).toList();
+        List<SubmitOrderLineCommand> items = request.items().stream()
+                .map(TradeOrderController::toLineCommand)
+                .toList();
         return new SubmitOrderCommand(
                 memberId,
                 guestCartToken,
@@ -103,9 +99,6 @@ public class TradeOrderController {
     }
 
     private static SubmitOrderLineCommand toLineCommand(SubmitOrderLineRequest request) {
-        if (request == null) {
-            return null;
-        }
         return new SubmitOrderLineCommand(
                 request.cartItemId(),
                 request.cartItemVersion(),

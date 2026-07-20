@@ -6,8 +6,6 @@ import com.pinova.api.request.RegisterMemberRequest;
 import com.pinova.api.response.AuthenticatedMemberResponse;
 import com.pinova.api.web.CurrentMemberResolver;
 import com.pinova.common.api.ApiResponse;
-import com.pinova.common.error.BusinessException;
-import com.pinova.common.error.CommonErrorCode;
 import com.pinova.service.MemberLoginSessionService;
 import com.pinova.service.command.LoginMemberCommand;
 import com.pinova.service.command.RegisterMemberCommand;
@@ -16,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -53,12 +52,9 @@ public class MemberAuthenticationController {
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<AuthenticatedMemberResponse> register(
-            @RequestBody RegisterMemberRequest request,
+            @Valid @RequestBody RegisterMemberRequest request,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse) {
-        if (request == null) {
-            throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "注册请求体不能为空");
-        }
         MemberLoginResult result = memberLoginSessionService.register(new RegisterMemberCommand(
                 request.username(),
                 request.nickname(),
@@ -73,12 +69,9 @@ public class MemberAuthenticationController {
     @Operation(summary = "会员密码登录")
     @PostMapping("/login")
     public ApiResponse<AuthenticatedMemberResponse> login(
-            @RequestBody LoginMemberRequest request,
+            @Valid @RequestBody LoginMemberRequest request,
             HttpServletRequest servletRequest,
             HttpServletResponse servletResponse) {
-        if (request == null) {
-            throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "登录请求体不能为空");
-        }
         MemberLoginResult result = memberLoginSessionService.login(new LoginMemberCommand(
                 request.identifier(),
                 request.password(),

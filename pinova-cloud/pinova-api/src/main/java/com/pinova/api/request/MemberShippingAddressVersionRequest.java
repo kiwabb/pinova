@@ -1,4 +1,7 @@
 package com.pinova.api.request;
 
-public record MemberShippingAddressVersionRequest(Integer version) {
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
+
+public record MemberShippingAddressVersionRequest(@NotNull @PositiveOrZero Integer version) {
 }

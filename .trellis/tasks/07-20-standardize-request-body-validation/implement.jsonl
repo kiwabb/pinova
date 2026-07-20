@@ -1,0 +1,4 @@
+{"file":".trellis/spec/backend/index.md","reason":"Apply backend API response, boundary, and quality conventions."}
+{"file":".trellis/spec/backend/trade-order-contract.md","reason":"Preserve checkout request validation and business conflict semantics."}
+{"file":".trellis/spec/backend/payment-contract.md","reason":"Preserve payment request and mock-result business contracts."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Remove repeated controller checks without adding an unnecessary helper abstraction."}

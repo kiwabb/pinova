@@ -6,8 +6,6 @@ import com.pinova.api.request.SaveMemberShippingAddressRequest;
 import com.pinova.api.response.MemberShippingAddressResponse;
 import com.pinova.api.web.CurrentMemberResolver;
 import com.pinova.common.api.ApiResponse;
-import com.pinova.common.error.BusinessException;
-import com.pinova.common.error.CommonErrorCode;
 import com.pinova.service.MemberShippingAddressService;
 import com.pinova.service.command.CreateMemberShippingAddressCommand;
 import com.pinova.service.command.DeleteMemberShippingAddressCommand;
@@ -16,6 +14,7 @@ import com.pinova.service.command.UpdateMemberShippingAddressCommand;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -62,9 +61,8 @@ public class MemberShippingAddressController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ApiResponse<MemberShippingAddressResponse> create(
-            @RequestBody SaveMemberShippingAddressRequest body,
+            @Valid @RequestBody SaveMemberShippingAddressRequest body,
             HttpServletRequest request) {
-        requireBody(body);
         Long memberId = currentMemberResolver.requireCurrentMemberId(request);
         return ApiResponse.success(responseAssembler.toAddressResponse(addressService.createAddress(
                 new CreateMemberShippingAddressCommand(
@@ -88,9 +86,8 @@ public class MemberShippingAddressController {
     @PutMapping("/{addressId}")
     public ApiResponse<MemberShippingAddressResponse> update(
             @PathVariable Long addressId,
-            @RequestBody SaveMemberShippingAddressRequest body,
+            @Valid @RequestBody SaveMemberShippingAddressRequest body,
             HttpServletRequest request) {
-        requireBody(body);
         Long memberId = currentMemberResolver.requireCurrentMemberId(request);
         return ApiResponse.success(responseAssembler.toAddressResponse(addressService.updateAddress(
                 new UpdateMemberShippingAddressCommand(
@@ -116,11 +113,8 @@ public class MemberShippingAddressController {
     @PatchMapping("/{addressId}/default")
     public ApiResponse<MemberShippingAddressResponse> setDefault(
             @PathVariable Long addressId,
-            @RequestBody MemberShippingAddressVersionRequest body,
+            @Valid @RequestBody MemberShippingAddressVersionRequest body,
             HttpServletRequest request) {
-        if (body == null) {
-            throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "地址版本不能为空");
-        }
         Long memberId = currentMemberResolver.requireCurrentMemberId(request);
         return ApiResponse.success(responseAssembler.toAddressResponse(addressService.setDefaultAddress(
                 new SetDefaultMemberShippingAddressCommand(memberId, addressId, body.version()))));
@@ -137,9 +131,4 @@ public class MemberShippingAddressController {
         return ApiResponse.success();
     }
 
-    private static void requireBody(SaveMemberShippingAddressRequest body) {
-        if (body == null) {
-            throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "收货地址请求体不能为空");
-        }
-    }
 }

@@ -6,14 +6,13 @@ import com.pinova.api.request.SimulatePaymentResultRequest;
 import com.pinova.api.response.PaymentOrderResponse;
 import com.pinova.api.web.CurrentMemberResolver;
 import com.pinova.common.api.ApiResponse;
-import com.pinova.common.error.BusinessException;
-import com.pinova.common.error.CommonErrorCode;
 import com.pinova.service.PaymentOrderService;
 import com.pinova.service.command.CreatePaymentCommand;
 import com.pinova.service.command.SimulatePaymentResultCommand;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,11 +41,8 @@ public class PaymentOrderController {
     @Operation(summary = "为一次结算创建或获取支付单")
     @PostMapping
     public ApiResponse<PaymentOrderResponse> createPayment(
-            @RequestBody(required = false) CreatePaymentRequest body,
+            @Valid @RequestBody CreatePaymentRequest body,
             HttpServletRequest request) {
-        if (body == null) {
-            throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "支付请求体不能为空");
-        }
         Long memberId = currentMemberResolver.requireCurrentMemberId(request);
         return ApiResponse.success(responseAssembler.toPaymentResponse(
                 paymentOrderService.createPayment(
@@ -77,11 +73,8 @@ public class PaymentOrderController {
     @PostMapping("/{paymentNo}/mock-result")
     public ApiResponse<PaymentOrderResponse> simulatePaymentResult(
             @PathVariable String paymentNo,
-            @RequestBody(required = false) SimulatePaymentResultRequest body,
+            @Valid @RequestBody SimulatePaymentResultRequest body,
             HttpServletRequest request) {
-        if (body == null) {
-            throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "模拟支付请求体不能为空");
-        }
         Long memberId = currentMemberResolver.requireCurrentMemberId(request);
         return ApiResponse.success(responseAssembler.toPaymentResponse(
                 paymentOrderService.simulatePayment(
