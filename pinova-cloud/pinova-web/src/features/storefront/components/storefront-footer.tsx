@@ -11,6 +11,14 @@ export function StorefrontFooter() {
             <PinovaBrand tone="light" />
           </Link>
           <p>拼豆材料、数字图纸与武汉到店体验。</p>
+          <span className={styles.footerBeads} aria-hidden="true">
+            <i style={{ background: "var(--catalog-accent)" }} />
+            <i style={{ background: "var(--catalog-marigold)" }} />
+            <i style={{ background: "var(--catalog-emerald)" }} />
+            <i style={{ background: "var(--catalog-blue)" }} />
+            <i style={{ background: "var(--catalog-violet)" }} />
+            <i style={{ background: "var(--catalog-coral)" }} />
+          </span>
         </div>
 
         <nav className={styles.footerDirectory} aria-label="页尾商品目录">

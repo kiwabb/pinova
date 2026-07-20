@@ -267,7 +267,7 @@
 .products {
   scroll-margin-top: calc(var(--storefront-header-offset, 72px) + 16px);
   padding: 32px 0 40px;
-  background: var(--catalog-surface);
+  background: var(--catalog-paper);
 }
 
 .clearBtn {
@@ -335,7 +335,7 @@
 /* ── Store ── */
 .store {
   padding: 8px 0 48px;
-  background: var(--catalog-surface);
+  background: var(--catalog-paper);
 }
 
 .storeCard {
@@ -525,6 +525,30 @@
 
   .heroBanner {
     min-height: 460px;
+  }
+}
+
+@media (max-width: 539px) {
+  .exploreCard {
+    min-height: 84px;
+    padding: 12px;
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .exploreIcon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .exploreText strong {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .exploreArrow {
+    display: none;
   }
 }
 
