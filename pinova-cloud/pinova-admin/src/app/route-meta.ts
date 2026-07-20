@@ -35,6 +35,14 @@ export function getRouteMeta(pathname: string): RouteMeta {
     };
   }
 
+  if (pathname === "/products") {
+    return { menuKey: "/products", title: "商品管理", breadcrumbs: ["商品", "商品与 SKU"] };
+  }
+
+  if (pathname === "/inventory") {
+    return { menuKey: "/inventory", title: "库存管理", breadcrumbs: ["商品", "仓库与库存"] };
+  }
+
   if (pathname === "/orders") {
     return {
       menuKey: "/orders",
@@ -49,6 +57,14 @@ export function getRouteMeta(pathname: string): RouteMeta {
       title: "订单详情",
       breadcrumbs: ["订单", "订单详情"],
     };
+  }
+
+  if (pathname === "/after-sales") {
+    return { menuKey: "/after-sales", title: "售后退款", breadcrumbs: ["订单", "售后退款"] };
+  }
+
+  if (pathname === "/audits") {
+    return { menuKey: "/audits", title: "操作审计", breadcrumbs: ["系统", "操作审计"] };
   }
 
   if (pathname === "/overview" || pathname === "/") {

@@ -1,11 +1,12 @@
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import { useQuery } from "@tanstack/react-query";
-import { Alert, Button, Descriptions, Empty, Result, Skeleton, Table, Typography } from "antd";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Alert, App, Button, Descriptions, Empty, Form, Input, Modal, Result, Skeleton, Space, Table, Typography } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 
 import { AdminApiError } from "../../lib/admin-api-client";
-import { getAdminOrder } from "./lib/order-api";
+import { completeAdminOrder, correctAdminOrderShipment, getAdminOrder, shipAdminOrder } from "./lib/order-api";
 import { formatOrderDate, formatOrderMoney, fulfillmentLabel } from "./lib/order-format";
 import { OrderStatusTag } from "./components/order-status-tag";
 import styles from "./orders.module.css";
@@ -13,11 +14,29 @@ import type { OrderItem } from "./types";
 
 export function OrderDetailPage() {
   const { orderNo = "" } = useParams();
+  const { message } = App.useApp();
+  const [shipmentOpen, setShipmentOpen] = useState(false);
+  const [shipmentCorrection, setShipmentCorrection] = useState(false);
+  const [shipmentForm] = Form.useForm();
   const order = useQuery({
     queryKey: ["admin-order", orderNo],
     queryFn: () => getAdminOrder(orderNo),
     enabled: Boolean(orderNo),
     retry: false,
+  });
+  const lifecycle = useMutation({
+    mutationFn: async (input: { type: "ship" | "correct" | "complete"; values: Record<string, string> }) => {
+      if (input.type === "ship") return shipAdminOrder(orderNo, input.values as { carrierCode: string; carrierName: string; trackingNo: string });
+      if (input.type === "correct") return correctAdminOrderShipment(orderNo, input.values as { carrierCode: string; carrierName: string; trackingNo: string; reason: string });
+      return completeAdminOrder(orderNo, input.values.reason);
+    },
+    onSuccess: async () => {
+      setShipmentOpen(false);
+      shipmentForm.resetFields();
+      await order.refetch();
+      void message.success("订单履约状态已更新");
+    },
+    onError: (error) => void message.error(error.message),
   });
 
   if (order.isPending) {
@@ -53,6 +72,25 @@ export function OrderDetailPage() {
     <div className={styles.orderDetail}>
       <Link className={styles.backLink} to="/orders"><ArrowLeftOutlined />返回订单列表</Link>
 
+      <Space wrap>
+        {data.status === 1 && <Button type="primary" onClick={() => { setShipmentCorrection(false); setShipmentOpen(true); }}>发货</Button>}
+        {data.status === 2 && <Button onClick={() => {
+          setShipmentCorrection(true);
+          shipmentForm.setFieldsValue({ carrierCode: data.carrierCode, carrierName: data.carrierName, trackingNo: data.trackingNo });
+          setShipmentOpen(true);
+        }}>修改物流</Button>}
+        {data.status === 2 && <Button onClick={() => Modal.confirm({
+          title: "强制完成订单",
+          content: <Input.TextArea id="force-complete-reason" placeholder="填写强制完成原因" rows={3} />,
+          okText: "确认完成",
+          onOk: () => {
+            const reason = (document.getElementById("force-complete-reason") as HTMLTextAreaElement | null)?.value.trim();
+            if (!reason) return Promise.reject(new Error("请填写强制完成原因"));
+            return lifecycle.mutateAsync({ type: "complete", values: { reason } });
+          },
+        })}>强制完成</Button>}
+      </Space>
+
       <section aria-labelledby="order-summary-heading">
         <Typography.Title id="order-summary-heading" level={2}>订单信息</Typography.Title>
         <Descriptions bordered column={{ xs: 1, sm: 2, lg: 3 }} size="small">
@@ -68,11 +106,33 @@ export function OrderDetailPage() {
           <Descriptions.Item label="支付截止">{formatOrderDate(data.paymentExpiresAt)}</Descriptions.Item>
           <Descriptions.Item label="支付时间">{formatOrderDate(data.paidAt)}</Descriptions.Item>
           <Descriptions.Item label="履约开始">{formatOrderDate(data.fulfillmentStartedAt)}</Descriptions.Item>
+          <Descriptions.Item label="承运商">{data.carrierName || "-"}</Descriptions.Item>
+          <Descriptions.Item label="运单号">{data.trackingNo || "-"}</Descriptions.Item>
+          <Descriptions.Item label="发货时间">{formatOrderDate(data.shippedAt)}</Descriptions.Item>
+          <Descriptions.Item label="自动完成时间">{formatOrderDate(data.autoCompleteAt)}</Descriptions.Item>
           <Descriptions.Item label="完成时间">{formatOrderDate(data.completedAt)}</Descriptions.Item>
+          <Descriptions.Item label="售后截止">{formatOrderDate(data.afterSaleDeadlineAt)}</Descriptions.Item>
+          <Descriptions.Item label="退款时间">{formatOrderDate(data.refundedAt)}</Descriptions.Item>
           <Descriptions.Item label="关闭时间">{formatOrderDate(data.closedAt)}</Descriptions.Item>
           <Descriptions.Item label="买家备注" span={3}>{data.buyerRemark || "-"}</Descriptions.Item>
         </Descriptions>
       </section>
+
+      <Modal
+        title={shipmentCorrection ? "修改物流信息" : "订单发货"}
+        open={shipmentOpen}
+        okText={shipmentCorrection ? "保存修改" : "确认发货"}
+        confirmLoading={lifecycle.isPending}
+        onCancel={() => setShipmentOpen(false)}
+        onOk={() => shipmentForm.validateFields().then((values) => lifecycle.mutateAsync({ type: shipmentCorrection ? "correct" : "ship", values }))}
+      >
+        <Form form={shipmentForm} layout="vertical">
+          <Form.Item name="carrierCode" label="承运商编码" rules={[{ required: true, message: "请输入承运商编码" }]}><Input maxLength={32} /></Form.Item>
+          <Form.Item name="carrierName" label="承运商名称" rules={[{ required: true, message: "请输入承运商名称" }]}><Input maxLength={64} /></Form.Item>
+          <Form.Item name="trackingNo" label="运单号" rules={[{ required: true, message: "请输入运单号" }]}><Input maxLength={128} /></Form.Item>
+          {shipmentCorrection && <Form.Item name="reason" label="修改原因" rules={[{ required: true, message: "请输入修改原因" }]}><Input.TextArea maxLength={500} rows={3} /></Form.Item>}
+        </Form>
+      </Modal>
 
       <section aria-labelledby="order-items-heading">
         <Typography.Title id="order-items-heading" level={2}>成交商品</Typography.Title>
