@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --catalog-paper: #f4f6f3;
+  --catalog-paper: #faf5ec;
   --catalog-surface: #ffffff;
-  --catalog-surface-subtle: #fafbf9;
-  --catalog-surface-muted: #ebefeb;
-  --catalog-ink: #111311;
-  --catalog-muted: #626761;
-  --catalog-rule: #e1e5e1;
-  --catalog-rule-strong: #c7cdc7;
+  --catalog-surface-subtle: #fdfbf6;
+  --catalog-surface-muted: #f2ecdf;
+  --catalog-ink: #17130d;
+  --catalog-muted: #6b6455;
+  --catalog-rule: #e9e2d2;
+  --catalog-rule-strong: #d6cdb8;
   --catalog-accent: #c72c59;
   --catalog-accent-strong: #9f1744;
   --catalog-accent-soft: #f7e5eb;
@@ -22,12 +22,12 @@
   --catalog-danger: #b42318;
   --catalog-danger-soft: #f9e9e7;
   --catalog-focus: #126fbd;
-  --catalog-on-ink: #f7f9f5;
-  --catalog-on-ink-muted: #c4cbc4;
-  --catalog-on-ink-faint: #aeb6ae;
+  --catalog-on-ink: #faf6ee;
+  --catalog-on-ink-muted: #cfc7b8;
+  --catalog-on-ink-faint: #b1a894;
   --catalog-content-max: 1344px;
-  --catalog-radius-control: 6px;
-  --catalog-radius-surface: 8px;
+  --catalog-radius-control: 8px;
+  --catalog-radius-surface: 12px;
   --catalog-shadow-subtle: 0 8px 28px rgb(17 19 17 / 5%);
   --catalog-shadow-card: 0 4px 16px rgb(17 19 17 / 6%);
   --catalog-shadow-raise: 0 3px 10px rgb(17 19 17 / 7%);

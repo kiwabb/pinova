@@ -481,7 +481,7 @@
     align-self: end;
     width: 100%;
     height: min(92dvh, 760px);
-    border-radius: 8px 8px 0 0;
+    border-radius: var(--catalog-radius-surface) var(--catalog-radius-surface) 0 0;
   }
 
   .drawerHeader {
@@ -507,7 +507,7 @@
     width: 100%;
     max-height: 92dvh;
     grid-template-columns: minmax(0, 1fr);
-    border-radius: 8px 8px 0 0;
+    border-radius: var(--catalog-radius-surface) var(--catalog-radius-surface) 0 0;
   }
 
   .quickImage {
@@ -525,7 +525,7 @@
     width: min(calc(100% - 28px), 820px);
     max-height: calc(100dvh - 20px);
     grid-template-columns: minmax(260px, 0.9fr) minmax(300px, 1.1fr);
-    border-radius: 8px;
+    border-radius: var(--catalog-radius-surface);
   }
 
   .quickImage {

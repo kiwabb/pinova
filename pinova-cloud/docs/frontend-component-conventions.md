@@ -148,14 +148,14 @@ Pinova 商城采用 **材料电商密度** 视觉系统（`pinova-web/design-sys
 基础语义变量定义在全局样式（`pinova-web/src/app/globals.css` 是唯一权威来源），局部 CSS Module 只引用语义，不重复建立另一套品牌色。引用 `--catalog-*`、`--font-*`、`--motion-*` 令牌时不要携带字面量兜底值：这些令牌始终定义在 `:root`，历史上复制到各模块的兜底值已多次与真实令牌漂移。
 
 ```css
---catalog-paper: #f4f6f3;
+--catalog-paper: #faf5ec;
 --catalog-surface: #ffffff;
---catalog-surface-subtle: #fafbf9;
---catalog-surface-muted: #ebefeb;
---catalog-ink: #111311;
---catalog-muted: #626761;
---catalog-rule: #e1e5e1;
---catalog-rule-strong: #c7cdc7;
+--catalog-surface-subtle: #fdfbf6;
+--catalog-surface-muted: #f2ecdf;
+--catalog-ink: #17130d;
+--catalog-muted: #6b6455;
+--catalog-rule: #e9e2d2;
+--catalog-rule-strong: #d6cdb8;
 --catalog-accent: #c72c59;
 --catalog-accent-strong: #9f1744;
 --catalog-accent-soft: #f7e5eb;
@@ -169,16 +169,16 @@ Pinova 商城采用 **材料电商密度** 视觉系统（`pinova-web/design-sys
 --catalog-danger: #b42318;
 --catalog-danger-soft: #f9e9e7;
 --catalog-focus: #126fbd;
---catalog-on-ink: #f7f9f5;
---catalog-on-ink-muted: #c4cbc4;
---catalog-on-ink-faint: #aeb6ae;
+--catalog-on-ink: #faf6ee;
+--catalog-on-ink-muted: #cfc7b8;
+--catalog-on-ink-faint: #b1a894;
 --catalog-content-max: 1344px;
 ```
 
 阴影仅使用全局层级：`--catalog-shadow-subtle`（吸顶壳）、`--catalog-shadow-card`（重复卡片）、`--catalog-shadow-raise`（悬停抬升）、`--catalog-shadow-soft` 与 `--catalog-shadow-float`（浮层）。深色（ink）表面上的文字使用 `--catalog-on-ink*` 梯度，不再逐处硬编码灰阶。
 
 - 桌面内容最大宽度为 `1344px`；商品网格移动 2 列、平板 3 列、桌面 4–5 列。
-- 商品卡允许白底与轻阴影；控件圆角不超过 6px，表面圆角不超过 8px。
+- 商品卡允许白底与轻阴影；控件圆角不超过 8px，表面圆角不超过 12px；50% 圆形仅用于装饰性拼豆圆点图标底（≤48px）。
 - 中文正文使用系统中文无衬线栈；价格和数量使用 tabular figures；价格使用品牌洋红。
 - 分类强调色用于入口图标底与状态点，禁止整页只铺一组粉色变化。
 

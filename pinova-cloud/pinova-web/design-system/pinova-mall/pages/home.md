@@ -14,7 +14,7 @@ Read `../MASTER.md` first. This file only records home-specific rules.
 ## Section rules
 
 ### Merch hero
-- Ink band (`--catalog-ink` surface, on-ink text, marigold price, accent CTA)
+- Brand-rose poster band (`--catalog-accent-strong` surface, white title, marigold badge/price, white primary CTA)
 - Prefer product main image; fallback to atelier hero asset only if no featured product
 - Must show price when `priceFen` is non-null
 - Primary CTA → product detail; secondary → starter kits category

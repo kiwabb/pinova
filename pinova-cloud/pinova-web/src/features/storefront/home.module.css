@@ -16,9 +16,9 @@
   display: grid;
   overflow: hidden;
   border-radius: var(--catalog-radius-surface);
-  background: var(--catalog-ink);
+  background: var(--catalog-accent-strong);
   box-shadow: var(--catalog-shadow-card);
-  color: var(--catalog-on-ink);
+  color: #fff;
 }
 
 .heroCopy {
@@ -37,8 +37,8 @@
   display: inline-flex;
   align-items: center;
   border-radius: var(--catalog-radius-control);
-  background: var(--catalog-accent);
-  color: #fff;
+  background: var(--catalog-marigold);
+  color: var(--catalog-ink);
   font-size: 12px;
   font-weight: 700;
 }
@@ -46,9 +46,9 @@
 .heroCopy h1 {
   margin: 0;
   max-width: 12ch;
-  color: var(--catalog-on-ink);
-  font-size: clamp(30px, 4.2vw, 48px);
-  line-height: 1.12;
+  color: #fff;
+  font-size: clamp(34px, 4.6vw, 56px);
+  line-height: 1.1;
   font-weight: 800;
   letter-spacing: 0;
 }
@@ -56,7 +56,7 @@
 .heroDesc {
   margin: 0;
   max-width: 34ch;
-  color: var(--catalog-on-ink-muted);
+  color: rgb(255 255 255 / 82%);
   font-size: 14px;
   line-height: 1.7;
 }
@@ -100,8 +100,8 @@
 }
 
 .heroPrimary {
-  background: var(--catalog-accent);
-  color: #fff;
+  background: #fff;
+  color: var(--catalog-accent-strong);
   box-shadow: var(--catalog-shadow-card);
 }
 
@@ -207,28 +207,34 @@
 }
 
 .exploreCard {
-  min-height: 88px;
+  min-height: 92px;
   padding: 16px 14px;
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) 18px;
+  grid-template-columns: 46px minmax(0, 1fr) 18px;
   align-items: center;
   gap: 12px;
   border-radius: var(--catalog-radius-surface);
-  background: var(--card-tint, var(--catalog-surface));
+  background: color-mix(
+    in srgb,
+    var(--index-color, var(--catalog-accent)) 15%,
+    #fff
+  );
   color: var(--catalog-ink);
   transition:
     transform var(--motion-fast),
+    background var(--motion-fast),
     box-shadow var(--motion-fast);
 }
 
+/* White bead with the category-color glyph — the brand's bead-dot motif. */
 .exploreIcon {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--catalog-radius-control);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
   display: grid;
   place-items: center;
-  background: rgb(255 255 255 / 78%);
-  color: var(--index-color, var(--catalog-muted));
+  background: #fff;
+  color: var(--index-color, var(--catalog-accent));
   box-shadow: var(--catalog-shadow-card);
 }
 
@@ -246,7 +252,7 @@
 
 .exploreText small {
   overflow: hidden;
-  color: var(--catalog-muted);
+  color: color-mix(in srgb, var(--catalog-ink) 62%, var(--index-color, var(--catalog-muted)));
   font-size: 12px;
   line-height: 1.35;
   text-overflow: ellipsis;
@@ -254,7 +260,7 @@
 }
 
 .exploreArrow {
-  color: var(--catalog-rule-strong);
+  color: color-mix(in srgb, var(--index-color, var(--catalog-muted)) 70%, var(--catalog-ink));
 }
 
 /* ── Products ── */
@@ -408,7 +414,7 @@
 
 @media (hover: hover) and (pointer: fine) {
   .heroPrimary:hover {
-    background: var(--catalog-accent-strong);
+    background: var(--catalog-paper);
   }
 
   .heroSecondary:hover {
@@ -421,6 +427,11 @@
 
   .exploreCard:hover {
     transform: translateY(-2px);
+    background: color-mix(
+      in srgb,
+      var(--index-color, var(--catalog-accent)) 24%,
+      #fff
+    );
     box-shadow: var(--catalog-shadow-soft);
   }
 

@@ -31,16 +31,16 @@ persist a new palette, change the stack, or override an existing page rule.
 | --- | --- |
 | Price / primary CTA | `--catalog-accent` `#c72c59` |
 | Success / in-stock | `--catalog-emerald` `#0c715f` |
-| Ink / dark band surface | `--catalog-ink` `#111311` |
+| Ink / dark band surface | `--catalog-ink` `#17130d` |
 | Text on ink | `--catalog-on-ink` / `-muted` / `-faint` |
 | Highlight on ink (price, brand mark) | `--catalog-marigold` `#efbc35` |
-| Muted | `--catalog-muted` `#626761` |
-| Paper / page bg | `--catalog-paper` `#f4f6f3` |
+| Muted | `--catalog-muted` `#6b6455` |
+| Paper / page bg | `--catalog-paper` `#faf5ec` (warm cream canvas) |
 | Product surface | `#ffffff` |
 | Rule | `--catalog-rule` |
 | Danger tint | `--catalog-danger-soft` |
-| Control radius | `--catalog-radius-control` `6px` |
-| Surface radius | `--catalog-radius-surface` `8px` |
+| Control radius | `--catalog-radius-control` `8px` |
+| Surface radius | `--catalog-radius-surface` `12px` |
 | Repeated-item shadow | `--catalog-shadow-card` |
 | Hover raise shadow | `--catalog-shadow-raise` / `--catalog-shadow-soft` |
 | Sticky-shell shadow | `--catalog-shadow-subtle` |
@@ -51,7 +51,9 @@ Category accent colors are used for shortcut icon chips and the category masthea
 
 - The shared header carries a `3px` flat accent topline as the brand mark.
 - Home section `h2` and the category masthead `h1` carry a flat 5px accent bar marker (category pages use the category color). No gradients — flat blocks only.
-- The merch hero and the store strip are **ink bookends**: flat `--catalog-ink` surfaces with `--catalog-on-ink` text, marigold price/eyebrow highlights, and accent-filled primary CTAs. All other bands stay light.
+- The merch hero is a **brand-rose poster band**: flat `--catalog-accent-strong` surface, white display title, marigold badge/price, white primary CTA. The store strip is the matching **ink bookend** (flat `--catalog-ink`, on-ink text, marigold eyebrow, accent CTA). All other bands stay light on the cream canvas.
+- Category shortcut tiles are **candy blocks**: `color-mix` of the category color (~15%) into white, a white bead-dot circle carrying the category-colored icon, ink text. Hover deepens the mix and raises the tile.
+- Decorative icon chips (page headings, empty states, category shortcuts, avatars) are drawn as circles — the bead-dot brand motif. Interactive controls stay on the 8px control radius.
 
 ## Typography
 
@@ -65,21 +67,21 @@ Category accent colors are used for shortcut icon chips and the category masthea
 - Content max: `1344px`
 - Home product grid: 2 col mobile → 3 tablet → 4–5 desktop
 - Section vertical padding: ~24–40px (not 80–120px gallery gaps)
-- Cards: light surface, optional soft shadow `0 4px 16px rgb(17 19 17 / 6%)`, radius ≤ 8px
+- Cards: white surface on the cream canvas, soft shadow `--catalog-shadow-card`, radius ≤ 12px
 - Prefer spacing, surface tone and one shadow tier over visible borders. Do not create a line around every region.
-- Text commands use 6px controls. Fully pill-shaped text buttons are not part of the storefront language.
+- Text commands use 8px controls. Fully pill-shaped text buttons are not part of the storefront language; the only circles are the decorative bead-dot icon chips (≤ 48px) that carry the brand motif.
 - Decorative radial/linear gradients and backdrop blur are prohibited. Product imagery carries the visual signal.
 
 ## Components
 
 ### Product card
-A raised white commerce card: surface `#ffffff`, radius 8px, `--catalog-shadow-card`, 12px inner padding, media on the 6px control radius. Image-led, title 2 lines max at 14-16px, price 16-20px bold mono accent, add-to-cart is an accent-filled CTA visible at rest (not hover-only). Hover raises the card (`translateY(-2px)` + `--catalog-shadow-soft`, 140-240ms, reduced-motion safe). Empty price/stock remain empty.
+A raised white commerce card: surface `#ffffff`, radius 12px, `--catalog-shadow-card`, 12px inner padding, media on the 8px control radius. Image-led, title 2 lines max at 14-16px, price 16-20px bold mono accent, add-to-cart is an accent-filled CTA visible at rest (not hover-only). Hover raises the card (`translateY(-2px)` + `--catalog-shadow-soft`, 140-240ms, reduced-motion safe). Empty price/stock remain empty.
 
 ### Category shortcut
 Icon chip + label + real category href. Horizontal strip, scroll on mobile.
 
 ### Merch hero
-Ink band: featured product photo + name + price + primary CTA on the flat `--catalog-ink` surface. Badge and primary CTA use accent fill; the price uses marigold mono; secondary CTA is a translucent on-ink chip. No manifesto copy as the main message.
+Brand-rose poster band: featured product photo + name + price + primary CTA on the flat `--catalog-accent-strong` surface. White display title, marigold badge (ink text) and marigold mono price, white primary CTA (accent text), translucent white secondary CTA. No manifesto copy as the main message.
 
 ### Floor header
 Title + optional count + “查看更多” link on one row.
@@ -131,7 +133,7 @@ Title + optional count + “查看更多” link on one row.
 - Verify no horizontal overflow, no text overlap and no content hidden under sticky UI.
 - All interactive targets are at least `44×44px`; icon-only controls have accessible names.
 - Run `npm run lint` and `npx tsc --noEmit`; run the relevant Playwright flow for behavior or layout changes.
-- Scan changed CSS for raw brand colors, radii above 8px, decorative gradients and page-local header implementations.
+- Scan changed CSS for raw brand colors, radii above 12px (50% is reserved for bead-dot icon chips), decorative gradients and page-local header implementations.
 
 ## Stack
 
