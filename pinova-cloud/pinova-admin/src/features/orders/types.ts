@@ -38,7 +38,16 @@ export interface OrderDetail extends OrderSummary {
   paymentExpiresAt: string | null;
   paidAt: string | null;
   fulfillmentStartedAt: string | null;
+  carrierCode: string | null;
+  carrierName: string | null;
+  trackingNo: string | null;
+  shippedAt: string | null;
+  autoCompleteAt: string | null;
   completedAt: string | null;
+  completionSource: number | null;
+  completionReason: string | null;
+  afterSaleDeadlineAt: string | null;
+  refundedAt: string | null;
   closedAt: string | null;
   closeReasonCode: number | null;
   closeReason: string | null;
@@ -61,4 +70,3 @@ export interface OrderFilters {
   page: number;
   pageSize: number;
 }
-

@@ -1,0 +1,1 @@
+package com.pinova.service.command;import com.pinova.service.model.AuthenticatedAdminResult;public record AdjustInventoryCommand(AuthenticatedAdminResult admin,Long stockId,String transactionNo,String mode,Long quantity,Integer version,String reason){}

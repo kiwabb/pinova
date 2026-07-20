@@ -17,6 +17,7 @@ public class LocalMockPaymentProvider implements SimulatedPaymentProvider {
 
     private final Environment environment;
     private final Map<String, ProviderPaymentResult> results = new ConcurrentHashMap<>();
+    private final Map<String, ProviderRefundResult> refundResults = new ConcurrentHashMap<>();
 
     public LocalMockPaymentProvider(Environment environment) {
         this.environment = environment;
@@ -88,6 +89,25 @@ public class LocalMockPaymentProvider implements SimulatedPaymentProvider {
                 Instant.now(),
                 outcome == ProviderPaymentStatus.FAILED ? "MOCK_PAYMENT_FAILED" : null,
                 outcome == ProviderPaymentStatus.FAILED ? "模拟支付失败，可重新发起支付" : null));
+    }
+
+    @Override
+    public ProviderRefundResult createRefund(ProviderRefundCommand command) {
+        requireEnabled();
+        String providerRefundNo = "MOCK-REFUND-" + command.refundNo() + "-" + command.attemptCount();
+        ProviderRefundResult result = new ProviderRefundResult(providerRefundNo,
+                ProviderRefundStatus.SUCCEEDED, command.amountFen(), command.currencyCode(),
+                Instant.now(), null, null);
+        refundResults.put(providerRefundNo, result);
+        return result;
+    }
+
+    @Override
+    public ProviderRefundResult queryRefund(ProviderRefundCommand command, String providerRefundNo) {
+        requireEnabled();
+        return refundResults.getOrDefault(providerRefundNo, new ProviderRefundResult(
+                providerRefundNo, ProviderRefundStatus.FAILED, command.amountFen(), command.currencyCode(),
+                Instant.now(), "MOCK_REFUND_NOT_FOUND", "模拟退款记录不存在"));
     }
 
     private ProviderPaymentResult pending(

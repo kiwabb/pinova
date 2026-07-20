@@ -20,7 +20,9 @@ public class AdminOrderResponseAssembler {
                 result.currencyCode(), result.goodsAmountFen(), result.discountAmountFen(),
                 result.shippingAmountFen(), result.payableAmountFen(), result.paidAmountFen(),
                 result.buyerRemark(), result.submittedAt(), result.paymentExpiresAt(), result.paidAt(),
-                result.fulfillmentStartedAt(), result.completedAt(), result.closedAt(),
+                result.fulfillmentStartedAt(), result.carrierCode(), result.carrierName(), result.trackingNo(),
+                result.shippedAt(), result.autoCompleteAt(), result.completedAt(), result.completionSource(),
+                result.completionReason(), result.afterSaleDeadlineAt(), result.refundedAt(), result.closedAt(),
                 result.closeReasonCode(), result.closeReason(),
                 result.items().stream().map(this::toItemResponse).toList(),
                 toAddressResponse(result.shippingAddress()));
@@ -70,4 +72,3 @@ public class AdminOrderResponseAssembler {
         return value.substring(0, 3) + "*".repeat(value.length() - 7) + value.substring(value.length() - 4);
     }
 }
-

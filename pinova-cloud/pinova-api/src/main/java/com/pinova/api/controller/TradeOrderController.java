@@ -1,15 +1,20 @@
 package com.pinova.api.controller;
 
 import com.pinova.api.assembler.MemberOrderResponseAssembler;
+import com.pinova.api.assembler.OrderLifecycleResponseAssembler;
 import com.pinova.api.assembler.TradeOrderResponseAssembler;
 import com.pinova.api.response.MemberOrderSummaryResponse;
 import com.pinova.api.response.PageResponse;
 import com.pinova.api.request.SubmitOrderLineRequest;
 import com.pinova.api.request.SubmitOrderRequest;
 import com.pinova.api.response.SubmittedCheckoutResponse;
+import com.pinova.api.response.CancelledCheckoutResponse;
+import com.pinova.api.response.OrderLifecycleResponse;
 import com.pinova.api.web.CurrentMemberResolver;
 import com.pinova.common.api.ApiResponse;
 import com.pinova.service.MemberOrderQueryService;
+import com.pinova.service.PaymentOrderService;
+import com.pinova.service.OrderLifecycleService;
 import com.pinova.service.TradeOrderService;
 import com.pinova.service.command.SubmitOrderCommand;
 import com.pinova.service.command.SubmitOrderLineCommand;
@@ -25,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -37,22 +43,41 @@ public class TradeOrderController {
     private static final String CART_TOKEN_COOKIE = "PINOVA_CART_TOKEN";
 
     private final TradeOrderService tradeOrderService;
+    private final PaymentOrderService paymentOrderService;
     private final TradeOrderResponseAssembler responseAssembler;
     private final MemberOrderQueryService memberOrderQueryService;
     private final MemberOrderResponseAssembler memberOrderResponseAssembler;
     private final CurrentMemberResolver currentMemberResolver;
+    private final OrderLifecycleService lifecycleService;
+    private final OrderLifecycleResponseAssembler lifecycleAssembler;
 
     public TradeOrderController(
             TradeOrderService tradeOrderService,
+            PaymentOrderService paymentOrderService,
             TradeOrderResponseAssembler responseAssembler,
             MemberOrderQueryService memberOrderQueryService,
             MemberOrderResponseAssembler memberOrderResponseAssembler,
-            CurrentMemberResolver currentMemberResolver) {
+            CurrentMemberResolver currentMemberResolver,
+            OrderLifecycleService lifecycleService,
+            OrderLifecycleResponseAssembler lifecycleAssembler) {
         this.tradeOrderService = tradeOrderService;
+        this.paymentOrderService = paymentOrderService;
         this.responseAssembler = responseAssembler;
         this.memberOrderQueryService = memberOrderQueryService;
         this.memberOrderResponseAssembler = memberOrderResponseAssembler;
         this.currentMemberResolver = currentMemberResolver;
+        this.lifecycleService = lifecycleService;
+        this.lifecycleAssembler = lifecycleAssembler;
+    }
+
+    @Operation(summary = "确认当前会员的订单已收货")
+    @PostMapping("/{orderNo}/confirm-receipt")
+    public ApiResponse<OrderLifecycleResponse> confirmReceipt(
+            @PathVariable String orderNo,
+            @RequestHeader("Idempotency-Key") String requestKey,
+            HttpServletRequest request) {
+        return ApiResponse.success(lifecycleAssembler.toResponse(lifecycleService.confirmReceipt(
+                currentMemberResolver.requireCurrentMemberId(request), orderNo, requestKey)));
     }
 
     @Operation(summary = "分页获取当前会员的订单")
@@ -77,6 +102,17 @@ public class TradeOrderController {
         Long memberId = currentMemberResolver.requireCurrentMemberId(request);
         return ApiResponse.success(responseAssembler.toSubmittedCheckoutResponse(
                 tradeOrderService.submitOrder(toCommand(memberId, guestCartToken, idempotencyKey, body))));
+    }
+
+    @Operation(summary = "取消当前会员的待支付结算")
+    @PostMapping("/checkout/{checkoutNo}/cancel")
+    public ApiResponse<CancelledCheckoutResponse> cancelCheckout(
+            @PathVariable String checkoutNo,
+            HttpServletRequest request) {
+        var cancelled = paymentOrderService.cancelCheckout(
+                currentMemberResolver.requireCurrentMemberId(request), checkoutNo);
+        return ApiResponse.success(new CancelledCheckoutResponse(
+                cancelled.checkoutNo(), cancelled.cancelledOrderCount()));
     }
 
     private static SubmitOrderCommand toCommand(

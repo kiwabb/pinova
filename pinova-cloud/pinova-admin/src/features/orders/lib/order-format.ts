@@ -4,6 +4,7 @@ const statusLabels: Record<number, { label: string; color: string }> = {
   2: { label: "履约中", color: "cyan" },
   3: { label: "已完成", color: "green" },
   4: { label: "已关闭", color: "default" },
+  5: { label: "已退款", color: "purple" },
 };
 
 export const orderStatusOptions = Object.entries(statusLabels).map(([value, item]) => ({
@@ -35,4 +36,3 @@ export function formatOrderDate(value: string | null) {
 export function fulfillmentLabel(value: number) {
   return ({ 1: "实物配送", 2: "数字交付", 3: "到店服务" } as Record<number, string>)[value] ?? "未知";
 }
-

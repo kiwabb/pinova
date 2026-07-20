@@ -76,7 +76,7 @@
   padding: 4px;
   border-radius: var(--catalog-radius-surface);
   display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 4px;
   background: var(--catalog-surface-muted);
 }
@@ -229,6 +229,8 @@
   color: var(--catalog-muted);
 }
 
+.orderStatus[data-status="REFUNDED"] { color: var(--catalog-violet); }
+
 .orderNumber {
   justify-content: flex-end;
   gap: 8px;
@@ -246,6 +248,24 @@
   padding: 4px 20px;
   background: var(--catalog-surface-subtle);
 }
+
+.logistics {
+  min-height: 44px;
+  padding: 8px 20px;
+  border-top: 1px solid var(--catalog-rule);
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--catalog-muted);
+  font-size: 12px;
+}
+
+.logistics strong {
+  color: var(--catalog-ink);
+  font-family: var(--font-mono);
+}
+
+.logistics small { margin-left: auto; }
 
 .orderItem {
   min-width: 0;
@@ -336,6 +356,24 @@
     background var(--motion-fast),
     transform var(--motion-fast);
 }
+
+.orderActions { display: flex; align-items: center; gap: 8px; }
+.orderActions button {
+  min-height: 44px;
+  padding-inline: 12px;
+  border: 1px solid var(--catalog-rule);
+  border-radius: var(--catalog-radius-control);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: var(--catalog-surface);
+  color: var(--catalog-ink);
+  font-size: 12px;
+  font-weight: 700;
+}
+.orderActions .payButton { border: 0; background: var(--catalog-accent); color: #fff; }
+.afterSaleHint { color: var(--catalog-warning); font-size: 12px; font-weight: 700; }
 
 .payButton:hover {
   background: var(--catalog-accent-strong);
@@ -432,6 +470,21 @@
   font-variant-numeric: tabular-nums;
 }
 
+.afterSales { margin-top: 20px; padding: 18px 20px; border-radius: var(--catalog-radius-surface); background: var(--catalog-surface); box-shadow: var(--catalog-shadow-card); }
+.afterSales h2 { margin: 0 0 12px; display: flex; align-items: center; gap: 8px; font-size: 16px; letter-spacing: 0; }
+.afterSales > div { min-height: 40px; display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 14px; border-top: 1px solid var(--catalog-rule); font-size: 12px; }
+.afterSales span { overflow-wrap: anywhere; font-family: var(--font-mono); }
+.afterSales small { color: var(--catalog-muted); }
+
+.dialogBackdrop { position: fixed; inset: 0; z-index: 100; padding: 20px; display: grid; place-items: center; background: rgb(23 19 13 / 52%); }
+.refundDialog { width: min(100%, 440px); padding: 22px; border-radius: var(--catalog-radius-surface); display: grid; gap: 16px; background: var(--catalog-surface); box-shadow: var(--catalog-shadow-raise); }
+.refundDialog h2 { margin: 0; font-size: 20px; letter-spacing: 0; }
+.refundDialog label { display: grid; gap: 7px; color: var(--catalog-muted); font-size: 12px; font-weight: 700; }
+.refundDialog select, .refundDialog textarea { width: 100%; padding: 10px 12px; border: 1px solid var(--catalog-rule-strong); border-radius: var(--catalog-radius-control); background: #fff; color: var(--catalog-ink); font: inherit; }
+.refundDialog > div { display: flex; justify-content: flex-end; gap: 8px; }
+.refundDialog button { min-height: 44px; padding-inline: 16px; border: 1px solid var(--catalog-rule); border-radius: var(--catalog-radius-control); background: var(--catalog-surface); color: var(--catalog-ink); font-weight: 700; }
+.refundDialog button.payButton { border: 0; background: var(--catalog-accent); color: #fff; }
+
 @keyframes member-order-spin {
   to {
     transform: rotate(360deg);
@@ -511,6 +564,11 @@
   .payButton {
     width: 100%;
   }
+
+  .orderActions { width: 100%; }
+  .orderActions button { flex: 1; }
+  .logistics { align-items: flex-start; flex-wrap: wrap; }
+  .logistics small { width: 100%; margin-left: 25px; }
 }
 
 @media (max-width: 420px) {

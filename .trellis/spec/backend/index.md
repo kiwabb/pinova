@@ -11,6 +11,7 @@ These rules cover the Pinova Java backend and PostgreSQL schema under `pinova-cl
 | [Member Order Query Contract](./member-order-query-contract.md) | Authenticated member order history and immutable item snapshots | Current |
 | [Payment Contract](./payment-contract.md) | Checkout payment aggregation, provider results, inventory conversion and timeout closing | Current |
 | [Request Validation Contract](./request-validation-contract.md) | Required JSON bodies, Bean Validation, nested requests and error ownership | Current |
+| [Commerce Operation Lifecycle](./commerce-operation-lifecycle.md) | Cancellation, fulfillment, refund, catalog, inventory and admin-write contracts | Current |
 
 ## Pre-Development Checklist
 

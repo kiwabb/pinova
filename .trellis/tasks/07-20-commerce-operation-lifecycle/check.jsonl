@@ -1,0 +1,8 @@
+{"file":".trellis/spec/backend/index.md","reason":"Backend quality checklist"}
+{"file":".trellis/spec/backend/trade-order-contract.md","reason":"Verify order and inventory invariants"}
+{"file":".trellis/spec/backend/payment-contract.md","reason":"Verify payment/refund concurrency invariants"}
+{"file":".trellis/spec/backend/admin-order-contract.md","reason":"Verify admin authorization and masking"}
+{"file":".trellis/spec/backend/request-validation-contract.md","reason":"Verify request validation ownership"}
+{"file":".trellis/spec/frontend/pinova-admin.md","reason":"Verify admin UI architecture"}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"Verify frontend behavior and accessibility"}
+{"file":".trellis/tasks/07-20-commerce-operation-lifecycle/research/domain-design.md","reason":"Verify implementation against selected domain approach"}

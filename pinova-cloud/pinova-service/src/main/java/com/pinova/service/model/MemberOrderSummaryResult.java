@@ -12,6 +12,13 @@ public record MemberOrderSummaryResult(
         long payableAmountFen,
         long paidAmountFen,
         Instant submittedAt,
+        String carrierName,
+        String trackingNo,
+        Instant shippedAt,
+        Instant autoCompleteAt,
+        Instant completedAt,
+        Instant afterSaleDeadlineAt,
+        Instant refundedAt,
         List<MemberOrderItemResult> items) {
     public MemberOrderSummaryResult {
         items = List.copyOf(items);

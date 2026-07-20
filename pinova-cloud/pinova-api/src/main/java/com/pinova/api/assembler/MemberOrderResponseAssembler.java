@@ -35,6 +35,13 @@ public class MemberOrderResponseAssembler {
                 result.payableAmountFen(),
                 result.paidAmountFen(),
                 result.submittedAt(),
+                result.carrierName(),
+                result.trackingNo(),
+                result.shippedAt(),
+                result.autoCompleteAt(),
+                result.completedAt(),
+                result.afterSaleDeadlineAt(),
+                result.refundedAt(),
                 result.items().stream().map(this::toItemResponse).toList());
     }
 

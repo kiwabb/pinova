@@ -4,6 +4,7 @@ import type {
   MemberOrderItem,
   MemberOrderPageData,
   MemberOrderStatusFilter,
+  MemberAfterSale,
 } from "../types";
 import {
   isMemberOrderStatus,
@@ -37,6 +38,13 @@ interface MemberOrderDto {
   payableAmountFen: number | string;
   paidAmountFen: number | string;
   submittedAt: string;
+  carrierName: string | null;
+  trackingNo: string | null;
+  shippedAt: string | null;
+  autoCompleteAt: string | null;
+  completedAt: string | null;
+  afterSaleDeadlineAt: string | null;
+  refundedAt: string | null;
   items: MemberOrderItemDto[];
 }
 
@@ -94,8 +102,47 @@ function mapOrder(order: MemberOrderDto): MemberOrder {
     payableAmountFen: toNumber(order.payableAmountFen, "订单金额"),
     paidAmountFen: toNumber(order.paidAmountFen, "支付金额"),
     submittedAt: order.submittedAt,
+    carrierName: order.carrierName,
+    trackingNo: order.trackingNo,
+    shippedAt: order.shippedAt,
+    autoCompleteAt: order.autoCompleteAt,
+    completedAt: order.completedAt,
+    afterSaleDeadlineAt: order.afterSaleDeadlineAt,
+    refundedAt: order.refundedAt,
     items: Array.isArray(order.items) ? order.items.map(mapOrderItem) : [],
   };
+}
+
+async function mutation<T>(path: string, body?: object): Promise<T> {
+  const response = await fetch(path, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: { "Content-Type": "application/json", "Idempotency-Key": crypto.randomUUID() },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!response.ok) throw new MemberOrderApiError(await errorMessage(response), response.status);
+  const payload = JSONBig.parse(await response.text()) as ApiResponseDto<T>;
+  if (payload.code !== "SUCCESS") throw new MemberOrderApiError(payload.message || "订单操作失败", response.status);
+  return payload.data;
+}
+
+export function cancelCheckout(checkoutNo: string) {
+  return mutation(`/api/orders/checkout/${encodeURIComponent(checkoutNo)}/cancel`);
+}
+
+export function confirmOrderReceipt(orderNo: string) {
+  return mutation(`/api/orders/${encodeURIComponent(orderNo)}/confirm-receipt`);
+}
+
+export function applyOrderRefund(orderNo: string, reasonCode: number, reason: string) {
+  return mutation<MemberAfterSale>(`/api/after-sales/orders/${encodeURIComponent(orderNo)}`, { reasonCode, reason });
+}
+
+export async function listMemberAfterSales(signal?: AbortSignal): Promise<MemberAfterSale[]> {
+  const response = await fetch("/api/after-sales", { credentials: "same-origin", cache: "no-store", signal });
+  if (!response.ok) throw new MemberOrderApiError(await errorMessage(response), response.status);
+  const payload = JSONBig.parse(await response.text()) as ApiResponseDto<MemberAfterSale[]>;
+  return Array.isArray(payload.data) ? payload.data : [];
 }
 
 async function errorMessage(response: Response) {

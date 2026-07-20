@@ -45,7 +45,16 @@ public final class AdminOrderResultAssembler {
                 order.getPaymentExpiresAt(),
                 order.getPaidAt(),
                 order.getFulfillmentStartedAt(),
+                order.getCarrierCode(),
+                order.getCarrierName(),
+                order.getTrackingNo(),
+                order.getShippedAt(),
+                order.getAutoCompleteAt(),
                 order.getCompletedAt(),
+                order.getCompletionSource(),
+                order.getCompletionReason(),
+                order.getAfterSaleDeadlineAt(),
+                order.getRefundedAt(),
                 order.getClosedAt(),
                 order.getCloseReasonCode(),
                 order.getCloseReason(),
@@ -79,4 +88,3 @@ public final class AdminOrderResultAssembler {
                 address.getDetailAddress());
     }
 }
-

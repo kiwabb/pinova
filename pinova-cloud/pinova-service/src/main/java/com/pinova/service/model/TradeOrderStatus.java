@@ -7,7 +7,8 @@ public enum TradeOrderStatus {
     PENDING_FULFILLMENT((short) 1),
     FULFILLING((short) 2),
     COMPLETED((short) 3),
-    CLOSED((short) 4);
+    CLOSED((short) 4),
+    REFUNDED((short) 5);
 
     private final short code;
 

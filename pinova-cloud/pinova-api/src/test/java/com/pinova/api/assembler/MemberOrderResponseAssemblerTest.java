@@ -23,6 +23,7 @@ class MemberOrderResponseAssemblerTest {
                         "PO202607190001", "550e8400-e29b-41d4-a716-446655440000",
                         "PENDING_PAYMENT", (short) 1, "CNY",
                         5990L, 0L, Instant.parse("2026-07-19T04:00:00Z"),
+                        null, null, null, null, null, null, null,
                         List.of(new MemberOrderItemResult(
                                 "48 色基础拼豆套装", "48 色 / 基础版",
                                 "products/基础套装.webp", 5990L, 1L, 5990L)))),

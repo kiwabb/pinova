@@ -22,6 +22,7 @@ import com.pinova.service.command.CreatePaymentCommand;
 import com.pinova.service.command.SimulatePaymentResultCommand;
 import com.pinova.service.error.PaymentErrorCode;
 import com.pinova.service.model.PaymentOrderResult;
+import com.pinova.service.model.CancelledCheckoutResult;
 import com.pinova.service.model.PaymentOrderStatus;
 import com.pinova.service.model.TradeOrderStatus;
 import com.pinova.service.payment.LocalMockPaymentProvider;
@@ -192,6 +193,49 @@ public class PaymentOrderServiceImpl implements PaymentOrderService {
         simulatedProvider.simulateResult(
                 toProviderCommand(payment), payment.getProviderTransactionNo(), outcome);
         return refreshPayment(command.memberId(), paymentNo);
+    }
+
+    @Override
+    @Transactional
+    public CancelledCheckoutResult cancelCheckout(Long memberId, String rawCheckoutNo) {
+        requireMember(memberId);
+        String checkoutNo = normalizeCheckoutNo(rawCheckoutNo);
+        Instant now = Instant.now();
+        tradeOrderMapper.acquireCheckoutLock(checkoutNo);
+        List<TradeOrder> orders = tradeOrderMapper.selectCheckoutOrdersForUpdate(checkoutNo);
+        if (orders.isEmpty() || orders.stream().anyMatch(order -> !memberId.equals(order.getMemberId()))) {
+            throw new BusinessException(PaymentErrorCode.CHECKOUT_NOT_FOUND);
+        }
+        List<TradeOrder> positiveOrders = orders.stream()
+                .filter(order -> order.getPayableAmountFen() > 0)
+                .toList();
+        if (positiveOrders.isEmpty()) {
+            throw new BusinessException(PaymentErrorCode.PAYMENT_NOT_REQUIRED);
+        }
+        boolean alreadyCancelled = positiveOrders.stream().allMatch(order ->
+                order.getStatus() == TradeOrderStatus.CLOSED.code()
+                        && Short.valueOf((short) 1).equals(order.getCloseReasonCode()));
+        if (alreadyCancelled) {
+            return new CancelledCheckoutResult(checkoutNo, positiveOrders.size());
+        }
+        if (positiveOrders.stream().anyMatch(order -> order.getStatus() != TradeOrderStatus.PENDING_PAYMENT.code())) {
+            throw new BusinessException(PaymentErrorCode.PAYMENT_STATE_CONFLICT, "订单当前不能取消");
+        }
+        PaymentOrder payment = paymentOrderMapper.selectByCheckoutNoForUpdate(checkoutNo);
+        if (payment != null && (payment.getStatus() == PaymentOrderStatus.SUCCEEDED.code()
+                || payment.getStatus() == PaymentOrderStatus.REVIEW_REQUIRED.code())) {
+            throw new BusinessException(PaymentErrorCode.PAYMENT_STATE_CONFLICT, "支付已确认，订单不能取消");
+        }
+        closeProviderPayment(payment);
+        releaseReservations(positiveOrders, now);
+        for (TradeOrder order : positiveOrders) {
+            if (tradeOrderMapper.closeCancelled(
+                    order.getId(), order.getVersion(), now, memberId) != 1) {
+                throw new BusinessException(PaymentErrorCode.PAYMENT_STATE_CONFLICT);
+            }
+        }
+        closePaymentRecord(payment, now);
+        return new CancelledCheckoutResult(checkoutNo, positiveOrders.size());
     }
 
     @Override

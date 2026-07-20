@@ -16,6 +16,7 @@ export const MEMBER_ORDER_FILTERS: readonly MemberOrderFilterOption[] = [
   { value: "FULFILLING", label: "履约中", queryValue: 2 },
   { value: "COMPLETED", label: "已完成", queryValue: 3 },
   { value: "CLOSED", label: "已关闭", queryValue: 4 },
+  { value: "REFUNDED", label: "已退款", queryValue: 5 },
 ];
 
 const STATUS_LABELS: Record<MemberOrderStatus, string> = {
@@ -24,6 +25,7 @@ const STATUS_LABELS: Record<MemberOrderStatus, string> = {
   FULFILLING: "履约中",
   COMPLETED: "已完成",
   CLOSED: "已关闭",
+  REFUNDED: "已退款",
 };
 
 const dateTimeFormatter = new Intl.DateTimeFormat("zh-CN", {

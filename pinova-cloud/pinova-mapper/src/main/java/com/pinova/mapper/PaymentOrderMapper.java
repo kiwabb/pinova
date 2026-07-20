@@ -30,4 +30,7 @@ public interface PaymentOrderMapper extends BaseMapper<PaymentOrder> {
             FOR UPDATE
             """)
     PaymentOrder selectByPaymentNoForUpdate(@Param("paymentNo") String paymentNo);
+
+    @Select("SELECT * FROM pinova.payment_order WHERE id = #{paymentId} FOR UPDATE")
+    PaymentOrder selectByIdForUpdate(@Param("paymentId") Long paymentId);
 }

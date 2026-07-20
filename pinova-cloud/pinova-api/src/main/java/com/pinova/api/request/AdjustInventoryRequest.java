@@ -1,0 +1,1 @@
+package com.pinova.api.request;import jakarta.validation.constraints.*;public record AdjustInventoryRequest(@NotBlank @Size(max=64)String transactionNo,@NotBlank String mode,@NotNull Long quantity,@NotNull @PositiveOrZero Integer version,@NotBlank @Size(max=500)String reason){}

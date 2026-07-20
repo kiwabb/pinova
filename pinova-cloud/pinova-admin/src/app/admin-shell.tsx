@@ -1,12 +1,16 @@
 import { useState } from "react";
 import {
   AppstoreOutlined,
+  AuditOutlined,
+  DatabaseOutlined,
   FileTextOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuOutlined,
   MenuUnfoldOutlined,
   TagsOutlined,
+  ShoppingOutlined,
+  SyncOutlined,
   TeamOutlined,
   UserOutlined,
 } from "@ant-design/icons";
@@ -23,8 +27,12 @@ const { Header, Content, Sider } = Layout;
 const navigationItems: MenuProps["items"] = [
   { key: "/overview", icon: <AppstoreOutlined />, label: "概览" },
   { key: "/orders", icon: <FileTextOutlined />, label: "订单管理" },
+  { key: "/after-sales", icon: <SyncOutlined />, label: "售后退款" },
+  { key: "/products", icon: <ShoppingOutlined />, label: "商品管理" },
+  { key: "/inventory", icon: <DatabaseOutlined />, label: "库存管理" },
   { key: "/members", icon: <TeamOutlined />, label: "会员管理" },
   { key: "/categories", icon: <TagsOutlined />, label: "类目管理" },
+  { key: "/audits", icon: <AuditOutlined />, label: "操作审计" },
 ];
 
 interface AdminNavigationProps {

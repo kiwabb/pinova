@@ -1,0 +1,1 @@
+package com.pinova.api.request;import jakarta.validation.constraints.*;public record SaveAdminCategoryRequest(Long parentId,@NotBlank @Size(max=64) String categoryCode,@NotBlank @Size(max=64) String name,@NotNull @PositiveOrZero Integer sortOrder,@Size(max=512) String iconUrl,@NotNull @Min(0) @Max(1) Short status,@PositiveOrZero Integer version){}

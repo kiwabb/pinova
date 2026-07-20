@@ -1,0 +1,1 @@
+package com.pinova.service.model;import java.time.Instant;public record AdminAuditResult(Long id,Long operatorId,String domainCode,String actionCode,String targetType,String targetId,String requestId,String reason,String beforeSnapshot,String afterSnapshot,Instant occurredAt){}

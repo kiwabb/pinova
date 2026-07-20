@@ -8,7 +8,7 @@ export default defineConfig({
     strictPort: true,
     proxy: {
       "/api": {
-        target: "http://127.0.0.1:18080",
+        target: process.env.PINOVA_API_BASE_URL ?? "http://127.0.0.1:18080",
         changeOrigin: false,
         rewrite: (path) => path.replace(/^\/api/, ""),
       },

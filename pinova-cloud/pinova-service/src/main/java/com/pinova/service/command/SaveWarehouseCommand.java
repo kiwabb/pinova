@@ -1,0 +1,1 @@
+package com.pinova.service.command;import com.pinova.service.model.AuthenticatedAdminResult;public record SaveWarehouseCommand(AuthenticatedAdminResult admin,Long id,Long shopId,String warehouseCode,String name,Short warehouseType,Short status,Integer version){}

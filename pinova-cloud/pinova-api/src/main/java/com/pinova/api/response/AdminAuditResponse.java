@@ -1,0 +1,1 @@
+package com.pinova.api.response;import java.time.Instant;public record AdminAuditResponse(String id,String operatorId,String domainCode,String actionCode,String targetType,String targetId,String requestId,String reason,String beforeSnapshot,String afterSnapshot,Instant occurredAt){}

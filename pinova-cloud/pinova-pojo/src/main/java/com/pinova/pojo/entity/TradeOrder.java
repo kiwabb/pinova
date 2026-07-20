@@ -142,11 +142,38 @@ public class TradeOrder implements Serializable {
     @TableField("fulfillment_started_at")
     private Instant fulfillmentStartedAt;
 
+    @TableField("carrier_code")
+    private String carrierCode;
+
+    @TableField("carrier_name")
+    private String carrierName;
+
+    @TableField("tracking_no")
+    private String trackingNo;
+
+    @TableField("shipped_at")
+    private Instant shippedAt;
+
+    @TableField("auto_complete_at")
+    private Instant autoCompleteAt;
+
     /**
      * 订单完成时间
      */
     @TableField("completed_at")
     private Instant completedAt;
+
+    @TableField("completion_source")
+    private Short completionSource;
+
+    @TableField("completion_reason")
+    private String completionReason;
+
+    @TableField("after_sale_deadline_at")
+    private Instant afterSaleDeadlineAt;
+
+    @TableField("refunded_at")
+    private Instant refundedAt;
 
     /**
      * 未支付订单关闭时间
@@ -357,6 +384,17 @@ public class TradeOrder implements Serializable {
         this.fulfillmentStartedAt = fulfillmentStartedAt;
     }
 
+    public String getCarrierCode() { return carrierCode; }
+    public void setCarrierCode(String carrierCode) { this.carrierCode = carrierCode; }
+    public String getCarrierName() { return carrierName; }
+    public void setCarrierName(String carrierName) { this.carrierName = carrierName; }
+    public String getTrackingNo() { return trackingNo; }
+    public void setTrackingNo(String trackingNo) { this.trackingNo = trackingNo; }
+    public Instant getShippedAt() { return shippedAt; }
+    public void setShippedAt(Instant shippedAt) { this.shippedAt = shippedAt; }
+    public Instant getAutoCompleteAt() { return autoCompleteAt; }
+    public void setAutoCompleteAt(Instant autoCompleteAt) { this.autoCompleteAt = autoCompleteAt; }
+
     public Instant getCompletedAt() {
         return completedAt;
     }
@@ -364,6 +402,15 @@ public class TradeOrder implements Serializable {
     public void setCompletedAt(Instant completedAt) {
         this.completedAt = completedAt;
     }
+
+    public Short getCompletionSource() { return completionSource; }
+    public void setCompletionSource(Short completionSource) { this.completionSource = completionSource; }
+    public String getCompletionReason() { return completionReason; }
+    public void setCompletionReason(String completionReason) { this.completionReason = completionReason; }
+    public Instant getAfterSaleDeadlineAt() { return afterSaleDeadlineAt; }
+    public void setAfterSaleDeadlineAt(Instant afterSaleDeadlineAt) { this.afterSaleDeadlineAt = afterSaleDeadlineAt; }
+    public Instant getRefundedAt() { return refundedAt; }
+    public void setRefundedAt(Instant refundedAt) { this.refundedAt = refundedAt; }
 
     public Instant getClosedAt() {
         return closedAt;

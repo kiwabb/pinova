@@ -1,0 +1,1 @@
+package com.pinova.service.model;public record AdminSkuResult(Long id,String skuCode,String specSummary,long salePriceFen,short inventoryMode,String mainImageKey,String barcode,short status,int sortOrder,int version){}

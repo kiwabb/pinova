@@ -1,0 +1,89 @@
+{
+  "id": 8583384,
+  "name": "pinova-cloud",
+  "description": "",
+  "teamId": 1861737,
+  "statistics": {
+    "moduleCount": 1,
+    "endpointFolderCount": 2,
+    "schemaFolderCount": 0,
+    "testCaseCategoryCount": 5,
+    "testScenarioFolderCount": 0,
+    "testSuiteFolderCount": 0
+  },
+  "modules": [
+    {
+      "id": 8193629,
+      "name": "默认模块",
+      "type": "DEFAULT",
+      "updatedAt": "2026-07-15T02:15:06.000Z"
+    }
+  ],
+  "branches": [
+    {
+      "id": 8360938,
+      "name": "main",
+      "type": "SPRINT",
+      "isMain": true,
+      "isProtected": false,
+      "updatedAt": "2026-07-15T02:15:06.000Z"
+    }
+  ],
+  "endpointFolders": [
+    {
+      "id": 90937839,
+      "name": "商品分类",
+      "moduleId": 8193629,
+      "parentId": 0,
+      "updatedAt": "2026-07-15 10:42:43"
+    },
+    {
+      "id": 90958099,
+      "name": "商品管理",
+      "moduleId": 8193629,
+      "parentId": 0,
+      "updatedAt": "2026-07-15 13:29:40"
+    }
+  ],
+  "schemaFolders": [],
+  "testCaseCategories": [
+    {
+      "id": 12054576,
+      "name": "正向",
+      "description": "有效的输入和正确的预期结果,代表典型的用法。",
+      "builtIn": true,
+      "updatedAt": "2026-07-15T02:15:10.000Z"
+    },
+    {
+      "id": 12054577,
+      "name": "负向",
+      "description": "消极的、无效的输入,如缺少字段、错误的类型、不支持的方法等。",
+      "builtIn": true,
+      "updatedAt": "2026-07-15T02:15:10.000Z"
+    },
+    {
+      "id": 12054578,
+      "name": "边界值",
+      "description": "极端或边缘条件,如最大字符串长度、空值、零、null等",
+      "builtIn": true,
+      "updatedAt": "2026-07-15T02:15:10.000Z"
+    },
+    {
+      "id": 12054579,
+      "name": "安全性",
+      "description": "可能暴露API安全性风险的测试用例。",
+      "builtIn": true,
+      "updatedAt": "2026-07-15T02:15:10.000Z"
+    },
+    {
+      "id": 12054580,
+      "name": "其他",
+      "description": "其他未归属的测试用例。",
+      "builtIn": true,
+      "updatedAt": "2026-07-15T02:15:10.000Z"
+    }
+  ],
+  "testScenarioFolders": [],
+  "testSuiteFolders": [],
+  "fetchedAt": "2026-07-15T05:30:19Z"
+}

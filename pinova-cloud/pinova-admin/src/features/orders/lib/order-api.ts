@@ -16,3 +16,22 @@ export function getAdminOrder(orderNo: string) {
   return adminApiRequest<OrderDetail>(`/admin/orders/${encodeURIComponent(orderNo)}`);
 }
 
+function lifecycleRequest(orderNo: string, path: string, method: "POST" | "PUT", body: object) {
+  return adminApiRequest(`/admin/orders/${encodeURIComponent(orderNo)}/${path}`, {
+    method,
+    headers: { "Idempotency-Key": crypto.randomUUID() },
+    body: JSON.stringify(body),
+  });
+}
+
+export function shipAdminOrder(orderNo: string, body: { carrierCode: string; carrierName: string; trackingNo: string }) {
+  return lifecycleRequest(orderNo, "shipment", "POST", body);
+}
+
+export function correctAdminOrderShipment(orderNo: string, body: { carrierCode: string; carrierName: string; trackingNo: string; reason: string }) {
+  return lifecycleRequest(orderNo, "shipment", "PUT", body);
+}
+
+export function completeAdminOrder(orderNo: string, reason: string) {
+  return lifecycleRequest(orderNo, "complete", "POST", { reason });
+}

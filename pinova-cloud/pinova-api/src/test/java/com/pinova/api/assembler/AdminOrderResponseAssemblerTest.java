@@ -19,7 +19,8 @@ class AdminOrderResponseAssemblerTest {
         AdminOrderDetailResult result = new AdminOrderDetailResult(
                 "P202607180001", "checkout", (short) 0, (short) 1, "CNY",
                 1000, 0, 0, 1000, 0, null, Instant.now(), Instant.now(),
-                null, null, null, null, null, null, List.of(),
+                null, null, null, null, null, null, null, null, null, null,
+                null, null, null, null, null, List.of(),
                 new AdminOrderShippingAddressResult(
                         "周小明", "+8613812345678", "CN", "湖北省", "武汉市", "武昌区", "水果湖街道 1 号"));
 
@@ -31,4 +32,3 @@ class AdminOrderResponseAssemblerTest {
         assertFalse(response.toString().contains("水果湖"));
     }
 }
-

@@ -11,7 +11,8 @@ public enum TradeOrderErrorCode implements ErrorCode {
     ADDRESS_CHANGED("ORDER.ADDRESS_CHANGED", "收货地址已更新，请刷新后重新确认", 409),
     PRODUCT_NOT_SALEABLE("ORDER.PRODUCT_NOT_SALEABLE", "部分商品已不可售，请返回购物车确认", 409),
     UNSUPPORTED_PRODUCT_TYPE("ORDER.UNSUPPORTED_PRODUCT_TYPE", "当前结算只支持实物商品", 409),
-    INVENTORY_INSUFFICIENT("ORDER.INVENTORY_INSUFFICIENT", "部分商品库存不足，请返回购物车确认", 409);
+    INVENTORY_INSUFFICIENT("ORDER.INVENTORY_INSUFFICIENT", "部分商品库存不足，请返回购物车确认", 409),
+    AMOUNT_OVERFLOW("ORDER.AMOUNT_OVERFLOW", "订单金额超出支持范围", 400);
 
     private final String code;
     private final String message;

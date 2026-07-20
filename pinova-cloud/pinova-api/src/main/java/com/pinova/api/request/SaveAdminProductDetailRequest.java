@@ -1,0 +1,1 @@
+package com.pinova.api.request;import com.fasterxml.jackson.databind.JsonNode;import jakarta.validation.constraints.*;public record SaveAdminProductDetailRequest(@NotNull JsonNode document,@Size(max=2000)String packingList,@Size(max=4000)String usageInstructions,@Size(max=2000)String afterSalesNote,@PositiveOrZero Integer version){}
