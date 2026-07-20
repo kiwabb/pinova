@@ -3,8 +3,9 @@
   position: sticky;
   top: 0;
   z-index: 80;
+  border-top: 3px solid var(--catalog-accent);
   background: var(--catalog-surface);
-  box-shadow: var(--catalog-shadow-subtle, 0 8px 28px rgb(17 19 17 / 5%));
+  box-shadow: var(--catalog-shadow-subtle);
   color: var(--catalog-ink);
 }
 
@@ -40,9 +41,9 @@
 
 .backLink,
 .actionLink {
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   color: var(--catalog-muted);
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 700;
   transition:
     background var(--motion-fast),
@@ -68,17 +69,18 @@
 
 .actionLink b {
   min-width: 18px;
-  height: 16px;
-  padding-inline: 3px;
+  height: 18px;
+  padding-inline: 4px;
   position: absolute;
   right: 0;
-  top: 1px;
+  top: 0;
   display: grid;
   place-items: center;
+  border-radius: 4px;
   background: var(--catalog-accent);
   color: #fff;
   font-family: var(--font-mono);
-  font-size: 8px;
+  font-size: 10px;
   font-variant-numeric: tabular-nums;
   line-height: 1;
 }
@@ -114,8 +116,8 @@
     display: inline-flex;
     align-items: center;
     color: var(--catalog-muted);
-    font-size: 12px;
-    font-weight: 680;
+    font-size: 13px;
+    font-weight: 600;
     transition: color var(--motion-fast);
     white-space: nowrap;
   }

@@ -1,38 +1,28 @@
 .productGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  column-gap: clamp(20px, 2.2vw, 32px);
-  row-gap: clamp(48px, 6vw, 88px);
+  column-gap: clamp(12px, 1.4vw, 16px);
+  row-gap: clamp(12px, 1.4vw, 16px);
   min-width: 0;
 }
 
+@media (min-width: 1120px) {
+  .productGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 .emptyState {
-  position: relative;
   display: grid;
   min-height: 320px;
   place-content: center;
-  justify-items: start;
+  justify-items: center;
   gap: 12px;
-  border: 0;
-  border-radius: var(--catalog-radius-surface, 8px);
-  background-image: radial-gradient(
-    circle,
-    color-mix(in srgb, var(--catalog-rule, #cbd1cb) 72%, transparent) 1.5px,
-    transparent 1.6px
-  );
-  background-size: 20px 20px;
+  border-radius: var(--catalog-radius-surface);
+  background: var(--catalog-surface-subtle);
+  box-shadow: var(--catalog-shadow-card);
   padding: 48px;
-}
-
-.emptyState > * {
-  position: relative;
-}
-
-.emptyState::before {
-  position: absolute;
-  inset: 32px;
-  background: color-mix(in srgb, var(--catalog-paper, #f4f6f2) 92%, transparent);
-  content: "";
+  text-align: center;
 }
 
 .emptyState h3,
@@ -47,7 +37,7 @@
 
 .emptyState p {
   max-width: 34rem;
-  color: var(--catalog-muted, #626761);
+  color: var(--catalog-muted);
   line-height: 1.65;
 }
 
@@ -58,21 +48,22 @@
   justify-content: center;
   margin-top: 8px;
   border: 0;
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   padding: 0 18px;
-  background: var(--catalog-ink, #111311);
+  background: var(--catalog-ink);
   color: #fff;
   font-weight: 700;
   text-decoration: none;
+  transition: background var(--motion-fast);
 }
 
 .emptyState a:hover {
-  background: var(--catalog-accent, #c72c59);
+  background: var(--catalog-accent);
   color: #fff;
 }
 
 .emptyState a:focus-visible {
-  outline: 3px solid var(--catalog-focus, #2f63b7);
+  outline: 3px solid var(--catalog-focus);
   outline-offset: 3px;
 }
 
@@ -84,7 +75,7 @@
 
 @media (min-width: 768px) {
   .emptyState h3 {
-    font-size: 30px;
+    font-size: 26px;
   }
 }
 
@@ -92,16 +83,11 @@
   .productGrid {
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
-    border-top: 0;
   }
 
   .emptyState {
     min-height: 280px;
     padding: 40px 28px;
-  }
-
-  .emptyState::before {
-    inset: 20px;
   }
 }
 

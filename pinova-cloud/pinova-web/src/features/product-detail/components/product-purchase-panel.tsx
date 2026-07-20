@@ -38,31 +38,38 @@ function availabilityText(sku: ProductDetailSku | null) {
 }
 
 function ReviewSummary({ reviews }: { reviews: ProductReviewPage }) {
+  // Only average when every review is present; a first-page average would
+  // present an invented aggregate rating (business truth gate).
   const average = useMemo(() => {
-    if (!reviews.items.length) return null;
+    if (!reviews.items.length || reviews.items.length !== reviews.total) {
+      return null;
+    }
     const sum = reviews.items.reduce((total, item) => total + item.rating, 0);
     return sum / reviews.items.length;
-  }, [reviews.items]);
+  }, [reviews.items, reviews.total]);
 
-  if (average === null || reviews.total <= 0) return null;
-
-  const rounded = Math.round(average * 10) / 10;
-  const filled = Math.round(average);
+  if (reviews.total <= 0) return null;
 
   return (
     <p className={styles.reviewSummary}>
-      <span className={styles.reviewStars} aria-hidden="true">
-        {Array.from({ length: 5 }, (_, index) => (
-          <span
-            key={index}
-            className={index < filled ? styles.starOn : styles.starOff}
-          >
-            ★
+      {average !== null && (
+        <>
+          <span className={styles.reviewStars} aria-hidden="true">
+            {Array.from({ length: 5 }, (_, index) => (
+              <span
+                key={index}
+                className={
+                  index < Math.round(average) ? styles.starOn : styles.starOff
+                }
+              >
+                ★
+              </span>
+            ))}
           </span>
-        ))}
-      </span>
-      <strong>{rounded.toFixed(1)}</strong>
-      <span>（{reviews.total} 条评价）</span>
+          <strong>{(Math.round(average * 10) / 10).toFixed(1)}</strong>
+        </>
+      )}
+      <a href="#product-reviews-title">{reviews.total} 条评价</a>
     </p>
   );
 }
@@ -86,9 +93,7 @@ export function ProductPurchasePanel({
 
   return (
     <section className={styles.purchasePanel} aria-labelledby="product-title">
-      <div className={styles.productFileHeader}>
-        <span className={styles.categoryLabel}>{product.categoryName}</span>
-      </div>
+      <span className={styles.categoryLabel}>{product.categoryName}</span>
 
       <h1 id="product-title">{product.name}</h1>
 

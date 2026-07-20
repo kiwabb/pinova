@@ -8,6 +8,7 @@ import {
   Check,
   ChevronRight,
   Home,
+  LoaderCircle,
   RefreshCw,
   ShoppingCart,
 } from "lucide-react";
@@ -55,13 +56,13 @@ export function ShoppingCartPage({
       .slice(0, 4);
   }, [cart.items, suggestProducts]);
 
-  const toggleSelectAll = () => {
+  const toggleSelectAll = async () => {
     const next = !allSelected;
-    cart.items.forEach((item) => {
+    for (const item of cart.items) {
       if (item.selected !== next) {
-        void updateSelected(item, next);
+        await updateSelected(item, next);
       }
-    });
+    }
   };
 
   return (
@@ -104,47 +105,51 @@ export function ShoppingCartPage({
 
         {isLoading ? (
           <div className={styles.loadingState} role="status" aria-live="polite">
-            <ShoppingCart aria-hidden="true" size={28} />
+            <LoaderCircle
+              aria-hidden="true"
+              className={styles.loadingSpinner}
+              size={28}
+            />
             <span>正在读取购物车</span>
           </div>
         ) : hasItems ? (
           <div className={styles.cartWorkspace}>
-            <div className={styles.lineColumn}>
-              <section className={styles.lineCard} aria-label="购物车商品">
-                <div className={styles.tableHead}>
-                  <label className={styles.selectAll}>
-                    <input
-                      type="checkbox"
-                      checked={allSelected}
-                      onChange={toggleSelectAll}
-                    />
-                    <span className={styles.checkMark} aria-hidden="true">
-                      {allSelected ? <Check size={12} strokeWidth={3} /> : null}
-                    </span>
-                    全选 ({count})
-                  </label>
-                  <span className={styles.colInfo}>商品信息</span>
-                  <span className={styles.colPrice}>单价</span>
-                  <span className={styles.colQty}>数量</span>
-                  <span className={styles.colTotal}>小计</span>
-                  <span className={styles.colAction}>操作</span>
-                </div>
+            <section className={styles.lineCard} aria-label="购物车商品">
+              <div className={styles.lineToolbar}>
+                <label className={styles.selectAll}>
+                  <input
+                    type="checkbox"
+                    checked={allSelected}
+                    onChange={() => void toggleSelectAll()}
+                  />
+                  <span className={styles.checkMark} aria-hidden="true">
+                    {allSelected ? <Check size={12} strokeWidth={3} /> : null}
+                  </span>
+                  全选 ({count})
+                </label>
+              </div>
 
-                <div className={styles.lineList}>
-                  {cart.items.map((item) => (
-                    <ShoppingCartLine
-                      key={item.id}
-                      item={item}
-                      pending={pendingItemId === item.id}
-                      onRemoveItem={removeItem}
-                      onUpdateQuantity={updateQuantity}
-                      onUpdateSelected={updateSelected}
-                    />
-                  ))}
-                </div>
-              </section>
+              <div className={styles.tableHead}>
+                <span className={styles.colInfo}>商品信息</span>
+                <span className={styles.colPrice}>单价</span>
+                <span className={styles.colQty}>数量</span>
+                <span className={styles.colTotal}>小计</span>
+                <span className={styles.colAction}>操作</span>
+              </div>
 
-            </div>
+              <div className={styles.lineList}>
+                {cart.items.map((item) => (
+                  <ShoppingCartLine
+                    key={item.id}
+                    item={item}
+                    pending={pendingItemId === item.id}
+                    onRemoveItem={removeItem}
+                    onUpdateQuantity={updateQuantity}
+                    onUpdateSelected={updateSelected}
+                  />
+                ))}
+              </div>
+            </section>
 
             <aside className={styles.summaryPanel} aria-labelledby="summary-title">
               <div className={styles.summaryHeading}>
@@ -161,11 +166,23 @@ export function ShoppingCartPage({
                 </div>
               </dl>
               <div className={styles.summaryActions}>
-                {canCheckout && (
+                {canCheckout ? (
                   <Link href="/checkout" className={styles.checkoutAction}>
                     去结算
                     <ArrowRight aria-hidden="true" size={18} />
                   </Link>
+                ) : (
+                  <>
+                    <button type="button" className={styles.checkoutAction} disabled>
+                      去结算
+                      <ArrowRight aria-hidden="true" size={18} />
+                    </button>
+                    <p className={styles.checkoutHint}>
+                      {selectedCount === 0
+                        ? "请先勾选要结算的商品"
+                        : "已选商品缺少价格，暂时无法结算"}
+                    </p>
+                  </>
                 )}
                 <Link href="/category/all" className={styles.continueAction}>
                   继续选材
@@ -189,7 +206,13 @@ export function ShoppingCartPage({
 
         {suggestions.length > 0 && (
           <section className={styles.suggest} aria-labelledby="suggest-title">
-            <h2 id="suggest-title">你可能还需要</h2>
+            <header className={styles.suggestHead}>
+              <h2 id="suggest-title">你可能还需要</h2>
+              <Link href="/category/all" className={styles.suggestMore}>
+                查看更多
+                <ArrowRight aria-hidden="true" size={15} />
+              </Link>
+            </header>
             <div className={styles.suggestGrid}>
               {suggestions.map((product) => (
                 <Link

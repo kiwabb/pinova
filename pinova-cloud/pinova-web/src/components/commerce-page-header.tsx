@@ -92,9 +92,7 @@ export function CommercePageHeader({
             <span>购物车</span>
             {displayedCartCount !== null && displayedCartCount > 0 && (
               <b>
-                {displayedCartCount > 99
-                  ? "99+"
-                  : String(displayedCartCount).padStart(2, "0")}
+                {displayedCartCount > 99 ? "99+" : displayedCartCount}
               </b>
             )}
           </Link>

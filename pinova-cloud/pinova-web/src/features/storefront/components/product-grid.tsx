@@ -7,6 +7,7 @@ import styles from "./product-grid.module.css";
 interface ProductGridProps {
   products: StoreProduct[];
   favorites: string[];
+  eagerFirstImage?: boolean;
   emptyAction?: ReactNode;
   searchQuery?: string;
   onAddToCart: (product: StoreProduct) => void;
@@ -17,6 +18,7 @@ interface ProductGridProps {
 export function ProductGrid({
   products,
   favorites,
+  eagerFirstImage = true,
   emptyAction,
   searchQuery,
   onAddToCart,
@@ -48,7 +50,7 @@ export function ProductGrid({
       {products.map((product, index) => (
         <ProductCard
           key={product.id}
-          highPriorityImage={index === 0}
+          highPriorityImage={eagerFirstImage && index === 0}
           isFavorite={favorites.includes(product.id)}
           product={product}
           onAddToCart={onAddToCart}
