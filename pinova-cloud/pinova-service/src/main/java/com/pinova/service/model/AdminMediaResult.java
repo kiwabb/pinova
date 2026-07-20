@@ -1,0 +1,1 @@
+package com.pinova.service.model;public record AdminMediaResult(Long id,Long spuId,Long skuId,short mediaType,short mediaRole,String objectKey,String mimeType,long fileSizeBytes,Integer width,Integer height,String altText,int sortOrder,short status,int version){}

@@ -13,4 +13,8 @@ public interface PaymentProvider {
             String providerTransactionNo);
 
     void closePayment(ProviderPaymentCommand command, String providerTransactionNo);
+
+    ProviderRefundResult createRefund(ProviderRefundCommand command);
+
+    ProviderRefundResult queryRefund(ProviderRefundCommand command, String providerRefundNo);
 }

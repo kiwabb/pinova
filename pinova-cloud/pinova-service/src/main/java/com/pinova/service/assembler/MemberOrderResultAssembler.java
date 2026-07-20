@@ -24,6 +24,13 @@ public final class MemberOrderResultAssembler {
                 order.getPayableAmountFen(),
                 order.getPaidAmountFen(),
                 order.getSubmittedAt(),
+                order.getCarrierName(),
+                order.getTrackingNo(),
+                order.getShippedAt(),
+                order.getAutoCompleteAt(),
+                order.getCompletedAt(),
+                order.getAfterSaleDeadlineAt(),
+                order.getRefundedAt(),
                 items.stream().map(MemberOrderResultAssembler::toItemResult).toList());
     }
 

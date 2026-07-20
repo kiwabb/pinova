@@ -1,0 +1,1 @@
+package com.pinova.api.request;import jakarta.validation.constraints.*;public record SaveWarehouseRequest(@NotNull @Positive Long shopId,@NotBlank @Size(max=64)String warehouseCode,@NotBlank @Size(max=128)String name,@NotNull @Min(1) @Max(2)Short warehouseType,@NotNull @Min(0) @Max(1)Short status,@PositiveOrZero Integer version){}

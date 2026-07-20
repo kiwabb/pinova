@@ -1,0 +1,1 @@
+package com.pinova.service;import com.pinova.service.command.SaveAdminCategoryCommand;import com.pinova.service.model.*;import java.util.List;public interface AdminCategoryService{List<AdminCategoryResult> list(AuthenticatedAdminResult admin);AdminCategoryResult save(SaveAdminCategoryCommand command);void delete(AuthenticatedAdminResult admin,Long id,int version,String reason);}

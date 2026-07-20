@@ -1,0 +1,1 @@
+package com.pinova.service.command;import com.pinova.service.model.AuthenticatedAdminResult;public record AddAdminProductMediaCommand(AuthenticatedAdminResult admin,Long productId,Long skuId,String objectKey,String mimeType,Long fileSizeBytes,Integer width,Integer height,Short mediaRole,String altText,Integer sortOrder){}

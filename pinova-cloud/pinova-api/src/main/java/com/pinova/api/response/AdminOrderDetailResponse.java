@@ -19,7 +19,16 @@ public record AdminOrderDetailResponse(
         Instant paymentExpiresAt,
         Instant paidAt,
         Instant fulfillmentStartedAt,
+        String carrierCode,
+        String carrierName,
+        String trackingNo,
+        Instant shippedAt,
+        Instant autoCompleteAt,
         Instant completedAt,
+        Short completionSource,
+        String completionReason,
+        Instant afterSaleDeadlineAt,
+        Instant refundedAt,
         Instant closedAt,
         Short closeReasonCode,
         String closeReason,
@@ -29,4 +38,3 @@ public record AdminOrderDetailResponse(
         items = List.copyOf(items);
     }
 }
-

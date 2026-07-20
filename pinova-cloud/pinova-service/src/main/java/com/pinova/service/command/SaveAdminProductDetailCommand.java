@@ -1,0 +1,1 @@
+package com.pinova.service.command;import com.pinova.service.model.AuthenticatedAdminResult;public record SaveAdminProductDetailCommand(AuthenticatedAdminResult admin,Long productId,String documentJson,String packingList,String usageInstructions,String afterSalesNote,Integer version){}

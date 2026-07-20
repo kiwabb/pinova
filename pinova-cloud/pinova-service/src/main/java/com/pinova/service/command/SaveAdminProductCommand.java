@@ -1,0 +1,1 @@
+package com.pinova.service.command;import com.pinova.service.model.AuthenticatedAdminResult;public record SaveAdminProductCommand(AuthenticatedAdminResult admin,Long id,Long shopId,Long categoryId,String spuCode,String name,String summary,String mainImageKey,Short status,Integer sortOrder,Integer version){}

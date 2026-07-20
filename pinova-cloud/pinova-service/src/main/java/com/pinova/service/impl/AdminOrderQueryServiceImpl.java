@@ -17,6 +17,7 @@ import com.pinova.service.error.AdminOrderErrorCode;
 import com.pinova.service.model.AdminOrderDetailResult;
 import com.pinova.service.model.AdminOrderPageResult;
 import com.pinova.service.model.AuthenticatedAdminResult;
+import com.pinova.service.model.TradeOrderStatus;
 import com.pinova.service.query.AdminOrderListQuery;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,7 +90,7 @@ public class AdminOrderQueryServiceImpl implements AdminOrderQueryService {
         if (query.page() < 1 || query.pageSize() < 1 || query.pageSize() > MAX_PAGE_SIZE) {
             throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "页码必须从 1 开始，每页数量为 1 到 100");
         }
-        if (query.status() != null && (query.status() < 0 || query.status() > 4)) {
+        if (query.status() != null && (query.status() < 0 || query.status() > TradeOrderStatus.REFUNDED.code())) {
             throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "订单状态无效");
         }
         if (query.submittedFrom() != null
@@ -118,4 +119,3 @@ public class AdminOrderQueryServiceImpl implements AdminOrderQueryService {
         return normalized;
     }
 }
-

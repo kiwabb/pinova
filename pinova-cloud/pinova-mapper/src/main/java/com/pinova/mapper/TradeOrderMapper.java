@@ -31,6 +31,16 @@ public interface TradeOrderMapper extends BaseMapper<TradeOrder> {
             """)
     List<TradeOrder> selectCheckoutOrdersForUpdate(@Param("checkoutNo") String checkoutNo);
 
+    @Select("SELECT * FROM pinova.trade_order WHERE order_no = #{orderNo} FOR UPDATE")
+    TradeOrder selectByOrderNoForUpdate(@Param("orderNo") String orderNo);
+
+    @Select("""
+            SELECT order_no FROM pinova.trade_order
+            WHERE status = 2 AND auto_complete_at <= #{now}
+            ORDER BY auto_complete_at, id LIMIT #{limit}
+            """)
+    List<String> selectAutoCompleteOrderNos(@Param("now") Instant now, @Param("limit") int limit);
+
     @Select("""
             SELECT DISTINCT checkout_no
             FROM (
@@ -79,6 +89,25 @@ public interface TradeOrderMapper extends BaseMapper<TradeOrder> {
               AND version = #{version}
             """)
     int closeExpired(
+            @Param("orderId") Long orderId,
+            @Param("version") Integer version,
+            @Param("closedAt") Instant closedAt,
+            @Param("operatorId") Long operatorId);
+
+    @Update("""
+            UPDATE pinova.trade_order
+            SET status = 4,
+                closed_at = #{closedAt},
+                close_reason_code = 1,
+                close_reason = '用户取消',
+                version = version + 1,
+                updated_at = #{closedAt},
+                updated_by = #{operatorId}
+            WHERE id = #{orderId}
+              AND status = 0
+              AND version = #{version}
+            """)
+    int closeCancelled(
             @Param("orderId") Long orderId,
             @Param("version") Integer version,
             @Param("closedAt") Instant closedAt,

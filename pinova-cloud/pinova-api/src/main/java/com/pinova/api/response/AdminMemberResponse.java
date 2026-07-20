@@ -1,0 +1,1 @@
+package com.pinova.api.response;import java.time.Instant;public record AdminMemberResponse(String id,String memberNo,String username,String mobile,String email,String nickname,String avatarUrl,short status,int version,Instant lastLoginAt,Instant createdAt){}

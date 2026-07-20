@@ -1,0 +1,1 @@
+package com.pinova.api.request;import jakarta.validation.constraints.*;public record AdminMemberStatusRequest(@NotNull @PositiveOrZero Integer version,@NotNull @Min(0) @Max(1) Short status,@NotBlank @Size(max=500) String reason){}
