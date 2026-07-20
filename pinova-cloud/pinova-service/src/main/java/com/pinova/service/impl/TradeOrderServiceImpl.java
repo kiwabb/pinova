@@ -263,7 +263,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
                 validated.add(new ValidatedLine(cartItem, sku, product, lineAmount));
             }
         } catch (ArithmeticException exception) {
-            throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "订单金额超出支持范围", exception);
+            throw new BusinessException(
+                    TradeOrderErrorCode.AMOUNT_OVERFLOW,
+                    TradeOrderErrorCode.AMOUNT_OVERFLOW.message(),
+                    exception);
         }
         return validated;
     }
@@ -280,7 +283,10 @@ public class TradeOrderServiceImpl implements TradeOrderService {
             goodsAmount = lines.stream().mapToLong(ValidatedLine::lineAmountFen)
                     .reduce(0L, Math::addExact);
         } catch (ArithmeticException exception) {
-            throw new BusinessException(CommonErrorCode.INVALID_REQUEST, "订单金额超出支持范围", exception);
+            throw new BusinessException(
+                    TradeOrderErrorCode.AMOUNT_OVERFLOW,
+                    TradeOrderErrorCode.AMOUNT_OVERFLOW.message(),
+                    exception);
         }
 
         Long orderId = IdWorker.getId();
