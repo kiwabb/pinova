@@ -3,7 +3,8 @@ export type MemberOrderStatus =
   | "PENDING_FULFILLMENT"
   | "FULFILLING"
   | "COMPLETED"
-  | "CLOSED";
+  | "CLOSED"
+  | "REFUNDED";
 
 export type MemberOrderStatusFilter = "ALL" | MemberOrderStatus;
 
@@ -25,7 +26,29 @@ export interface MemberOrder {
   payableAmountFen: number;
   paidAmountFen: number;
   submittedAt: string;
+  carrierName: string | null;
+  trackingNo: string | null;
+  shippedAt: string | null;
+  autoCompleteAt: string | null;
+  completedAt: string | null;
+  afterSaleDeadlineAt: string | null;
+  refundedAt: string | null;
   items: MemberOrderItem[];
+}
+
+export interface MemberAfterSale {
+  afterSaleNo: string;
+  orderNo: string;
+  status: string;
+  amountFen: number;
+  currencyCode: string;
+  reasonCode: number;
+  reason: string | null;
+  reviewReason: string | null;
+  refundNo: string | null;
+  refundStatus: string | null;
+  appliedAt: string;
+  completedAt: string | null;
 }
 
 export interface MemberOrderPageData {

@@ -10,6 +10,7 @@ import {
   LockKeyhole,
   RefreshCw,
   ShoppingBag,
+  RotateCcw,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { CommercePageHeader } from "@/components/commerce-page-header";
@@ -18,11 +19,16 @@ import { MemberOrderCard } from "./components/member-order-card";
 import { OrderStatusFilter } from "./components/order-status-filter";
 import {
   listMemberOrders,
+  listMemberAfterSales,
+  cancelCheckout,
+  confirmOrderReceipt,
+  applyOrderRefund,
   MemberOrderApiError,
 } from "./lib/member-order-api";
 import type {
   MemberOrderPageData,
   MemberOrderStatusFilter,
+  MemberAfterSale,
 } from "./types";
 import styles from "./member-orders.module.css";
 
@@ -42,12 +48,21 @@ export function MemberOrdersPage() {
   const [error, setError] = useState<string | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const [paymentCheckoutNo, setPaymentCheckoutNo] = useState<string | null>(null);
+  const [afterSales, setAfterSales] = useState<MemberAfterSale[]>([]);
+  const [refundOrderNo, setRefundOrderNo] = useState<string | null>(null);
+  const [refundReasonCode, setRefundReasonCode] = useState(1);
+  const [refundReason, setRefundReason] = useState("");
+  const [isOperating, setIsOperating] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
-    void listMemberOrders({ filter, page, pageSize: PAGE_SIZE }, controller.signal)
-      .then((nextData) => {
+    void Promise.all([
+      listMemberOrders({ filter, page, pageSize: PAGE_SIZE }, controller.signal),
+      listMemberAfterSales(controller.signal).catch(() => []),
+    ])
+      .then(([nextData, nextAfterSales]) => {
         setData(nextData);
+        setAfterSales(nextAfterSales);
         setRequiresLogin(false);
       })
       .catch((requestError: unknown) => {
@@ -89,6 +104,21 @@ export function MemberOrdersPage() {
     setIsLoading(true);
     setError(null);
     setPage(nextPage);
+  };
+  const activeAfterSaleOrders = new Set(afterSales.filter((item) => !["REJECTED", "CLOSED", "COMPLETED"].includes(item.status)).map((item) => item.orderNo));
+  const operate = async (action: () => Promise<unknown>) => {
+    setIsOperating(true);
+    setError(null);
+    try {
+      await action();
+      reload();
+      return true;
+    } catch (operationError) {
+      setError(requestErrorMessage(operationError));
+      return false;
+    } finally {
+      setIsOperating(false);
+    }
   };
 
   return (
@@ -169,9 +199,30 @@ export function MemberOrdersPage() {
                   key={order.orderNo}
                   order={order}
                   onPay={setPaymentCheckoutNo}
+                  hasActiveAfterSale={activeAfterSaleOrders.has(order.orderNo)}
+                  onCancel={(checkoutNo) => {
+                    if (window.confirm("确认取消本次结算中的全部待支付订单？")) void operate(() => cancelCheckout(checkoutNo));
+                  }}
+                  onConfirmReceipt={(orderNo) => {
+                    if (window.confirm("确认已经收到商品？确认后订单将完成。")) void operate(() => confirmOrderReceipt(orderNo));
+                  }}
+                  onRefund={setRefundOrderNo}
                 />
               ))}
             </section>
+
+            {afterSales.length > 0 && (
+              <section className={styles.afterSales} aria-labelledby="after-sales-heading">
+                <h2 id="after-sales-heading"><RotateCcw aria-hidden="true" size={18} />退款记录</h2>
+                {afterSales.map((item) => (
+                  <div key={item.afterSaleNo}>
+                    <span>{item.orderNo}</span>
+                    <strong>{item.status}</strong>
+                    <small>{item.refundStatus || "待审核"}</small>
+                  </div>
+                ))}
+              </section>
+            )}
 
             {totalPages > 1 && (
               <nav className={styles.pagination} aria-label="订单分页">
@@ -228,6 +279,23 @@ export function MemberOrdersPage() {
           onClose={() => setPaymentCheckoutNo(null)}
           onPaid={reload}
         />
+      )}
+      {refundOrderNo && (
+        <div className={styles.dialogBackdrop} role="presentation">
+          <form className={styles.refundDialog} onSubmit={(event) => {
+            event.preventDefault();
+            void operate(() => applyOrderRefund(refundOrderNo, refundReasonCode, refundReason.trim())).then((succeeded) => {
+              if (succeeded) { setRefundOrderNo(null); setRefundReason(""); }
+            });
+          }}>
+            <h2>申请整单退款</h2>
+            <label>退款原因<select value={refundReasonCode} onChange={(event) => setRefundReasonCode(Number(event.target.value))}>
+              <option value={1}>不想要了</option><option value={2}>商品问题</option><option value={3}>物流问题</option><option value={4}>重复购买</option><option value={5}>其他</option>
+            </select></label>
+            <label>补充说明<textarea maxLength={500} rows={4} value={refundReason} onChange={(event) => setRefundReason(event.target.value)} /></label>
+            <div><button type="button" onClick={() => setRefundOrderNo(null)}>取消</button><button className={styles.payButton} disabled={isOperating} type="submit">提交申请</button></div>
+          </form>
+        </div>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { CreditCard, Package } from "lucide-react";
+import { CreditCard, Package, PackageCheck, RotateCcw, XCircle } from "lucide-react";
 import { formatPrice } from "@/lib/format-price";
 import {
   formatMemberOrderTime,
@@ -11,9 +11,13 @@ import styles from "../member-orders.module.css";
 interface MemberOrderCardProps {
   order: MemberOrder;
   onPay: (checkoutNo: string) => void;
+  onCancel: (checkoutNo: string) => void;
+  onConfirmReceipt: (orderNo: string) => void;
+  onRefund: (orderNo: string) => void;
+  hasActiveAfterSale: boolean;
 }
 
-export function MemberOrderCard({ order, onPay }: MemberOrderCardProps) {
+export function MemberOrderCard({ order, onPay, onCancel, onConfirmReceipt, onRefund, hasActiveAfterSale }: MemberOrderCardProps) {
   const headingId = `order-${order.orderNo}`;
   const itemCount = order.items.reduce((total, item) => total + item.quantity, 0);
 
@@ -60,6 +64,15 @@ export function MemberOrderCard({ order, onPay }: MemberOrderCardProps) {
         ))}
       </div>
 
+      {order.trackingNo && (
+        <div className={styles.logistics}>
+          <Package aria-hidden="true" size={16} />
+          <span>{order.carrierName || "物流"}</span>
+          <strong>{order.trackingNo}</strong>
+          {order.autoCompleteAt && <small>{formatMemberOrderTime(order.autoCompleteAt)} 自动完成</small>}
+        </div>
+      )}
+
       <footer className={styles.orderFooter}>
         <span>共 {itemCount} 件商品</span>
         <div>
@@ -67,15 +80,21 @@ export function MemberOrderCard({ order, onPay }: MemberOrderCardProps) {
           <strong>{formatPrice(order.payableAmountFen)}</strong>
         </div>
         {order.status === "PENDING_PAYMENT" && (
-          <button
-            className={styles.payButton}
-            type="button"
-            onClick={() => onPay(order.checkoutNo)}
-          >
-            <CreditCard aria-hidden="true" size={16} />
-            去支付
-          </button>
+          <div className={styles.orderActions}>
+            <button type="button" onClick={() => onCancel(order.checkoutNo)}><XCircle aria-hidden="true" size={16} />取消订单</button>
+            <button className={styles.payButton} type="button" onClick={() => onPay(order.checkoutNo)}><CreditCard aria-hidden="true" size={16} />去支付</button>
+          </div>
         )}
+        {order.status === "FULFILLING" && !hasActiveAfterSale && (
+          <div className={styles.orderActions}>
+            <button type="button" onClick={() => onRefund(order.orderNo)}><RotateCcw aria-hidden="true" size={16} />申请退款</button>
+            <button className={styles.payButton} type="button" onClick={() => onConfirmReceipt(order.orderNo)}><PackageCheck aria-hidden="true" size={16} />确认收货</button>
+          </div>
+        )}
+        {(order.status === "PENDING_FULFILLMENT" || order.status === "COMPLETED") && !hasActiveAfterSale && (
+          <div className={styles.orderActions}><button type="button" onClick={() => onRefund(order.orderNo)}><RotateCcw aria-hidden="true" size={16} />申请退款</button></div>
+        )}
+        {hasActiveAfterSale && <span className={styles.afterSaleHint}>退款处理中</span>}
       </footer>
     </article>
   );
