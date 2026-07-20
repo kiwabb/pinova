@@ -75,7 +75,7 @@
 .cartTitleIcon {
   width: 48px;
   height: 48px;
-  border-radius: var(--catalog-radius-surface);
+  border-radius: 50%;
   display: grid;
   place-items: center;
   flex: 0 0 48px;
@@ -106,7 +106,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  background: color-mix(in srgb, var(--catalog-danger) 7%, #fff);
+  background: var(--catalog-danger-soft);
   color: var(--catalog-danger);
 }
 
@@ -128,7 +128,7 @@
   background: transparent;
   color: inherit;
   font-size: 13px;
-  font-weight: 720;
+  font-weight: 700;
 }
 
 .errorBox button:hover {
@@ -153,14 +153,24 @@
   font-size: 14px;
 }
 
+.loadingSpinner {
+  animation: cart-spin 800ms linear infinite;
+}
+
+@keyframes cart-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .emptyIcon {
   width: 48px;
   height: 48px;
-  border-radius: var(--catalog-radius-surface);
+  border-radius: 50%;
   display: grid;
   place-items: center;
-  background: var(--catalog-surface-muted);
-  color: var(--catalog-muted);
+  background: var(--catalog-accent-soft);
+  color: var(--catalog-accent-strong);
 }
 
 .emptyState h2 {
@@ -183,7 +193,6 @@
   gap: 16px;
 }
 
-.lineColumn,
 .lineList {
   min-width: 0;
   display: grid;
@@ -197,7 +206,16 @@
 }
 
 .lineCard {
+  min-width: 0;
   overflow: hidden;
+}
+
+.lineToolbar {
+  min-height: 52px;
+  padding-inline: 14px;
+  display: flex;
+  align-items: center;
+  background: var(--catalog-surface-subtle);
 }
 
 .tableHead {
@@ -310,13 +328,16 @@
 
 .itemName {
   min-height: 44px;
-  display: flex;
-  align-items: center;
+  display: -webkit-box;
+  overflow: hidden;
   color: var(--catalog-ink);
   font-size: 14px;
-  font-weight: 720;
+  font-weight: 700;
   line-height: 1.45;
   overflow-wrap: anywhere;
+  transition: color var(--motion-fast);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .itemName:hover {
@@ -333,6 +354,7 @@
 
 .unitPrice,
 .lineTotal {
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
@@ -370,6 +392,18 @@
   color: var(--catalog-ink);
 }
 
+.quantityControl button {
+  transition:
+    background var(--motion-fast),
+    color var(--motion-fast);
+}
+
+.quantityControl button {
+  transition:
+    background var(--motion-fast),
+    color var(--motion-fast);
+}
+
 .quantityControl button:hover:not(:disabled) {
   background: var(--catalog-surface-subtle);
   color: var(--catalog-accent-strong);
@@ -380,8 +414,9 @@
 }
 
 .quantityControl output {
+  font-family: var(--font-mono);
   font-size: 13px;
-  font-weight: 740;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
@@ -396,6 +431,9 @@
   place-items: center;
   background: transparent;
   color: var(--catalog-muted);
+  transition:
+    background var(--motion-fast),
+    color var(--motion-fast);
 }
 
 .removeButton:hover:not(:disabled) {
@@ -447,8 +485,9 @@
 .summaryPanel dd {
   margin: 0;
   color: var(--catalog-ink);
+  font-family: var(--font-mono);
   font-size: 14px;
-  font-weight: 760;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
@@ -468,7 +507,7 @@
   background: var(--catalog-ink);
   color: #fff;
   font-size: 14px;
-  font-weight: 750;
+  font-weight: 700;
   transition:
     background var(--motion-fast),
     transform var(--motion-fast);
@@ -487,13 +526,23 @@
 .continueAction {
   min-height: 48px;
   padding-inline: 16px;
+  border: 0;
   border-radius: var(--catalog-radius-control);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   font-size: 14px;
-  font-weight: 750;
+  font-weight: 700;
+  transition:
+    background var(--motion-fast),
+    transform var(--motion-fast);
+}
+
+.checkoutAction:active:not(:disabled),
+.continueAction:active,
+.primaryAction:active {
+  transform: translateY(1px);
 }
 
 .checkoutAction {
@@ -501,8 +550,21 @@
   color: #fff;
 }
 
-.checkoutAction:hover {
+.checkoutAction:hover:not(:disabled) {
   background: var(--catalog-accent-strong);
+}
+
+.checkoutAction:disabled {
+  opacity: 0.46;
+  cursor: not-allowed;
+}
+
+.checkoutHint {
+  margin: 0;
+  color: var(--catalog-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  text-align: center;
 }
 
 .continueAction {
@@ -518,9 +580,33 @@
   padding-top: 40px;
 }
 
-.suggest > h2 {
-  margin: 0 0 16px;
+.suggestHead {
+  margin-bottom: 16px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.suggestHead h2 {
+  margin: 0;
   font-size: 20px;
+}
+
+.suggestMore {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: var(--catalog-muted);
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: color var(--motion-fast);
+}
+
+.suggestMore:hover {
+  color: var(--catalog-accent-strong);
 }
 
 .suggestGrid {
@@ -564,13 +650,18 @@
 
 .suggestBody strong {
   min-height: 40px;
+  display: -webkit-box;
+  overflow: hidden;
   color: var(--catalog-ink);
   font-size: 13px;
   line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .suggestBody em {
   color: var(--catalog-accent);
+  font-family: var(--font-mono);
   font-size: 16px;
   font-style: normal;
   font-weight: 800;
@@ -625,11 +716,15 @@
 
   .summaryPanel {
     position: sticky;
-    top: 96px;
+    top: 88px;
+  }
+
+  .lineToolbar {
+    padding-inline: 18px;
   }
 
   .tableHead {
-    min-height: 52px;
+    min-height: 40px;
     padding-inline: 18px;
     display: grid;
     grid-template-columns: 44px 96px minmax(0, 1fr) 100px 132px 100px 44px;
@@ -640,12 +735,8 @@
     font-size: 12px;
   }
 
-  .selectAll {
-    grid-column: 1 / 3;
-  }
-
   .colInfo {
-    grid-column: 3;
+    grid-column: 1 / 4;
   }
 
   .colPrice {
@@ -709,7 +800,23 @@
 @media (prefers-reduced-motion: reduce) {
   .cartLine,
   .primaryAction,
+  .checkoutAction,
+  .continueAction,
+  .quantityControl button,
+  .removeButton,
+  .itemName,
+  .suggestMore,
   .suggestMedia img {
     transition: none;
+  }
+
+  .checkoutAction:active:not(:disabled),
+  .continueAction:active,
+  .primaryAction:active {
+    transform: none;
+  }
+
+  .loadingSpinner {
+    animation: none;
   }
 }

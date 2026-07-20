@@ -114,11 +114,8 @@ export function getHomeProductGroups(products: StoreProduct[]) {
 }
 
 export function getHomeMerchandising(products: StoreProduct[]) {
-  const productGroups = getHomeProductGroups(products);
   return {
     featuredProduct: getHomeFeaturedProduct(products),
-    productGroups,
-    digitalProduct: productGroups.find((group) => group.kind === "digital")
-      ?.products[0],
+    productGroups: getHomeProductGroups(products),
   };
 }

@@ -201,7 +201,7 @@ export function StorefrontHeader({
             <span>购物车</span>
             {cartCount > 0 && (
               <b key={cartCount}>
-                {cartCount > 99 ? "99+" : String(cartCount).padStart(2, "0")}
+                {cartCount > 99 ? "99+" : cartCount}
               </b>
             )}
           </button>

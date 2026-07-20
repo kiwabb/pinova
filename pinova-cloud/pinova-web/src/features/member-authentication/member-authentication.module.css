@@ -32,10 +32,10 @@
   width: min(100%, 1040px);
   min-width: 0;
   overflow: hidden;
-  border-radius: var(--catalog-radius-surface, 8px);
+  border-radius: var(--catalog-radius-surface);
   display: grid;
   background: var(--catalog-surface);
-  box-shadow: var(--catalog-shadow-float, 0 20px 56px rgb(17 19 17 / 13%));
+  box-shadow: var(--catalog-shadow-soft);
 }
 
 .visual {
@@ -66,7 +66,7 @@
 .modeTabs {
   min-height: 52px;
   padding: 4px;
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 4px;
@@ -80,7 +80,7 @@
   place-items: center;
   color: var(--catalog-muted);
   font-size: 14px;
-  font-weight: 720;
+  font-weight: 700;
   transition:
     background var(--motion-fast),
     color var(--motion-fast),
@@ -89,8 +89,8 @@
 
 .modeTabs a[aria-current="page"] {
   background: var(--catalog-surface);
-  box-shadow: 0 3px 10px rgb(17 19 17 / 7%);
-  color: var(--catalog-ink);
+  box-shadow: var(--catalog-shadow-raise);
+  color: var(--catalog-accent-strong);
 }
 
 .formHeading {
@@ -102,7 +102,7 @@
   margin: 0 0 7px;
   color: var(--catalog-accent-strong);
   font-size: 12px;
-  font-weight: 760;
+  font-weight: 700;
 }
 
 .formHeading h1,
@@ -110,7 +110,7 @@
   margin: 0;
   overflow-wrap: anywhere;
   font-size: 28px;
-  font-weight: 790;
+  font-weight: 800;
   line-height: 1.2;
   letter-spacing: 0;
 }
@@ -134,7 +134,7 @@
   gap: 7px;
   color: var(--catalog-ink);
   font-size: 13px;
-  font-weight: 690;
+  font-weight: 600;
 }
 
 .field > span:first-child {
@@ -154,7 +154,7 @@
   height: 48px;
   padding: 0 13px;
   border: 1px solid transparent;
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   outline: 0;
   background: var(--catalog-surface-muted);
   color: var(--catalog-ink);
@@ -177,8 +177,8 @@
 }
 
 .field input[aria-invalid="true"] {
-  background: color-mix(in srgb, var(--catalog-danger) 7%, #fff);
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--catalog-danger) 48%, transparent);
+  background: color-mix(in srgb, var(--catalog-danger) 6%, #fff);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--catalog-danger) 44%, transparent);
 }
 
 .passwordInput {
@@ -206,7 +206,7 @@
 }
 
 .passwordInput button:hover {
-  background: rgb(17 19 17 / 5%);
+  background: var(--catalog-surface-muted);
   color: var(--catalog-ink);
 }
 
@@ -229,11 +229,11 @@
 .submitError {
   margin: 0;
   padding: 11px 12px;
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   background: color-mix(in srgb, var(--catalog-danger) 8%, #fff);
   color: var(--catalog-danger);
   font-size: 13px;
-  font-weight: 620;
+  font-weight: 600;
   line-height: 1.5;
 }
 
@@ -242,13 +242,13 @@
   min-height: 48px;
   padding: 0 18px;
   border: 0;
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
   font-size: 14px;
-  font-weight: 760;
+  font-weight: 700;
   transition:
     background var(--motion-fast),
     color var(--motion-fast),
@@ -319,9 +319,9 @@
 .memberActions a {
   min-height: 64px;
   padding: 10px 12px;
-  border-radius: var(--catalog-radius-control, 6px);
+  border-radius: var(--catalog-radius-control);
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) auto;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   background: var(--catalog-surface-subtle);
@@ -330,9 +330,26 @@
     color var(--motion-fast);
 }
 
+.memberActions a > svg:first-child {
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  border-radius: 50%;
+  background: var(--catalog-accent-soft);
+  color: var(--catalog-accent-strong);
+}
+
+.memberActions a > svg:last-child {
+  transition: transform var(--motion-fast);
+}
+
 .memberActions a:hover {
   background: var(--catalog-surface-muted);
   color: var(--catalog-accent-strong);
+}
+
+.memberActions a:hover > svg:last-child {
+  transform: translateX(3px);
 }
 
 .memberActions span {
@@ -419,7 +436,12 @@
   .field input,
   .primaryButton,
   .logoutButton,
-  .memberActions a {
+  .memberActions a,
+  .memberActions a > svg:last-child {
     transition: none;
+  }
+
+  .memberActions a:hover > svg:last-child {
+    transform: none;
   }
 }

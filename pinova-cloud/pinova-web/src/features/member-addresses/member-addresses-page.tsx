@@ -66,33 +66,13 @@ export function MemberAddressesPage() {
 
   useEffect(() => {
     const controller = new AbortController();
-    void listMemberAddresses(controller.signal)
-      .then((nextAddresses) => {
-        setAddresses(nextAddresses);
-        setRequiresLogin(false);
-        if (nextAddresses.length === 0) setIsFormOpen(true);
-      })
-      .catch((requestError: unknown) => {
-        if (
-          requestError instanceof DOMException &&
-          requestError.name === "AbortError"
-        ) {
-          return;
-        }
-        if (
-          requestError instanceof MemberAddressApiError &&
-          requestError.status === 401
-        ) {
-          setRequiresLogin(true);
-        } else {
-          setError(requestErrorMessage(requestError));
-        }
-      })
-      .finally(() => {
-        if (!controller.signal.aborted) setIsLoading(false);
-      });
+    const runInitialLoad = async () => {
+      await loadAddresses(controller.signal);
+      if (!controller.signal.aborted) setIsLoading(false);
+    };
+    void runInitialLoad();
     return () => controller.abort();
-  }, []);
+  }, [loadAddresses]);
 
   const openCreateForm = () => {
     setEditingAddress(null);

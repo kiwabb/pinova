@@ -3,7 +3,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: #111311;
+  color: var(--catalog-ink);
 }
 
 .mark {
@@ -14,7 +14,7 @@
 }
 
 .nova {
-  color: #c72c59;
+  color: var(--catalog-accent);
 }
 
 .type {
@@ -25,15 +25,15 @@
 
 .type strong {
   font-size: 19px;
-  font-weight: 820;
+  font-weight: 800;
   line-height: 0.9;
 }
 
 .type small {
   overflow: hidden;
-  color: #626761;
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  font-size: 8px;
+  color: var(--catalog-muted);
+  font-family: var(--font-mono);
+  font-size: 10px;
   font-weight: 600;
   line-height: 1;
   text-overflow: ellipsis;
@@ -41,15 +41,15 @@
 }
 
 .light {
-  color: #f7f9f5;
+  color: var(--catalog-on-ink);
 }
 
 .light .type small {
-  color: #aeb6ae;
+  color: var(--catalog-on-ink-faint);
 }
 
 .light .nova {
-  color: #efbc35;
+  color: var(--catalog-marigold);
 }
 
 @media (max-width: 479px) {

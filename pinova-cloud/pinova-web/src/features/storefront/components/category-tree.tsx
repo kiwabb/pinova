@@ -43,17 +43,11 @@ function CategoryTreeNode({
   } as CSSProperties;
 
   return (
-    <li
-      className={styles.categoryTreeItem}
-      data-depth={depth}
-      data-state={isCurrent ? "current" : isAncestor ? "ancestor" : undefined}
-    >
+    <li className={styles.categoryTreeItem} data-depth={depth}>
       <div
         className={`${styles.categoryTreeRow} ${
-          isCurrent ? styles.categoryTreeRowActive : ""
-        } ${isAncestor ? styles.categoryTreeRowAncestor : ""} ${
-          isCurrent ? styles.categoryTreeRowCurrent : ""
-        }`}
+          isAncestor ? styles.categoryTreeRowAncestor : ""
+        } ${isCurrent ? styles.categoryTreeRowCurrent : ""}`}
         data-has-children={category.hasChildren}
         style={rowStyle}
       >

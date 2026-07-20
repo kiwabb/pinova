@@ -56,8 +56,9 @@ export function ProductGallery({
             sizes="(max-width: 900px) 100vw, 52vw"
           />
         ) : (
-          <div className={styles.galleryEmpty} aria-label="暂无商品图片">
+          <div className={styles.galleryEmpty}>
             <ImageIcon aria-hidden="true" size={34} />
+            <span>暂无商品图片</span>
           </div>
         )}
 

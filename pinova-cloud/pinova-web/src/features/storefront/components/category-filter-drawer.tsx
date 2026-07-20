@@ -48,7 +48,6 @@ export function CategoryFilterDrawer({
       >
         <div className={styles.drawerHeader}>
           <div>
-            <p className={styles.drawerKicker}>INDEX / 分类目录</p>
             <h2>选择分类</h2>
             <p className={styles.filterDrawerCurrentPath}>
               当前：{currentPath || "全部商品"}

@@ -1,13 +1,7 @@
 "use client";
 
 import { Check, LoaderCircle, Save, X } from "lucide-react";
-import { useMemo, useRef, useState, type FormEvent } from "react";
-import {
-  getCityOptions,
-  getDistrictOptions,
-  includeCurrentRegion,
-  provinceOptions,
-} from "../lib/region-options";
+import { useRef, useState, type FormEvent } from "react";
 import { validateMemberAddress } from "../lib/validate-member-address";
 import type {
   MemberAddress,
@@ -15,7 +9,8 @@ import type {
   MemberAddressFormValues,
 } from "../types";
 import styles from "../member-addresses.module.css";
-import { RegionSelect } from "./region-select";
+import { AddressField } from "./address-field";
+import { AddressRegionFieldset } from "./address-region-fieldset";
 
 interface MemberAddressFormProps {
   address: MemberAddress | null;
@@ -59,50 +54,6 @@ function initialValues(address: MemberAddress | null): MemberAddressFormValues {
   };
 }
 
-interface AddressFieldProps {
-  autoComplete?: string;
-  error?: string;
-  label: string;
-  maxLength: number;
-  name: keyof MemberAddressFormValues;
-  placeholder?: string;
-  value: string;
-  onChange: (name: keyof MemberAddressFormValues, value: string) => void;
-}
-
-function AddressField({
-  autoComplete,
-  error,
-  label,
-  maxLength,
-  name,
-  placeholder,
-  value,
-  onChange,
-}: AddressFieldProps) {
-  const errorId = `${name}-error`;
-  return (
-    <label className={styles.field}>
-      <span>{label}</span>
-      <input
-        autoComplete={autoComplete}
-        name={name}
-        maxLength={maxLength}
-        placeholder={placeholder}
-        value={value}
-        aria-invalid={Boolean(error)}
-        aria-describedby={error ? errorId : undefined}
-        onChange={(event) => onChange(name, event.target.value)}
-      />
-      {error && (
-        <small id={errorId} className={styles.fieldError} role="alert">
-          {error}
-        </small>
-      )}
-    </label>
-  );
-}
-
 export function MemberAddressForm({
   address,
   isSaving,
@@ -112,37 +63,13 @@ export function MemberAddressForm({
   const formRef = useRef<HTMLFormElement>(null);
   const [values, setValues] = useState(() => initialValues(address));
   const [errors, setErrors] = useState<MemberAddressFieldErrors>({});
-  const selectedProvinceOptions = useMemo(
-    () => includeCurrentRegion(provinceOptions, values.provinceCode, values.provinceName),
-    [values.provinceCode, values.provinceName],
-  );
-  const cityOptions = useMemo(
-    () =>
-      includeCurrentRegion(
-        getCityOptions(values.provinceCode),
-        values.cityCode,
-        values.cityName,
-      ),
-    [values.cityCode, values.cityName, values.provinceCode],
-  );
-  const districtOptions = useMemo(
-    () =>
-      includeCurrentRegion(
-        getDistrictOptions(values.cityCode),
-        values.districtCode,
-        values.districtName,
-      ),
-    [values.cityCode, values.districtCode, values.districtName],
-  );
 
   const updateValue = (name: keyof MemberAddressFormValues, value: string) => {
     setValues((current) => ({ ...current, [name]: value }));
     setErrors((current) => ({ ...current, [name]: undefined }));
   };
 
-  const selectProvince = (provinceCode: string) => {
-    const provinceName =
-      provinceOptions.find((option) => option.code === provinceCode)?.name ?? "";
+  const selectProvince = (provinceCode: string, provinceName: string) => {
     setValues((current) => ({
       ...current,
       provinceCode,
@@ -160,8 +87,7 @@ export function MemberAddressForm({
     }));
   };
 
-  const selectCity = (cityCode: string) => {
-    const cityName = cityOptions.find((option) => option.code === cityCode)?.name ?? "";
+  const selectCity = (cityCode: string, cityName: string) => {
     setValues((current) => ({
       ...current,
       cityCode,
@@ -176,9 +102,7 @@ export function MemberAddressForm({
     }));
   };
 
-  const selectDistrict = (districtCode: string) => {
-    const districtName =
-      districtOptions.find((option) => option.code === districtCode)?.name ?? "";
+  const selectDistrict = (districtCode: string, districtName: string) => {
     setValues((current) => ({ ...current, districtCode, districtName }));
     setErrors((current) => ({ ...current, districtCode: undefined }));
   };
@@ -235,40 +159,13 @@ export function MemberAddressForm({
         />
       </div>
 
-      <fieldset className={styles.regionFields}>
-        <legend>所在地区</legend>
-        <div className={styles.regionSelectGrid}>
-          <RegionSelect
-            error={errors.provinceCode}
-            label="省 / 自治区"
-            name="provinceCode"
-            options={selectedProvinceOptions}
-            placeholder="请选择省 / 自治区"
-            value={values.provinceCode}
-            onChange={selectProvince}
-          />
-          <RegionSelect
-            disabled={!values.provinceCode}
-            error={errors.cityCode}
-            label="城市"
-            name="cityCode"
-            options={cityOptions}
-            placeholder="请选择城市"
-            value={values.cityCode}
-            onChange={selectCity}
-          />
-          <RegionSelect
-            disabled={!values.cityCode}
-            error={errors.districtCode}
-            label="区 / 县"
-            name="districtCode"
-            options={districtOptions}
-            placeholder="请选择区 / 县"
-            value={values.districtCode}
-            onChange={selectDistrict}
-          />
-        </div>
-      </fieldset>
+      <AddressRegionFieldset
+        errors={errors}
+        region={values}
+        onSelectCity={selectCity}
+        onSelectDistrict={selectDistrict}
+        onSelectProvince={selectProvince}
+      />
 
       <label className={styles.field}>
         <span>详细地址</span>

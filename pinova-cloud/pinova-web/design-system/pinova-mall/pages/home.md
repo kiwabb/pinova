@@ -14,6 +14,7 @@ Read `../MASTER.md` first. This file only records home-specific rules.
 ## Section rules
 
 ### Merch hero
+- Brand-rose poster band (`--catalog-accent-strong` surface, white title, marigold badge/price, white primary CTA)
 - Prefer product main image; fallback to atelier hero asset only if no featured product
 - Must show price when `priceFen` is non-null
 - Primary CTA → product detail; secondary → starter kits category
@@ -25,10 +26,12 @@ Read `../MASTER.md` first. This file only records home-specific rules.
 
 ### Product floors
 - Titles use plain commerce Chinese (e.g. 实物材料 / 数字图纸 / 到店体验)
-- Dense grid; digital products still use image + price card (no split editorial layout)
+- Floor header: 18px title + mono count chip; section h2 carries the accent bar marker
+- Dense grid of the shared raised product cards; digital products still use image + price card (no split editorial layout)
 - Floor “查看更多” only if a real category or filtered route exists
 
 ### Store strip
+- Ink band mirroring the hero (on-ink text, marigold eyebrow, accent CTA)
 - One image + short copy + link to store-experience category
 - Max ~2 sentences; no multi-step creation path story
 

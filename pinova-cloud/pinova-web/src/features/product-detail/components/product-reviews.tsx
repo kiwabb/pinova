@@ -179,9 +179,16 @@ export function ProductReviews({
           type="button"
           className={styles.loadMoreReviews}
           disabled={isLoadingMore}
+          aria-busy={isLoadingMore}
           onClick={loadMore}
         >
-          {isLoadingMore && <LoaderCircle aria-hidden="true" size={17} />}
+          {isLoadingMore && (
+            <LoaderCircle
+              aria-hidden="true"
+              className={styles.spinner}
+              size={17}
+            />
+          )}
           加载更多评价
         </button>
       )}

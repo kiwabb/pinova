@@ -20,9 +20,8 @@ test("opens a product detail page and adds the selected SKU", async ({ page }) =
   ).toBeVisible();
   await expect(page.getByText("¥59.90", { exact: true })).toBeVisible();
   await expect(page.getByText("现货", { exact: true })).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "SKU 01", exact: true }),
-  ).toHaveAttribute("aria-pressed", "true");
+  // 单 SKU 商品不渲染规格选择器（design-system 规则）。
+  await expect(page.getByRole("group", { name: "选择规格" })).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "商品亮点", level: 3 }),
   ).toBeVisible();
@@ -71,7 +70,9 @@ test("opens a product detail page and adds the selected SKU", async ({ page }) =
   await expect(
     page.getByRole("heading", { name: "购物车", level: 1 }),
   ).toBeVisible();
-  await expect(page.getByText("48 色基础拼豆套装")).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "48 色基础拼豆套装", exact: true }),
+  ).toBeVisible();
   await expect(
     page.locator('output[aria-label="48 色基础拼豆套装 数量"]'),
   ).toHaveText("1");

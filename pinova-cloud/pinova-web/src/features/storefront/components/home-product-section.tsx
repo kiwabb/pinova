@@ -9,7 +9,6 @@ import {
 } from "@/data/storefront";
 import homeStyles from "../home.module.css";
 import type { HomeProductGroup } from "../lib/home-merchandising";
-import { HomeProductTile } from "./home-product-tile";
 import { ProductGrid } from "./product-grid";
 
 interface HomeProductSectionProps {
@@ -28,6 +27,7 @@ export function HomeProductSection({
   appliedSearch,
   categories,
   favorites,
+  productGroups,
   products,
   onAddToCart,
   onClearFilters,
@@ -71,20 +71,22 @@ export function HomeProductSection({
         </header>
 
         {isDefaultView ? (
-          <div className={homeStyles.productGrid}>
-            {products.map((product) => (
-              <HomeProductTile
-                key={product.id}
-                isFavorite={favorites.includes(product.id)}
-                kind="other"
-                kindLabel=""
-                product={product}
+          productGroups.map((group) => (
+            <div className={homeStyles.homeFloor} key={group.kind}>
+              <header className={homeStyles.floorHead}>
+                <h3>{group.title}</h3>
+                <p>{group.products.length} 件商品</p>
+              </header>
+              <ProductGrid
+                products={group.products}
+                favorites={favorites}
+                eagerFirstImage={false}
                 onAddToCart={onAddToCart}
                 onQuickView={onQuickView}
                 onToggleFavorite={onToggleFavorite}
               />
-            ))}
-          </div>
+            </div>
+          ))
         ) : (
           <ProductGrid
             products={products}

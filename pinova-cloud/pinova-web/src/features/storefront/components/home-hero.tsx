@@ -1,13 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import type { StoreCategory, StoreProduct } from "@/data/storefront";
+import type { StoreProduct } from "@/data/storefront";
 import { formatPrice } from "../lib/format";
 import { homeVisuals } from "../lib/home-merchandising";
+import { ResponsiveArtDirectedImage } from "./responsive-art-directed-image";
 import homeStyles from "../home.module.css";
 
 interface HomeHeroProps {
-  categories: StoreCategory[];
   product?: StoreProduct;
 }
 
@@ -16,8 +16,6 @@ export function HomeHero({ product }: HomeHeroProps) {
   const detailHref = product
     ? `/products/${product.id}`
     : "/category/starter-kits";
-  const imageSrc = product?.image ?? homeVisuals.hero.desktopImage;
-  const imageAlt = product?.imageAlt ?? homeVisuals.hero.alt;
   const blurb =
     product?.description ??
     "材料、图纸与工具配齐，从新手套装开始这次创作。";
@@ -50,14 +48,24 @@ export function HomeHero({ product }: HomeHeroProps) {
           </div>
 
           <div className={homeStyles.heroVisual}>
-            <Image
-              src={imageSrc}
-              alt={imageAlt}
-              fill
-              priority
-              fetchPriority="high"
-              sizes="(max-width: 767px) 100vw, 55vw"
-            />
+            {product?.image ? (
+              <Image
+                src={product.image}
+                alt={product.imageAlt}
+                fill
+                priority
+                fetchPriority="high"
+                sizes="(max-width: 767px) 100vw, 55vw"
+              />
+            ) : (
+              <ResponsiveArtDirectedImage
+                alt={homeVisuals.hero.alt}
+                className={homeStyles.heroPicture}
+                desktopImage={homeVisuals.hero.desktopImage}
+                highPriority
+                mobileImage={homeVisuals.hero.mobileImage}
+              />
+            )}
           </div>
         </div>
       </div>
