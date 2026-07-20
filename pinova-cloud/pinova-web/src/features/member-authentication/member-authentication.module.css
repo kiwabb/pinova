@@ -321,13 +321,22 @@
   padding: 10px 12px;
   border-radius: var(--catalog-radius-control);
   display: grid;
-  grid-template-columns: 28px minmax(0, 1fr) auto;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
   align-items: center;
   gap: 12px;
   background: var(--catalog-surface-subtle);
   transition:
     background var(--motion-fast),
     color var(--motion-fast);
+}
+
+.memberActions a > svg:first-child {
+  width: 36px;
+  height: 36px;
+  padding: 8px;
+  border-radius: 50%;
+  background: var(--catalog-accent-soft);
+  color: var(--catalog-accent-strong);
 }
 
 .memberActions a > svg:last-child {

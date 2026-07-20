@@ -166,11 +166,12 @@
 
 .orderHeader {
   min-width: 0;
-  padding: 18px 20px;
+  padding: 14px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  background: var(--catalog-surface-subtle);
 }
 
 .orderIdentity,
