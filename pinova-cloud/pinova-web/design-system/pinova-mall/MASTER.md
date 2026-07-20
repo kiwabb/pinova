@@ -31,17 +31,27 @@ persist a new palette, change the stack, or override an existing page rule.
 | --- | --- |
 | Price / primary CTA | `--catalog-accent` `#c72c59` |
 | Success / in-stock | `--catalog-emerald` `#0c715f` |
-| Ink | `--catalog-ink` `#111311` |
+| Ink / dark band surface | `--catalog-ink` `#111311` |
+| Text on ink | `--catalog-on-ink` / `-muted` / `-faint` |
+| Highlight on ink (price, brand mark) | `--catalog-marigold` `#efbc35` |
 | Muted | `--catalog-muted` `#626761` |
 | Paper / page bg | `--catalog-paper` `#f4f6f3` |
 | Product surface | `#ffffff` |
 | Rule | `--catalog-rule` |
+| Danger tint | `--catalog-danger-soft` |
 | Control radius | `--catalog-radius-control` `6px` |
 | Surface radius | `--catalog-radius-surface` `8px` |
 | Repeated-item shadow | `--catalog-shadow-card` |
+| Hover raise shadow | `--catalog-shadow-raise` / `--catalog-shadow-soft` |
 | Sticky-shell shadow | `--catalog-shadow-subtle` |
 
-Category accent colors remain for shortcut icon chips only, not as full-page language.
+Category accent colors are used for shortcut icon chips and the category masthead identity bar, not as full-page language.
+
+### Vibrant block accents
+
+- The shared header carries a `3px` flat accent topline as the brand mark.
+- Home section `h2` and the category masthead `h1` carry a flat 5px accent bar marker (category pages use the category color). No gradients — flat blocks only.
+- The merch hero and the store strip are **ink bookends**: flat `--catalog-ink` surfaces with `--catalog-on-ink` text, marigold price/eyebrow highlights, and accent-filled primary CTAs. All other bands stay light.
 
 ## Typography
 
@@ -63,13 +73,13 @@ Category accent colors remain for shortcut icon chips only, not as full-page lan
 ## Components
 
 ### Product card
-Image-led, title 2 lines max, price always prominent when non-null, add-to-cart visible (not hover-only). Empty price/stock remain empty.
+A raised white commerce card: surface `#ffffff`, radius 8px, `--catalog-shadow-card`, 12px inner padding, media on the 6px control radius. Image-led, title 2 lines max at 14-16px, price 16-20px bold mono accent, add-to-cart is an accent-filled CTA visible at rest (not hover-only). Hover raises the card (`translateY(-2px)` + `--catalog-shadow-soft`, 140-240ms, reduced-motion safe). Empty price/stock remain empty.
 
 ### Category shortcut
 Icon chip + label + real category href. Horizontal strip, scroll on mobile.
 
 ### Merch hero
-Featured product photo + name + price + primary CTA. No manifesto copy as the main message.
+Ink band: featured product photo + name + price + primary CTA on the flat `--catalog-ink` surface. Badge and primary CTA use accent fill; the price uses marigold mono; secondary CTA is a translucent on-ink chip. No manifesto copy as the main message.
 
 ### Floor header
 Title + optional count + “查看更多” link on one row.

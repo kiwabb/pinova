@@ -1,8 +1,8 @@
 .productGrid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  column-gap: clamp(16px, 1.8vw, 24px);
-  row-gap: clamp(24px, 2.5vw, 32px);
+  column-gap: clamp(12px, 1.4vw, 16px);
+  row-gap: clamp(12px, 1.4vw, 16px);
   min-width: 0;
 }
 

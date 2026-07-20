@@ -16,8 +16,9 @@
   display: grid;
   overflow: hidden;
   border-radius: var(--catalog-radius-surface);
-  background: var(--catalog-surface-subtle);
+  background: var(--catalog-ink);
   box-shadow: var(--catalog-shadow-card);
+  color: var(--catalog-on-ink);
 }
 
 .heroCopy {
@@ -36,8 +37,8 @@
   display: inline-flex;
   align-items: center;
   border-radius: var(--catalog-radius-control);
-  background: var(--catalog-accent-soft);
-  color: var(--catalog-accent-strong);
+  background: var(--catalog-accent);
+  color: #fff;
   font-size: 12px;
   font-weight: 700;
 }
@@ -45,7 +46,7 @@
 .heroCopy h1 {
   margin: 0;
   max-width: 12ch;
-  color: var(--catalog-ink);
+  color: var(--catalog-on-ink);
   font-size: clamp(30px, 4.2vw, 48px);
   line-height: 1.12;
   font-weight: 800;
@@ -55,7 +56,7 @@
 .heroDesc {
   margin: 0;
   max-width: 34ch;
-  color: var(--catalog-muted);
+  color: var(--catalog-on-ink-muted);
   font-size: 14px;
   line-height: 1.7;
 }
@@ -65,7 +66,7 @@
 }
 
 .heroPrice strong {
-  color: var(--catalog-accent);
+  color: var(--catalog-marigold);
   font-family: var(--font-mono);
   font-size: 32px;
   font-weight: 800;
@@ -106,8 +107,8 @@
 
 .heroSecondary {
   border: 1px solid transparent;
-  background: var(--catalog-surface-muted);
-  color: var(--catalog-accent-strong);
+  background: rgb(255 255 255 / 12%);
+  color: var(--catalog-on-ink);
 }
 
 .heroPrimary:active,
@@ -153,10 +154,23 @@
 
 .sectionHead h2 {
   margin: 0;
+  padding-left: 14px;
+  position: relative;
   color: var(--catalog-ink);
   font-size: 22px;
   font-weight: 700;
   letter-spacing: 0;
+}
+
+.sectionHead h2::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 5px;
+  border-radius: 2px;
+  background: var(--catalog-accent);
 }
 
 .sectionHead p {
@@ -274,22 +288,29 @@
 .floorHead {
   margin-bottom: 14px;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 10px;
 }
 
 .floorHead h3 {
   margin: 0;
   color: var(--catalog-ink);
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 700;
 }
 
 .floorHead p {
   margin: 0;
+  min-height: 22px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 4px;
+  background: var(--catalog-surface-muted);
   color: var(--catalog-muted);
   font-family: var(--font-mono);
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
@@ -315,8 +336,9 @@
   display: grid;
   overflow: hidden;
   border-radius: var(--catalog-radius-surface);
-  background: var(--catalog-surface-subtle);
+  background: var(--catalog-ink);
   box-shadow: var(--catalog-shadow-card);
+  color: var(--catalog-on-ink);
 }
 
 .storeMedia {
@@ -347,7 +369,7 @@
 
 .storeCopy > p {
   margin: 0;
-  color: var(--catalog-accent-strong);
+  color: var(--catalog-marigold);
   font-size: 12px;
   font-weight: 700;
 }
@@ -359,7 +381,7 @@
 }
 
 .storeCopy > span {
-  color: var(--catalog-muted);
+  color: var(--catalog-on-ink-muted);
   font-size: 14px;
   line-height: 1.6;
 }
@@ -373,10 +395,15 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: var(--catalog-ink);
+  background: var(--catalog-accent);
   color: #fff;
   font-size: 13px;
   font-weight: 700;
+  transition: background var(--motion-fast);
+}
+
+.storeCopy a:hover {
+  background: var(--catalog-accent-strong);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -385,8 +412,7 @@
   }
 
   .heroSecondary:hover {
-    background: var(--catalog-surface);
-    border-color: var(--catalog-accent);
+    background: rgb(255 255 255 / 22%);
   }
 
   .sectionMore:hover {

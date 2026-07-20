@@ -267,7 +267,7 @@
   gap: 10px;
   border: 0;
   border-radius: var(--catalog-radius-control);
-  background: var(--catalog-ink);
+  background: var(--catalog-accent);
   padding: 0 18px;
   color: #fff;
   font-weight: 700;
@@ -275,7 +275,7 @@
 }
 
 .primaryButton:hover:not(:disabled) {
-  background: var(--catalog-accent);
+  background: var(--catalog-accent-strong);
 }
 
 .primaryButton:disabled {

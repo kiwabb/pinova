@@ -2,8 +2,15 @@
   display: grid;
   min-width: 0;
   align-content: start;
-  gap: 14px;
+  gap: 12px;
+  border-radius: var(--catalog-radius-surface);
+  background: var(--catalog-surface);
+  box-shadow: var(--catalog-shadow-card);
+  padding: 12px;
   color: var(--catalog-ink);
+  transition:
+    box-shadow var(--motion-fast),
+    transform var(--motion-fast);
 }
 
 .productMedia {
@@ -11,7 +18,7 @@
   overflow: hidden;
   aspect-ratio: 1 / 1.04;
   min-width: 0;
-  border-radius: var(--catalog-radius-surface);
+  border-radius: var(--catalog-radius-control);
   background: var(--catalog-surface-muted);
 }
 
@@ -175,7 +182,8 @@
 .productMeta strong {
   color: var(--catalog-accent);
   font-family: var(--font-mono);
-  font-size: 17px;
+  font-size: 18px;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
 }
@@ -190,7 +198,7 @@
   gap: 8px;
   border: 0;
   border-radius: var(--catalog-radius-control);
-  background: var(--catalog-ink);
+  background: var(--catalog-accent);
   padding: 0 13px;
   color: #fff;
   cursor: pointer;
@@ -203,7 +211,7 @@
 }
 
 .addButton:hover:not(:disabled) {
-  background: var(--catalog-accent);
+  background: var(--catalog-accent-strong);
   color: #fff;
 }
 
@@ -236,6 +244,11 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
+  .productSample:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--catalog-shadow-soft);
+  }
+
   .productSample:hover .productActionRail {
     opacity: 1;
     transform: translateX(0);
@@ -251,10 +264,6 @@
     grid-template-columns: minmax(116px, 40%) minmax(0, 1fr);
     align-items: stretch;
     gap: 16px;
-    border-bottom: 0;
-    border-radius: var(--catalog-radius-surface);
-    background: var(--catalog-surface);
-    padding: 12px;
   }
 
   .productMedia {
@@ -314,12 +323,14 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .productSample,
   .productImageLink img,
   .productActionRail,
   .addButton {
     transition-duration: 0.01ms !important;
   }
 
+  .productSample:hover,
   .productSample:hover .productImageLink img,
   .addButton:active:not(:disabled) {
     transform: none;
