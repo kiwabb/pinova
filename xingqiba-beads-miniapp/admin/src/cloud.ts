@@ -130,22 +130,41 @@ export async function cleanupPendingAdminUploads() {
   }
 }
 
+function fileToBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => {
+      const dataUrl = reader.result as string
+      const base64 = dataUrl.substring(dataUrl.indexOf(',') + 1)
+      resolve(base64)
+    }
+    reader.onerror = () => reject(new Error('文件读取失败'))
+    reader.readAsDataURL(file)
+  })
+}
+
 export async function uploadAdminImage(file: File, folder: 'collections' | 'tutorials' | 'store', onProgress: (progress: number) => void) {
   validateAdminImage(file)
+  onProgress(5)
   const uploadFile = await optimizeAdminImage(file)
   validateAdminImage(uploadFile)
-  const extension = IMAGE_EXTENSIONS[uploadFile.type]
-  const cloudPath = `admin/${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${extension}`
-  const result = await cloudApp.uploadFile({
-    cloudPath,
-    filePath: uploadFile as unknown as string,
-    onUploadProgress: (event: { loaded: number; total?: number }) => {
-      const total = event.total || 1
-      onProgress(Math.round((event.loaded / total) * 100))
-    },
-  })
-  trackAdminUpload(result.fileID)
-  return result.fileID
+  onProgress(20)
+  const base64 = await fileToBase64(uploadFile)
+  onProgress(50)
+  try {
+    const result = await callAdmin<{ fileID: string }>('uploadAdminFile', {
+      folder,
+      fileName: uploadFile.name,
+      fileContent: base64,
+      contentType: uploadFile.type,
+    })
+    onProgress(100)
+    trackAdminUpload(result.fileID)
+    return result.fileID
+  } catch (error) {
+    console.error('[uploadAdminImage] upload failed:', error, { type: uploadFile.type, size: uploadFile.size, folder })
+    throw error
+  }
 }
 
 export function uploadCollectionImage(file: File, onProgress: (progress: number) => void) {
@@ -161,10 +180,20 @@ export async function resolveImageUrls(fileIds: string[]) {
   if (!cloudIds.length) return new Map<string, string>()
   const urlMap = new Map<string, string>()
   for (let index = 0; index < cloudIds.length; index += 50) {
-    const result = await cloudApp.getTempFileURL({ fileList: cloudIds.slice(index, index + 50) })
-    ;(result.fileList || []).forEach((item) => {
-      if (item.tempFileURL) urlMap.set(item.fileID, item.tempFileURL)
-    })
+    const batch = cloudIds.slice(index, index + 50)
+    try {
+      const response = await callAdmin<{ fileList: Array<{ fileID: string; tempFileURL: string; code: string }> }>('getAdminFileUrls', { fileList: batch })
+      const list = response.fileList || []
+      const successCount = list.filter((item) => Boolean(item.tempFileURL)).length
+      if (successCount < list.length) console.warn('[resolveImageUrls] some files have no tempFileURL', { requested: list.length, resolved: successCount, firstMissing: list.find((item) => !item.tempFileURL)?.fileID })
+      list.forEach((item) => {
+        if (item.tempFileURL) urlMap.set(item.fileID, item.tempFileURL)
+      })
+    } catch (error) {
+      console.error('[resolveImageUrls] getAdminFileUrls failed:', error, { batchStart: index, totalFiles: cloudIds.length })
+      throw error
+    }
   }
+  console.log('[resolveImageUrls] done, resolved', urlMap.size, 'of', cloudIds.length, 'file IDs')
   return urlMap
 }

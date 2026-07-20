@@ -1,1 +1,6 @@
-{ "navigationBarTitleText": "门店" }
+{
+  "navigationBarTitleText": "门店",
+  "usingComponents": {
+    "brand-logo": "/components/brand-logo/index"
+  }
+}

@@ -77,10 +77,22 @@
   "srcMiniprogramRoot": "miniprogram/",
   "packOptions": {
     "ignore": [
-      { "type": "folder", "value": "assets/patterns" },
-      { "type": "file", "value": "assets/reference/hot-dry-noodles.jpg" },
-      { "type": "file", "value": "assets/reference/yellow-crane-tower.jpg" },
-      { "type": "file", "value": "assets/reference/wuhan-bridge.jpg" }
+      {
+        "type": "folder",
+        "value": "assets/patterns"
+      },
+      {
+        "type": "file",
+        "value": "assets/reference/hot-dry-noodles.jpg"
+      },
+      {
+        "type": "file",
+        "value": "assets/reference/yellow-crane-tower.jpg"
+      },
+      {
+        "type": "file",
+        "value": "assets/reference/wuhan-bridge.jpg"
+      }
     ],
     "include": []
   },

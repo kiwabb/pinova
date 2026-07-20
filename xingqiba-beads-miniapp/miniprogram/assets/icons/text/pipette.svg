@@ -1,0 +1,19 @@
+<!-- @license lucide-static v1.24.0 - ISC -->
+<svg
+  class="lucide lucide-pipette"
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="#1F1E25"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="m2 22 2-2h3l7-7" />
+  <path d="M4 20 2 22" />
+  <path d="M7 17 4 20" />
+  <path d="m9.5 14.5 5-5" />
+  <path d="m12 3 1.5 1.5c2 2 2 5.25 0 7.25L8 17.25c-2 2-5.25 2-7.25 0L3 15.5" />
+</svg>

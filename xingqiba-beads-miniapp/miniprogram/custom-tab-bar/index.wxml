@@ -1,8 +1,9 @@
 <view wx:if="{{!hidden}}" class="tab-shell">
   <view class="tab-bar">
-    <view wx:for="{{tabs}}" wx:key="pagePath" class="tab-item {{selected === index ? 'active' : ''}}" data-path="{{item.pagePath}}" data-index="{{index}}" bindtap="switchTab" hover-class="tab-pressed">
+    <view wx:for="{{tabs}}" wx:key="pagePath" class="tab-item {{selected === index ? 'active' : ''}}" data-path="{{item.pagePath}}" data-index="{{index}}" data-action="{{item.action}}" bindtap="switchTab" hover-class="tab-pressed">
       <image class="tab-icon" src="{{selected === index ? item.activeIcon : item.icon}}" mode="aspectFit" />
       <text>{{item.text}}</text>
+      <view wx:if="{{selected === index}}" class="tab-indicator" />
     </view>
   </view>
 </view>

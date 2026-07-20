@@ -2,18 +2,25 @@
   <view wx:if="{{loading}}" class="detail-state card">正在加载系列</view>
   <view wx:elif="{{loadError}}" class="detail-state error-state card"><text>{{loadError}}</text><button bindtap="retry">重试</button></view>
   <block wx:elif="{{collection}}">
-  <view class="summary card">
-    <view class="summary-copy">
-      <view class="summary-title"><text>{{collection.title}}</text></view>
-      <text class="summary-desc">{{collection.description}}</text>
+  <view class="detail-hero card">
+    <view class="hero-collage count-{{heroImages.length}}">
+      <image wx:for="{{heroImages}}" wx:key="*this" src="{{item}}" mode="aspectFill" />
+      <text wx:if="{{collection.level !== '公开'}}" class="hero-level">{{collection.level}} 专属</text>
     </view>
-    <view class="total">{{collection.count}}<small>张</small></view>
+    <view class="hero-summary">
+      <view class="summary-copy">
+        <text class="summary-kicker">图集系列</text>
+        <text class="summary-title">{{collection.title}}</text>
+        <text class="summary-desc">{{collection.description}}</text>
+      </view>
+      <view class="total"><b>{{collection.count}}</b><small>张图纸</small></view>
+    </view>
   </view>
   <view class="toolbar">
-    <text>{{!sortApplied ? '按推荐顺序' : sortAscending ? '按名称升序' : '按名称降序'}}</text>
-    <button bindtap="sort"><image src="/assets/icons/primary/arrow-down-wide-narrow.svg" /><text>切换</text></button>
+    <view><text>系列图纸</text><small>{{!sortApplied ? '推荐顺序' : sortAscending ? '名称升序' : '名称降序'}}</small></view>
+    <button bindtap="sort"><image src="/assets/icons/primary/arrow-down-wide-narrow.svg" /><text>排序</text></button>
   </view>
-  <view class="pattern-grid">
+  <view wx:if="{{items.length}}" class="pattern-grid">
     <view wx:for="{{items}}" wx:key="id" class="pattern card" data-index="{{index}}" bindtap="openPattern" hover-class="pattern-pressed">
       <view class="pattern-media">
         <image class="pattern-art" src="{{item.image}}" mode="aspectFill" />
@@ -22,8 +29,9 @@
           <image src="{{favoriteIds[item.id] ? '/assets/icons/primary/heart.svg' : '/assets/icons/muted/heart.svg'}}" />
         </button>
       </view>
-      <text>{{item.name}}</text>
+      <view class="pattern-copy"><text>{{item.name}}</text><small>点击生成拼豆图纸</small></view>
     </view>
   </view>
+  <view wx:else class="detail-state card">该系列暂时没有图纸</view>
   </block>
 </view>

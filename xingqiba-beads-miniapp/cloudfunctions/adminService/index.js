@@ -1,6 +1,6 @@
 const cloud = require('wx-server-sdk')
 const cloudbase = require('@cloudbase/node-sdk')
-const { auditRetentionCutoff, bookingSlotUsage, bookingUsageTransition, canReactivateBooking, documentPayload, hasUniqueIds, importPatternDecision, isAdminUploadFileId, isValidBusinessId, memberRecordMatchesExpected, normalizeHexColor, normalizeImportPattern, normalizeMemberConfig, normalizeStoreConfig, normalizeStringList, normalizeText, revisionDecision, unreferencedFileIds, workVersionDecision } = require('./business')
+const { auditRetentionCutoff, bookingSlotUsage, bookingUsageTransition, canReactivateBooking, defaultPatternMaterials, documentPayload, hasUniqueIds, importPatternDecision, isAdminUploadFileId, isValidBusinessId, memberRecordMatchesExpected, normalizeHexColor, normalizeImportPattern, normalizeMemberConfig, normalizePatternMaterials, normalizeStoreConfig, normalizeStringList, normalizeText, revisionDecision, unreferencedFileIds, workVersionDecision } = require('./business')
 
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV })
 
@@ -134,12 +134,12 @@ function normalizeCollection(input = {}) {
   const items = Array.isArray(input.items) ? input.items.map((item, index) => {
     if (typeof item === 'string') {
       const name = normalizeText(item, 40)
-      return name ? { id: `pattern-${index + 1}`, name, image: images[index % Math.max(1, images.length)] || '' } : null
+      return name ? { id: `pattern-${index + 1}`, name, image: images[index % Math.max(1, images.length)] || '', materials: defaultPatternMaterials() } : null
     }
     const name = normalizeText(item?.name, 40)
     const image = normalizeText(item?.image, 500)
     const id = normalizeText(item?.id, 80) || `pattern-${Date.now()}-${index}`
-    return name ? { id, name, image } : null
+    return name ? { id, name, image, materials: normalizePatternMaterials(item?.materials) } : null
   }).filter(Boolean).slice(0, 100) : []
 
   if (!title) return { error: '请输入图集名称' }
@@ -178,8 +178,8 @@ async function listCollections() {
     status: item.status || 'draft',
     images: item.images || [],
     items: (item.items || []).map((pattern, index) => typeof pattern === 'string'
-      ? { id: `${item._id}-pattern-${index + 1}`, name: pattern, image: (item.images || [])[index % Math.max(1, (item.images || []).length)] || '' }
-      : pattern),
+      ? { id: `${item._id}-pattern-${index + 1}`, name: pattern, image: (item.images || [])[index % Math.max(1, (item.images || []).length)] || '', materials: defaultPatternMaterials() }
+      : { ...pattern, materials: normalizePatternMaterials(pattern.materials) }),
     count: item.count || 0,
     background: item.background || '#F7F8FA',
     sort: item.sort || 0,
@@ -248,8 +248,8 @@ async function importPattern(event, uid) {
   const pattern = normalizedPattern.data
   const setAsCover = event.setAsCover === true
   const patternId = `pattern-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-
   const collectionId = normalizeText(event.collectionId, 80)
+
   if (!collectionId) {
     const input = event.newCollection && typeof event.newCollection === 'object' ? event.newCollection : {}
     const saveResult = await saveCollection({
@@ -261,7 +261,7 @@ async function importPattern(event, uid) {
         level: input.level || '公开',
         status: 'draft',
         images: setAsCover ? [pattern.image] : [],
-        items: [{ id: patternId, name: pattern.name, image: pattern.image }],
+        items: [{ id: patternId, name: pattern.name, image: pattern.image, materials: defaultPatternMaterials() }],
         background: input.background,
         sort: input.sort,
       },
@@ -278,7 +278,7 @@ async function importPattern(event, uid) {
       let collection
       try {
         collection = (await transaction.collection('collections').doc(collectionId).get()).data
-      } catch (error) {
+      } catch {
         throw new Error('COLLECTION_NOT_FOUND')
       }
       const decision = importPatternDecision(collection, { id: patternId, name: pattern.name, image: pattern.image }, { collectionId, setAsCover })
@@ -356,6 +356,50 @@ async function deleteFiles(event) {
     : []
   if (!fileList.length) return { success: true, data: { deleted: 0, skipped: 0 } }
   return { success: true, data: await deleteUnreferencedAdminFiles(fileList) }
+}
+
+const ADMIN_UPLOAD_FOLDERS = ['collections', 'tutorials', 'store']
+const MAX_UPLOAD_BASE64_BYTES = 11 * 1024 * 1024
+const IMAGE_EXTENSIONS = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }
+
+async function uploadAdminFile(event) {
+  const folder = ADMIN_UPLOAD_FOLDERS.includes(event.folder) ? event.folder : ''
+  const fileName = normalizeText(event.fileName, 80)
+  const contentType = normalizeText(event.contentType, 30)
+  const fileContent = typeof event.fileContent === 'string' ? event.fileContent : ''
+
+  if (!folder) return { success: false, code: 'INVALID_ARGUMENT', message: '文件夹参数不正确' }
+  if (!fileContent || fileContent.length > MAX_UPLOAD_BASE64_BYTES) return { success: false, code: 'INVALID_ARGUMENT', message: '文件内容过大' }
+  if (!IMAGE_EXTENSIONS[contentType]) return { success: false, code: 'INVALID_ARGUMENT', message: '仅支持 JPEG、PNG 或 WebP 图片' }
+
+  const extension = IMAGE_EXTENSIONS[contentType] || 'webp'
+  const safeName = fileName.replace(/\.[^.]+$/, '') || 'image'
+  const cloudPath = `admin/${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName.slice(0, 30)}.${extension}`
+
+  let buffer
+  try {
+    buffer = Buffer.from(fileContent, 'base64')
+    if (buffer.length > 8 * 1024 * 1024) return { success: false, code: 'INVALID_ARGUMENT', message: '单张图片不能超过 8MB' }
+  } catch {
+    return { success: false, code: 'INVALID_ARGUMENT', message: '文件内容编码不正确' }
+  }
+
+  const result = await cloud.uploadFile({ cloudPath, fileContent: buffer })
+  return { success: true, data: { fileID: result.fileID } }
+}
+
+async function getAdminFileUrls(event) {
+  const fileList = Array.isArray(event.fileList)
+    ? event.fileList.filter((id) => typeof id === 'string' && id.startsWith('cloud://')).slice(0, 50)
+    : []
+  if (!fileList.length) return { success: true, data: { fileList: [] } }
+  const result = await cloud.getTempFileURL({ fileList })
+  const mapped = (result.fileList || []).map((item) => {
+    if (!item.tempFileURL) console.warn('[getAdminFileUrls] no tempFileURL for', item.fileID)
+    return { fileID: item.fileID, tempFileURL: item.tempFileURL || '', code: item.code || '' }
+  })
+  console.log('[getAdminFileUrls] resolved', mapped.length, 'files, empty URLs:', mapped.filter((f) => !f.tempFileURL).length)
+  return { success: true, data: { fileList: mapped } }
 }
 
 function shanghaiDate(offsetDays = 0) {
@@ -1093,6 +1137,8 @@ exports.main = async (event = {}) => {
     if (event.action === 'updateStatus') return await updateStatus(event, auth.uid)
     if (event.action === 'archiveCollection') return await archiveCollection(event, auth.uid)
     if (event.action === 'deleteFiles') return await deleteFiles(event)
+    if (event.action === 'uploadAdminFile') return await uploadAdminFile(event)
+    if (event.action === 'getAdminFileUrls') return await getAdminFileUrls(event)
     if (event.action === 'listBookings') return await listBookings(event)
     if (event.action === 'updateBookingStatus') return await updateBookingStatus(event, auth.uid)
     if (event.action === 'listUsers') return await listUsers(event)

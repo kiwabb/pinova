@@ -1,4 +1,17 @@
 <view class="page home-page">
+  <view class="brand-header">
+    <view class="brand-inner">
+      <view class="brand-main">
+        <view class="brand-lockup"><brand-logo variant="lockup" /></view>
+        <view class="brand-copy">
+          <text class="brand-cn">星期八</text>
+          <text class="brand-en">Extra lovely day ♫</text>
+        </view>
+      </view>
+      <view class="brand-tagline"><text>拼出热爱，装点生活的小美好</text><text class="brand-sparkle">✦</text></view>
+    </view>
+  </view>
+
   <view class="hero card">
     <view class="hero-copy">
       <text class="hero-title">照片转图纸</text>
@@ -15,19 +28,19 @@
     </view>
   </view>
 
-  <view class="shortcuts">
-    <button class="shortcut card" bindtap="openEditor" hover-class="card-pressed">
+  <view class="shortcuts card">
+    <view class="shortcut" role="button" aria-label="空白创作，自由设计" bindtap="openEditor" hover-class="card-pressed">
       <view class="shortcut-icon"><image src="/assets/icons/primary/pencil.svg" /></view>
-      <view><text>空白创作</text><small>自由设计</small></view>
-    </button>
-    <button class="shortcut card" bindtap="openTutorial" hover-class="card-pressed">
+      <view class="shortcut-copy"><text>空白创作</text><small>自由设计</small></view>
+    </view>
+    <view class="shortcut" role="button" aria-label="新手教程，从入门到精通" bindtap="openTutorial" hover-class="card-pressed">
       <view class="shortcut-icon"><image src="/assets/icons/primary/book-open.svg" /></view>
-      <view><text>新手教程</text><small>从入门到精通</small></view>
-    </button>
-    <button class="shortcut card" bindtap="openStore" hover-class="card-pressed">
+      <view class="shortcut-copy"><text>新手教程</text><small>从入门到精通</small></view>
+    </view>
+    <view class="shortcut" role="button" aria-label="到店体验，查找线下门店" bindtap="openStore" hover-class="card-pressed">
       <view class="shortcut-icon"><image src="/assets/icons/primary/map-pin.svg" /></view>
-      <view><text>到店体验</text><small>查找线下门店</small></view>
-    </button>
+      <view class="shortcut-copy"><text>到店体验</text><small>查找线下门店</small></view>
+    </view>
   </view>
 
   <view class="section featured-section">

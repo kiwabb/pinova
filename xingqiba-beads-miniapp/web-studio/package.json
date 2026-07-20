@@ -12,7 +12,7 @@
     "mini:build": "npm --prefix miniapp run build:weapp"
   },
   "dependencies": {
-    "@cloudbase/js-sdk": "^2.23.0",
+    "@cloudbase/js-sdk": "^2.31.0",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",

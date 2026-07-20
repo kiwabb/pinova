@@ -8,7 +8,7 @@ Page({
   requestSerial: 0,
   searchTimer: 0,
   onShow() {
-    this.getTabBar()?.setData({ selected: 1, hidden: false })
+    this.getTabBar()?.setData({ selected: 2, hidden: false })
     void this.loadCollections(true)
   },
   onReachBottom() {
@@ -25,7 +25,7 @@ Page({
         action: 'listCollections',
         cursor: reset ? '' : this.data.nextCursor,
         pageSize: 20,
-        category: this.data.active === '精选' ? '' : this.data.active,
+        category: this.data.active === '全部' ? '' : this.data.active,
         level: this.data.activeLevel === '全部' ? '' : this.data.activeLevel,
         keyword: this.data.keyword,
       } })

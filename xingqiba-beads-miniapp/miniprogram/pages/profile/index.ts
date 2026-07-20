@@ -35,7 +35,7 @@ Page({
     points: 0,
   },
   onShow() {
-    this.getTabBar()?.setData({ selected: 3, hidden: false })
+    this.getTabBar()?.setData({ selected: 4, hidden: false })
     if (wx.getStorageSync('xingqiba-open-bind')) {
       wx.removeStorageSync('xingqiba-open-bind')
       wx.showToast({ title: '点击“去绑定”授权微信手机号', icon: 'none' })
@@ -94,6 +94,7 @@ Page({
       this.setData({ binding: false })
     }
   },
+  stopPropagation() {},
   openWorks() { wx.navigateTo({ url: '/pages/records/index?mode=works' }) },
   openFavorites() { wx.navigateTo({ url: '/pages/records/index?mode=favorites' }) },
   openBookings() { wx.navigateTo({ url: '/pages/records/index?mode=bookings' }) },

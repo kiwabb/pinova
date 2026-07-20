@@ -71,6 +71,34 @@ function rankFor(level) {
   return Object.prototype.hasOwnProperty.call(LEVEL_RANK, level) ? LEVEL_RANK[level] : Number.POSITIVE_INFINITY
 }
 
+function defaultPatternMaterials() {
+  return [
+    { id: 'material-board', kind: 'board', name: '29 × 29 底板', description: '标准拼豆底板', amount: '4', unit: '块' },
+    { id: 'material-beads', kind: 'beads', name: 'MARD 拼豆', description: '按生成后的颜色清单准备', amount: '≤ 3364', unit: '颗' },
+    { id: 'material-paper', kind: 'paper', name: '隔热烫纸', description: '用于完成后的熨烫定型', amount: '1', unit: '张' },
+  ]
+}
+
+function publicPatternMaterials(input) {
+  if (!Array.isArray(input) || !input.length) return defaultPatternMaterials()
+  const text = (value, length) => typeof value === 'string' ? value.trim().slice(0, length) : ''
+  const materials = input.slice(0, 12).map((item, index) => {
+    const kind = ['board', 'beads', 'paper', 'other'].includes(item?.kind) ? item.kind : 'other'
+    const name = text(item?.name, 40)
+    const amount = text(item?.amount, 16)
+    const unit = text(item?.unit, 8)
+    return name && amount && unit ? {
+      id: text(item?.id, 80) || `material-${index + 1}`,
+      kind,
+      name,
+      description: text(item?.description, 60),
+      amount,
+      unit,
+    } : null
+  }).filter(Boolean)
+  return materials.length ? materials : defaultPatternMaterials()
+}
+
 function paginationOptions(event = {}) {
   const pageSize = Math.min(50, Math.max(1, Number(event.pageSize) || 20))
   const parsedCursor = Number.parseInt(String(event.cursor || '0'), 10)
@@ -152,8 +180,8 @@ async function getCollection(collectionId, memberLevel) {
   }
 
   const items = Array.isArray(collection.items) ? collection.items.map((item, index) => typeof item === 'string'
-    ? { id: `${collectionId}-${String(index + 1).padStart(2, '0')}`, name: item, image: (collection.images || [])[index % Math.max(1, (collection.images || []).length)] || '' }
-    : { id: item.id || `${collectionId}-${String(index + 1).padStart(2, '0')}`, name: item.name, image: item.image || '' }) : []
+    ? { id: `${collectionId}-${String(index + 1).padStart(2, '0')}`, name: item, image: (collection.images || [])[index % Math.max(1, (collection.images || []).length)] || '', materials: defaultPatternMaterials() }
+    : { id: item.id || `${collectionId}-${String(index + 1).padStart(2, '0')}`, name: item.name, image: item.image || '', materials: publicPatternMaterials(item.materials) }) : []
   return {
     success: true,
     data: {
@@ -168,7 +196,7 @@ async function getCollection(collectionId, memberLevel) {
         items: items.map((item) => item.name),
         level: collection.level,
       },
-      patterns: items.map((item) => ({ id: item.id, name: item.name, image: item.image, level: collection.level })),
+      patterns: items.map((item) => ({ id: item.id, name: item.name, image: item.image, materials: item.materials, level: collection.level })),
     },
   }
 }

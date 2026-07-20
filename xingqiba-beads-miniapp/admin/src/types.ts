@@ -1,10 +1,22 @@
 export type MemberLevel = '公开' | 'V1' | 'V2' | 'V3' | 'V4'
 export type CollectionStatus = 'draft' | 'published' | 'offline' | 'archived'
 
+export type PatternMaterialKind = 'board' | 'beads' | 'paper' | 'other'
+
+export interface PatternMaterialInput {
+  id: string
+  kind: PatternMaterialKind
+  name: string
+  description: string
+  amount: string
+  unit: string
+}
+
 export interface PatternInput {
   id: string
   name: string
   image: string
+  materials: PatternMaterialInput[]
 }
 
 export interface CollectionRecord {

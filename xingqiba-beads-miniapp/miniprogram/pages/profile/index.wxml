@@ -1,22 +1,21 @@
-<view class="page profile-page">
-  <view class="profile-head card">
-    <view class="avatar"><image src="/assets/icons/primary/user-round.svg" /></view>
-    <view class="identity"><text>微信用户</text><small>{{bound ? maskedPhone : '手机号未绑定'}}</small></view>
-    <button wx:if="{{bound}}" open-type="getPhoneNumber" bindgetphonenumber="bindPhone" loading="{{binding}}" disabled="{{binding}}">{{binding ? '更新中' : '更换'}}</button>
-    <button wx:else open-type="getPhoneNumber" bindgetphonenumber="bindPhone" loading="{{binding}}" disabled="{{binding}}">{{binding ? '绑定中' : '去绑定'}}</button>
-  </view>
+  <view class="page profile-page">
+  <view class="profile-intro"><text class="profile-kicker">个人中心</text><text class="profile-intro-title">我的创作空间</text><text class="profile-intro-desc">管理作品、收藏、预约与会员权益</text></view>
   <view wx:if="{{loadError}}" class="load-error"><text>{{loadError}}</text><button bindtap="loadProfile">重试</button></view>
   <view class="member-strip" bindtap="openMember" hover-class="member-strip-pressed">
-    <view><text>星期八会员</text><small>{{bound ? memberLevel + ' 会员' : '查看 V1–V4 会员体系'}}</small></view>
-    <view class="member-summary"><text>{{points}} 积分</text><image src="/assets/icons/text/chevron-right.svg" /></view>
+    <view class="member-brand"><brand-logo variant="mark" tone="dark" /></view>
+    <view class="member-main"><text class="member-kicker">DAY 8 MEMBER</text><text class="member-title">星期八会员</text><small>{{bound ? memberLevel + ' 会员 · 解锁专属权益' : '查看 V1–V4 会员体系'}}</small></view>
+    <view wx:if="{{bound}}" class="member-summary"><small>当前积分</small><text>{{points}}</text><text class="member-arrow">›</text></view>
+    <button wx:else class="member-bind-button" catchtap="stopPropagation" open-type="getPhoneNumber" bindgetphonenumber="bindPhone" loading="{{binding}}" disabled="{{binding}}">{{binding ? '绑定中' : '去绑定'}}</button>
   </view>
-  <view class="metrics card"><view><b>{{favorites}}</b><text>收藏</text></view><view><b>{{works}}</b><text>作品</text></view><view><b>{{bookings}}</b><text>预约</text></view></view>
-  <view class="menu card">
-    <button bindtap="openBookings"><text>我的预约</text><image src="/assets/icons/text/chevron-right.svg" /></button>
-    <button bindtap="openWorks"><text>我的作品</text><image src="/assets/icons/text/chevron-right.svg" /></button>
-    <button bindtap="openFavorites"><text>我的收藏</text><image src="/assets/icons/text/chevron-right.svg" /></button>
-    <button bindtap="openMember"><text>会员权益</text><image src="/assets/icons/text/chevron-right.svg" /></button>
-    <button bindtap="openStore"><text>联系门店</text><image src="/assets/icons/text/chevron-right.svg" /></button>
+  <view class="metrics card"><view bindtap="openFavorites"><b>{{favorites}}</b><text>收藏</text></view><view bindtap="openWorks"><b>{{works}}</b><text>作品</text></view><view bindtap="openBookings"><b>{{bookings}}</b><text>预约</text></view></view>
+  <view class="service-section">
+    <view class="service-head"><text>创作与服务</text><small>常用功能</small></view>
+    <view class="menu card">
+      <button bindtap="openWorks" hover-class="menu-item-pressed"><view class="menu-icon rose"><image src="/assets/icons/text/save.svg" /></view><view class="menu-copy"><text>我的作品</text></view><image class="menu-chevron" src="/assets/icons/text/chevron-right.svg" /></button>
+      <button bindtap="openFavorites" hover-class="menu-item-pressed"><view class="menu-icon blush"><image src="/assets/icons/muted/heart.svg" /></view><view class="menu-copy"><text>我的收藏</text></view><image class="menu-chevron" src="/assets/icons/text/chevron-right.svg" /></button>
+      <button bindtap="openBookings" hover-class="menu-item-pressed"><view class="menu-icon mint"><image src="/assets/icons/green/circle-check.svg" /></view><view class="menu-copy"><text>我的预约</text></view><image class="menu-chevron" src="/assets/icons/text/chevron-right.svg" /></button>
+      <button bindtap="openMember" hover-class="menu-item-pressed"><view class="menu-icon cream"><image src="/assets/icons/primary/user-round.svg" /></view><view class="menu-copy"><text>会员权益</text></view><image class="menu-chevron" src="/assets/icons/text/chevron-right.svg" /></button>
+      <button bindtap="openStore" hover-class="menu-item-pressed"><view class="menu-icon gray"><image src="/assets/icons/muted/map-pin.svg" /></view><view class="menu-copy"><text>联系门店</text></view><image class="menu-chevron" src="/assets/icons/text/chevron-right.svg" /></button>
+    </view>
   </view>
-  <button wx:if="{{!bound}}" class="primary-button bind-button" open-type="getPhoneNumber" bindgetphonenumber="bindPhone" loading="{{binding}}" disabled="{{binding}}" hover-class="button-hover">绑定手机号，开启会员服务</button>
 </view>

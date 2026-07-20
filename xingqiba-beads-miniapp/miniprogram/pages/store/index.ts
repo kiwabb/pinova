@@ -83,7 +83,7 @@ Page({
     bookingTime: '',
   },
   onShow() {
-    this.getTabBar()?.setData({ selected: 2, hidden: false })
+    this.getTabBar()?.setData({ selected: 3, hidden: false })
     void this.loadStore()
   },
   async loadStore() {

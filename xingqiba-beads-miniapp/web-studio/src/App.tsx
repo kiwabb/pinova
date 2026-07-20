@@ -8,8 +8,8 @@ import {
   Eraser,
   FileImage,
   Flame,
-  Grid3X3,
   Image as ImageIcon,
+  LayoutGrid,
   Minus,
   Mountain,
   PaintBucket,
@@ -23,7 +23,9 @@ import {
 } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 import { PatternCanvas } from './components/PatternCanvas'
+import { ChartView } from './components/ChartView'
 import { studioPalette } from './domain/palette'
+import { nearestPaletteIndex, removeBackgroundByVote, removeSourceImageBackground } from './engine/converter'
 import { loadProject, saveProject } from './domain/project'
 import type { ConvertResult, ConvertSettings, EditorTool, ImageMode, PatternProject } from './domain/types'
 import { exportPatternPng } from './engine/export'
@@ -42,27 +44,31 @@ interface WorkerFailure {
 }
 
 const modeOptions: Array<{ id: ImageMode; label: string; hint: string; icon: LucideIcon }> = [
-  { id: 'pixel', label: '像素原图', hint: '不平滑', icon: Grid3X3 },
-  { id: 'illustration', label: '动漫插画', hint: '保轮廓', icon: Shapes },
-  { id: 'portrait', label: '真人宠物', hint: '保五官', icon: Dog },
-  { id: 'photo', label: '风景照片', hint: '保渐变', icon: Mountain },
+  { id: 'illustration', label: '卡通模式', hint: '取格内主导色', icon: Shapes },
+  { id: 'photo', label: '真实模式', hint: '取格内平均色', icon: Mountain },
 ]
 
 const modeDefaults: Record<ImageMode, Partial<ConvertSettings>> = {
-  pixel: { maxColors: 24, contrast: 1, dither: false, cleanupSize: 1 },
-  illustration: { maxColors: 20, contrast: 1.08, dither: false, cleanupSize: 3 },
-  portrait: { maxColors: 28, contrast: 1.1, dither: false, cleanupSize: 2 },
-  photo: { maxColors: 36, contrast: 1.04, dither: true, cleanupSize: 2 },
+  pixel: { maxColors: studioPalette.length, mergeDistance: 30, contrast: 1, dither: false, cleanupSize: 1 },
+  illustration: { maxColors: studioPalette.length, mergeDistance: 30, contrast: 1, dither: false, cleanupSize: 1 },
+  portrait: { maxColors: studioPalette.length, mergeDistance: 30, contrast: 1, dither: false, cleanupSize: 1 },
+  photo: { maxColors: studioPalette.length, mergeDistance: 30, contrast: 1, dither: false, cleanupSize: 1 },
 }
 
 const initialSettings: ConvertSettings = {
-  mode: 'portrait',
-  width: 64,
-  maxColors: 28,
-  contrast: 1.1,
+  mode: 'illustration',
+  width: 58,
+  height: 58,
+  imageScale: 1,
+  imageOffsetX: 0,
+  imageOffsetY: 0,
+  maxColors: studioPalette.length,
+  mergeDistance: 30,
+  contrast: 1,
   dither: false,
-  removeBackground: true,
-  cleanupSize: 2,
+  removeBackground: false,
+  cleanupSize: 1,
+  excludedColors: [],
 }
 
 const toolOptions: Array<{ id: EditorTool; label: string; icon: LucideIcon }> = [
@@ -72,15 +78,28 @@ const toolOptions: Array<{ id: EditorTool; label: string; icon: LucideIcon }> = 
   { id: 'fill', label: '填充', icon: PaintBucket },
 ]
 
+const cloneImageData = (image: ImageData) => new ImageData(new Uint8ClampedArray(image.data), image.width, image.height)
+
+const imageDataPreview = (image: ImageData) => {
+  const canvas = document.createElement('canvas')
+  canvas.width = image.width
+  canvas.height = image.height
+  canvas.getContext('2d')!.putImageData(cloneImageData(image), 0, 0)
+  return canvas.toDataURL('image/png')
+}
+
 export default function App() {
   const [project, setProject] = useState<PatternProject>(() => loadProject())
   const [settings, setSettings] = useState(initialSettings)
   const [sourceImage, setSourceImage] = useState<ImageData | null>(null)
+  const [originalSourceImage, setOriginalSourceImage] = useState<ImageData | null>(null)
+  const [sourceBackgroundRemoved, setSourceBackgroundRemoved] = useState(false)
   const [sourceName, setSourceName] = useState('')
   const [sourcePreview, setSourcePreview] = useState('')
-  const [view, setView] = useState<'edit' | 'preview'>('edit')
+  const [view, setView] = useState<'edit' | 'chart' | 'preview'>('edit')
   const [tool, setTool] = useState<EditorTool>('brush')
   const [selectedColor, setSelectedColor] = useState(16)
+  const [highlightedColor, setHighlightedColor] = useState<number | null>(null)
   const [zoom, setZoom] = useState(1)
   const [melt, setMelt] = useState(0.62)
   const [history, setHistory] = useState<Int16Array[]>([])
@@ -91,7 +110,7 @@ export default function App() {
   const [toast, setToast] = useState('')
   const fileInputRef = useRef<HTMLInputElement>(null)
   const workerRef = useRef<Worker | null>(null)
-  const submittedModeRef = useRef<ImageMode>('portrait')
+  const submittedModeRef = useRef<ImageMode>('illustration')
 
   useEffect(() => {
     const worker = new Worker(new URL('./workers/converter.worker.ts', import.meta.url), { type: 'module' })
@@ -116,8 +135,9 @@ export default function App() {
       setProject(next)
       setHistory([])
       setRedoStack([])
+      setHighlightedColor(null)
       setZoom(1)
-      setView('edit')
+      setView('chart')
       setMessage(`已生成 ${next.width} × ${next.height} 图纸，可继续精修`)
       showToast('图纸已生成')
     }
@@ -162,10 +182,8 @@ export default function App() {
     setMessage('正在读取图片...')
     try {
       const bitmap = await createImageBitmap(file)
-      const maxSide = 960
-      const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height))
-      const width = Math.max(1, Math.round(bitmap.width * scale))
-      const height = Math.max(1, Math.round(bitmap.height * scale))
+      const width = bitmap.width
+      const height = bitmap.height
       const canvas = document.createElement('canvas')
       canvas.width = width
       canvas.height = height
@@ -174,6 +192,9 @@ export default function App() {
       bitmap.close()
       const image = context.getImageData(0, 0, width, height)
       setSourceImage(image)
+      setOriginalSourceImage(cloneImageData(image))
+      setSourceBackgroundRemoved(false)
+      setSettings((current) => ({ ...current, imageScale: 1, imageOffsetX: 0, imageOffsetY: 0, excludedColors: [] }))
       setSourceName(file.name)
       if (sourcePreview) URL.revokeObjectURL(sourcePreview)
       setSourcePreview(URL.createObjectURL(file))
@@ -230,27 +251,109 @@ export default function App() {
     context.stroke()
     const image = context.getImageData(0, 0, 640, 640)
     setSourceImage(image)
+    setOriginalSourceImage(cloneImageData(image))
+    setSourceBackgroundRemoved(false)
     setSourceName('宠物头像示例.png')
     setSourcePreview(canvas.toDataURL('image/png'))
-    setSettings((current) => ({ ...current, ...modeDefaults.portrait, mode: 'portrait', width: 64 }))
+    setSettings((current) => ({ ...current, ...modeDefaults.illustration, mode: 'illustration', width: 58, height: 58, imageScale: 1, imageOffsetX: 0, imageOffsetY: 0, excludedColors: [] }))
     setMessage('已载入宠物头像示例，点击生成图纸')
     showToast('示例图片已载入')
   }
 
-  const generate = () => {
+  const removeOriginalBackground = () => {
+    if (!sourceImage) {
+      fileInputRef.current?.click()
+      return
+    }
+    const result = removeSourceImageBackground(sourceImage)
+    if (result.removedPixels === 0) {
+      showToast('原图边缘没有识别到连续背景')
+      return
+    }
+    setSourceImage(result.image)
+    setSourcePreview(imageDataPreview(result.image))
+    setSourceBackgroundRemoved(true)
+    setMessage(`原图背景已去除，共清理 ${result.removedPixels.toLocaleString()} 个像素`)
+    showToast('原图背景已去除，可以开始生成')
+  }
+
+  const restoreOriginalSource = () => {
+    if (!originalSourceImage) return
+    const restored = cloneImageData(originalSourceImage)
+    setSourceImage(restored)
+    setSourcePreview(imageDataPreview(restored))
+    setSourceBackgroundRemoved(false)
+    setMessage('已恢复未加工的原始图片')
+    showToast('原图已恢复')
+  }
+
+  const submitConversion = (activeSettings: ConvertSettings) => {
     if (!sourceImage || !workerRef.current) {
       fileInputRef.current?.click()
       return
     }
     setBusy(true)
-    setMessage('正在分析颜色、匹配色板并清理杂色...')
-    submittedModeRef.current = settings.mode
+    setMessage('正在提取格内代表色、匹配色板并合并相近颜色...')
+    submittedModeRef.current = activeSettings.mode
     const copy = new ImageData(new Uint8ClampedArray(sourceImage.data), sourceImage.width, sourceImage.height)
-    workerRef.current.postMessage({ image: copy, settings }, [copy.data.buffer])
+    workerRef.current.postMessage({ image: copy, settings: activeSettings }, [copy.data.buffer])
   }
+
+  const generate = () => submitConversion(settings)
 
   const switchMode = (mode: ImageMode) => {
     setSettings((current) => ({ ...current, ...modeDefaults[mode], mode }))
+  }
+
+  const setBoardSize = (size: number) => {
+    const nextSize = Math.max(12, Math.min(120, Math.round(size)))
+    setSettings((current) => ({ ...current, width: nextSize, height: nextSize, imageScale: 1, imageOffsetX: 0, imageOffsetY: 0 }))
+  }
+
+  const excludeColor = (colorIndex: number) => {
+    if (settings.excludedColors.includes(colorIndex) || settings.excludedColors.length >= studioPalette.length - 1) return
+    const excludedColors = [...settings.excludedColors, colorIndex]
+    const allowed = new Set([...project.cells].filter((cell) => cell >= 0 && !excludedColors.includes(cell)))
+    if (allowed.size === 0) return
+    const replacement = nearestPaletteIndex(studioPalette[colorIndex].rgb, allowed)
+    setHistory((current) => [...current, project.cells.slice()].slice(-40))
+    setRedoStack([])
+    setProject((current) => ({
+      ...current,
+      cells: new Int16Array([...current.cells].map((cell) => cell === colorIndex ? replacement : cell)),
+      updatedAt: Date.now(),
+    }))
+    setSettings((current) => ({ ...current, excludedColors }))
+    if (selectedColor === colorIndex) setSelectedColor(replacement)
+    if (highlightedColor === colorIndex) setHighlightedColor(null)
+    showToast(`${studioPalette[colorIndex].id} 已替换为最接近颜色`)
+  }
+
+  const restoreColor = (colorIndex: number) => {
+    const nextSettings = { ...settings, excludedColors: settings.excludedColors.filter((index) => index !== colorIndex) }
+    setSettings(nextSettings)
+    if (sourceImage && workerRef.current) submitConversion(nextSettings)
+    showToast(`${studioPalette[colorIndex].id} 已恢复可用`)
+  }
+
+  const restoreAllColors = () => {
+    const nextSettings = { ...settings, excludedColors: [] }
+    setSettings(nextSettings)
+    if (sourceImage && workerRef.current) submitConversion(nextSettings)
+    showToast('已恢复全部颜色')
+  }
+
+  const removeProjectBackground = () => {
+    const cells = removeBackgroundByVote(project.cells, project.width, project.height)
+    const changed = cells.some((cell, index) => cell !== project.cells[index])
+    if (!changed) {
+      showToast('板子边缘没有可去除的连续背景')
+      return
+    }
+    setHistory((current) => [...current, project.cells.slice()].slice(-40))
+    setRedoStack([])
+    setProject((current) => ({ ...current, cells, updatedAt: Date.now() }))
+    showToast('已去除与板子边缘连通的主背景色')
   }
 
   const beginEdit = useCallback(() => {
@@ -282,8 +385,11 @@ export default function App() {
     <div className="studio-app">
       <header className="studio-header">
         <div className="brand-lockup">
-          <span className="brand-mark" aria-hidden="true"><i /><i /><i /><i /></span>
-          <span><strong>星期八</strong><small>拼豆工作台</small></span>
+          <span className="brand-wordmark" aria-label="Day 8">
+            <strong>Day 8</strong>
+            <i aria-hidden="true">✦</i>
+          </span>
+          <span className="brand-copy"><strong>星期八</strong><small>Extra lovely day ♫</small></span>
         </div>
         <div className="header-status" aria-live="polite">
           <span className={busy ? 'status-dot working' : 'status-dot'} />
@@ -292,7 +398,7 @@ export default function App() {
         <div className="header-actions">
           <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={(event) => handleFile(event.target.files?.[0])} />
           <button className="button secondary" onClick={() => fileInputRef.current?.click()}><Upload size={18} />导入图片</button>
-          <button className="button secondary" onClick={() => exportPatternPng(project, studioPalette)}><Download size={18} />导出图纸</button>
+          <button className="button primary" onClick={() => exportPatternPng(project, studioPalette)}><Download size={18} />导出图纸</button>
           <button className="button primary" onClick={() => setImportOpen(true)}><CloudUpload size={18} />导入图集</button>
         </div>
       </header>
@@ -305,6 +411,12 @@ export default function App() {
               {sourcePreview ? <img src={sourcePreview} alt="待转换的源图片" /> : <><ImageIcon size={28} /><strong>选择一张图片</strong><span>建议主体清晰、背景简单</span></>}
               {sourcePreview && <span className="replace-label">更换图片</span>}
             </button>
+            {sourceImage && (
+              <div className="source-actions">
+                <button type="button" onClick={removeOriginalBackground} disabled={sourceBackgroundRemoved}><Eraser size={15} />{sourceBackgroundRemoved ? '背景已去除' : '原图去背景'}</button>
+                <button type="button" onClick={restoreOriginalSource} disabled={!sourceBackgroundRemoved}><Undo2 size={15} />恢复原图</button>
+              </div>
+            )}
             <button className="sample-button" onClick={loadSample}><Dog size={16} />使用宠物头像示例</button>
           </section>
 
@@ -320,26 +432,23 @@ export default function App() {
           </section>
 
           <section className="panel-section settings-section">
-            <label className="range-field">
-              <span>图纸宽度 <b>{settings.width} 格</b></span>
-              <input type="range" min="24" max="100" step="2" value={settings.width} onChange={(event) => setSettings({ ...settings, width: Number(event.target.value) })} />
-            </label>
-            <label className="range-field">
-              <span>最多颜色 <b>{settings.maxColors} 色</b></span>
-              <input type="range" min="6" max="48" step="1" value={settings.maxColors} onChange={(event) => setSettings({ ...settings, maxColors: Number(event.target.value) })} />
-            </label>
-            <label className="range-field">
-              <span>对比度 <b>{Math.round(settings.contrast * 100)}%</b></span>
-              <input type="range" min="0.86" max="1.28" step="0.01" value={settings.contrast} onChange={(event) => setSettings({ ...settings, contrast: Number(event.target.value) })} />
-            </label>
-            <div className="cleanup-field">
-              <span>孤立色清理</span>
-              <div className="segmented compact">
-                {[1, 2, 3].map((size) => <button key={size} className={settings.cleanupSize === size ? 'active' : ''} onClick={() => setSettings({ ...settings, cleanupSize: size })}>{size === 1 ? '关' : `< ${size}格`}</button>)}
+            <div className="board-settings">
+              <div className="section-title"><span>板子尺寸</span><small>正方形板</small></div>
+              <div className="board-size-control">
+                <button type="button" onClick={() => setBoardSize(settings.width - 1)} disabled={settings.width <= 12} aria-label="减小板子尺寸"><Minus size={16} /></button>
+                <input type="range" min="12" max="120" step="1" value={settings.width} onChange={(event) => setBoardSize(Number(event.target.value))} aria-label="板子尺寸" />
+                <button type="button" onClick={() => setBoardSize(settings.width + 1)} disabled={settings.width >= 120} aria-label="增大板子尺寸"><Plus size={16} /></button>
+              </div>
+              <div className="board-size-scale">
+                <span>12</span><strong>{settings.width} × {settings.width} 格</strong><span>120</span>
               </div>
             </div>
-            <label className="switch-row"><span>移除简单背景<small>从边缘识别连续背景</small></span><input type="checkbox" checked={settings.removeBackground} onChange={(event) => setSettings({ ...settings, removeBackground: event.target.checked })} /></label>
-            <label className="switch-row"><span>颜色抖动<small>照片渐变更自然，小图建议关闭</small></span><input type="checkbox" checked={settings.dither} onChange={(event) => setSettings({ ...settings, dither: event.target.checked })} /></label>
+            <label className="range-field">
+              <span>颜色合并程度 <b>{settings.mergeDistance === 0 ? '关闭' : settings.mergeDistance}</b></span>
+              <input type="range" min="0" max="100" step="1" value={settings.mergeDistance} onChange={(event) => setSettings({ ...settings, mergeDistance: Number(event.target.value) })} />
+            </label>
+            <small className="setting-help">数值越大，越接近的低频颜色越会并入主色；30 与目标网站默认值一致。</small>
+            <button type="button" className="background-action" onClick={removeProjectBackground}><Eraser size={16} /><span><strong>一键去除背景</strong><small>只移除与板子边缘连通的主背景色</small></span></button>
           </section>
 
           <button className="button generate-button" disabled={busy} onClick={generate}>
@@ -351,8 +460,9 @@ export default function App() {
         <section className={`stage-panel ${view === 'preview' ? 'preview-mode' : ''}`} aria-label="图纸工作区">
           <div className="stage-header">
             <div className="segmented" aria-label="工作区视图">
-              <button className={view === 'edit' ? 'active' : ''} onClick={() => setView('edit')}><Grid3X3 size={17} />编辑图纸</button>
-              <button className={view === 'preview' ? 'active' : ''} onClick={() => setView('preview')}><Flame size={17} />烫后预览</button>
+              <button className={view === 'chart' ? 'active' : ''} onClick={() => setView('chart')}><LayoutGrid size={17} />图纸</button>
+              <button className={view === 'edit' ? 'active' : ''} onClick={() => setView('edit')}><CircleDot size={17} />编辑</button>
+              <button className={view === 'preview' ? 'active' : ''} onClick={() => setView('preview')}><Flame size={17} />烫后</button>
             </div>
             <div className="project-meta"><strong>{project.name}</strong><span>{project.width} × {project.height}</span></div>
           </div>
@@ -368,10 +478,18 @@ export default function App() {
                   <button className="icon-button" onClick={redo} disabled={!redoStack.length} title="重做" aria-label="重做"><Redo2 size={20} /></button>
                 </div>
               </div>
-              <PatternCanvas project={project} palette={studioPalette} tool={tool} selectedColor={selectedColor} zoom={zoom} onBeginEdit={beginEdit} onCellsChange={changeCells} onPickColor={(index) => { setSelectedColor(index); setTool('brush') }} />
+              <PatternCanvas project={project} palette={studioPalette} tool={tool} selectedColor={selectedColor} highlightedColor={highlightedColor} zoom={zoom} onZoomChange={setZoom} onBeginEdit={beginEdit} onCellsChange={changeCells} onPickColor={(index) => { setSelectedColor(index); setTool('brush') }} />
               <div className="stage-footer">
-                <span><CircleDot size={16} />{stats.total.toLocaleString()} 颗 · {stats.colors.length} 色</span>
+                <span><CircleDot size={16} />{stats.total.toLocaleString()} 颗 · {stats.colors.length} 色{highlightedColor !== null ? ` · 高亮 ${studioPalette[highlightedColor].id}` : ''}</span>
                 <div className="zoom-control"><button onClick={() => setZoom((value) => Math.max(0.75, value - 0.25))} aria-label="缩小"><Minus size={17} /></button><b>{Math.round(zoom * 100)}%</b><button onClick={() => setZoom((value) => Math.min(3, value + 0.25))} aria-label="放大"><Plus size={17} /></button></div>
+              </div>
+            </>
+          ) : view === 'chart' ? (
+            <>
+              <ChartView project={project} palette={studioPalette} highlightedColor={highlightedColor} zoom={zoom} onZoomChange={setZoom} />
+              <div className="stage-footer">
+                <span><LayoutGrid size={16} />{stats.total.toLocaleString()} 格 · {stats.colors.length} 色 · {project.width}×{project.height}{highlightedColor !== null ? ` · 高亮 ${studioPalette[highlightedColor].id}` : ''}</span>
+                <div className="zoom-control"><button onClick={() => setZoom((value) => Math.max(0.5, value - 0.25))} aria-label="缩小"><Minus size={17} /></button><b>{Math.round(zoom * 100)}%</b><button onClick={() => setZoom((value) => Math.min(3, value + 0.25))} aria-label="放大"><Plus size={17} /></button></div>
               </div>
             </>
           ) : (
@@ -404,19 +522,36 @@ export default function App() {
             </button>
           </section>
           <section className="panel-section material-section">
-            <div className="section-title"><span>材料清单</span><small>{stats.physicalWidth.toFixed(1)} × {stats.physicalHeight.toFixed(1)} cm</small></div>
+            <div className="section-title"><span>材料清单</span><small>点击色号高亮 · × 排除</small></div>
             <div className="material-list">
               {stats.colors.map(([index, count]) => (
-                <button key={index} className={selectedColor === index ? 'material-row active' : 'material-row'} onClick={() => { setSelectedColor(index); setTool('brush') }}>
-                  <i style={{ background: studioPalette[index].hex }} />
-                  <span><strong>{studioPalette[index].id}</strong><small>{studioPalette[index].name}</small></span>
-                  <b>{count}</b>
-                </button>
+                <div key={index} className={highlightedColor === index ? 'material-row active' : 'material-row'}>
+                  <button className="material-select" aria-pressed={highlightedColor === index} onClick={() => { setSelectedColor(index); setHighlightedColor((current) => current === index ? null : index); setTool('brush') }}>
+                    <i style={{ background: studioPalette[index].hex }} />
+                    <span><strong>{studioPalette[index].id}</strong><small>{studioPalette[index].name}</small></span>
+                    <b>{count}</b>
+                  </button>
+                  <button className="exclude-color" onClick={() => excludeColor(index)} aria-label={`排除 ${studioPalette[index].id}`} title="排除并自动替换">×</button>
+                </div>
               ))}
             </div>
           </section>
+          {settings.excludedColors.length > 0 && (
+            <section className="panel-section excluded-section">
+              <div className="section-title"><span>已排除颜色</span><button onClick={restoreAllColors}>全部恢复</button></div>
+              <div className="excluded-list">
+                {settings.excludedColors.map((index) => (
+                  <button key={index} onClick={() => restoreColor(index)}>
+                    <i style={{ background: studioPalette[index].hex }} />
+                    <span>{studioPalette[index].id} · {studioPalette[index].name}</span>
+                    <b>恢复</b>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
           <section className="panel-section palette-section">
-            <div className="section-title"><span>星期八基础色板</span><small>48 色</small></div>
+            <div className="section-title"><span>MARD 标准色板</span><small>{studioPalette.length} 色</small></div>
             <div className="palette-grid">
               {studioPalette.map((color, index) => <button key={color.id} className={selectedColor === index ? 'palette-swatch active' : 'palette-swatch'} style={{ '--swatch': color.hex } as React.CSSProperties} onClick={() => { setSelectedColor(index); setTool('brush') }} aria-label={`${color.id} ${color.name}`} title={`${color.id} ${color.name}`} />)}
             </div>

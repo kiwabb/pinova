@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import type { BeadColor, EditorTool, PatternProject } from '../domain/types'
 
 interface PatternCanvasProps {
@@ -6,16 +6,19 @@ interface PatternCanvasProps {
   palette: BeadColor[]
   tool: EditorTool
   selectedColor: number
+  highlightedColor: number | null
   zoom: number
+  onZoomChange: (zoom: number) => void
   onBeginEdit: () => void
   onCellsChange: (cells: Int16Array) => void
   onPickColor: (index: number) => void
 }
 
-export function PatternCanvas({ project, palette, tool, selectedColor, zoom, onBeginEdit, onCellsChange, onPickColor }: PatternCanvasProps) {
+export function PatternCanvas({ project, palette, tool, selectedColor, highlightedColor, zoom, onZoomChange, onBeginEdit, onCellsChange, onPickColor }: PatternCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const drawingRef = useRef(false)
   const lastIndexRef = useRef(-1)
+  const pinchStartRef = useRef({ dist: 0, zoom: 1 })
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -32,13 +35,15 @@ export function PatternCanvas({ project, palette, tool, selectedColor, zoom, onB
         const value = project.cells[y * project.width + x]
         const cx = x * cellSize + cellSize / 2
         const cy = y * cellSize + cellSize / 2
+        const isHighlighted = highlightedColor !== null && value === highlightedColor
+        const isDimmed = highlightedColor !== null && value !== highlightedColor
         context.beginPath()
         context.arc(cx, cy, value >= 0 ? cellSize * 0.39 : Math.max(0.7, cellSize * 0.08), 0, Math.PI * 2)
-        context.fillStyle = value >= 0 ? palette[value].hex : '#d9d9d5'
+        context.fillStyle = value >= 0 ? (isDimmed ? '#e8e6e8' : palette[value].hex) : '#d9d9d5'
         context.fill()
         if (value >= 0) {
-          context.strokeStyle = 'rgba(37, 33, 38, 0.16)'
-          context.lineWidth = Math.max(0.5, cellSize * 0.045)
+          context.strokeStyle = isHighlighted ? '#c63868' : (isDimmed ? 'rgba(111, 107, 112, 0.12)' : 'rgba(37, 33, 38, 0.16)')
+          context.lineWidth = isHighlighted ? Math.max(1.5, cellSize * 0.14) : Math.max(0.5, cellSize * 0.045)
           context.stroke()
         }
       }
@@ -57,7 +62,7 @@ export function PatternCanvas({ project, palette, tool, selectedColor, zoom, onB
       context.lineTo(canvas.width, y * cellSize)
       context.stroke()
     }
-  }, [palette, project, zoom])
+  }, [highlightedColor, palette, project, zoom])
 
   const locate = (event: React.PointerEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current!
@@ -100,12 +105,42 @@ export function PatternCanvas({ project, palette, tool, selectedColor, zoom, onB
     onCellsChange(next)
   }
 
+  const handleWheel = useCallback((event: React.WheelEvent) => {
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault()
+      const delta = -event.deltaY * 0.005
+      onZoomChange(Math.max(0.5, Math.min(3, zoom + delta)))
+    }
+  }, [zoom, onZoomChange])
+
+  const handleTouchStart = useCallback((event: React.TouchEvent) => {
+    if (event.touches.length === 2) {
+      const dx = event.touches[1].clientX - event.touches[0].clientX
+      const dy = event.touches[1].clientY - event.touches[0].clientY
+      pinchStartRef.current = { dist: Math.hypot(dx, dy), zoom }
+    }
+  }, [zoom])
+
+  const handleTouchMove = useCallback((event: React.TouchEvent) => {
+    if (event.touches.length === 2 && pinchStartRef.current.dist > 0) {
+      const dx = event.touches[1].clientX - event.touches[0].clientX
+      const dy = event.touches[1].clientY - event.touches[0].clientY
+      const dist = Math.hypot(dx, dy)
+      const newZoom = pinchStartRef.current.zoom * (dist / pinchStartRef.current.dist)
+      onZoomChange(Math.max(0.5, Math.min(3, newZoom)))
+    }
+  }, [onZoomChange])
+
+  const handleTouchEnd = useCallback(() => {
+    pinchStartRef.current = { dist: 0, zoom: 1 }
+  }, [])
+
   return (
-    <div className="canvas-scroll" aria-label="拼豆图纸编辑区域">
+    <div className="canvas-scroll" aria-label="拼豆图纸编辑区域" onWheel={handleWheel} onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd} onTouchCancel={handleTouchEnd}>
       <canvas
         ref={canvasRef}
         className="pattern-canvas"
-        style={{ width: `${zoom * 100}%` }}
+        style={{ width: `${zoom * 100}%`, minWidth: `${zoom * 100}%` }}
         onPointerDown={(event) => {
           drawingRef.current = tool === 'brush' || tool === 'eraser'
           lastIndexRef.current = -1

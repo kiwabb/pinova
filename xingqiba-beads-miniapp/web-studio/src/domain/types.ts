@@ -36,11 +36,17 @@ export interface PatternProject {
 export interface ConvertSettings {
   mode: ImageMode
   width: number
+  height: number
+  imageScale: number
+  imageOffsetX: number
+  imageOffsetY: number
   maxColors: number
+  mergeDistance: number
   contrast: number
   dither: boolean
   removeBackground: boolean
   cleanupSize: number
+  excludedColors: number[]
 }
 
 export interface ConvertRequest {

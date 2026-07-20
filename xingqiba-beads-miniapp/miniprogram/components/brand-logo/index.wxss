@@ -1,0 +1,15 @@
+:host {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.brand-logo {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.brand-logo--mono.brand-logo--dark {
+  filter: invert(1);
+}

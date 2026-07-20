@@ -98,9 +98,7 @@ Page({
       return
     }
     if (this.data.mode === 'favorites' && item.patternId && item.collectionId) {
-      wx.navigateTo({
-        url: `/pages/editor/index?sourcePatternId=${encodeURIComponent(item.patternId)}&sourceCollectionId=${encodeURIComponent(item.collectionId)}&sourceImage=${encodeURIComponent(item.imageUrl || item.image || '')}&title=${encodeURIComponent(item.title || '收藏图纸')}`,
-      })
+      wx.navigateTo({ url: `/pages/pattern-detail/index?collectionId=${encodeURIComponent(item.collectionId)}&patternId=${encodeURIComponent(item.patternId)}` })
     }
   },
   removeItem(event: WechatMiniprogram.TouchEvent) {

@@ -11,5 +11,5 @@ export interface Collection {
   locked?: boolean
 }
 
-export const categories = ['精选', '武汉', '情侣', '亲子', '学生', '节日', '其他']
+export const categories = ['全部', '精选', '武汉', '情侣', '亲子', '学生', '节日', '其他']
 export const memberLevels = ['全部', '公开', 'V1', 'V2', 'V3', 'V4']

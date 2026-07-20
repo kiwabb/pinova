@@ -17,6 +17,63 @@ function hasUniqueIds(items) {
   return ids.every(isValidBusinessId) && new Set(ids).size === ids.length
 }
 
+const DEFAULT_PATTERN_MATERIALS = [
+  { id: 'material-board', kind: 'board', name: '29 × 29 底板', description: '标准拼豆底板', amount: '4', unit: '块' },
+  { id: 'material-beads', kind: 'beads', name: 'MARD 拼豆', description: '按生成后的颜色清单准备', amount: '≤ 3364', unit: '颗' },
+  { id: 'material-paper', kind: 'paper', name: '隔热烫纸', description: '用于完成后的熨烫定型', amount: '1', unit: '张' },
+]
+
+function defaultPatternMaterials() {
+  return DEFAULT_PATTERN_MATERIALS.map((item) => ({ ...item }))
+}
+
+function normalizePatternMaterials(input) {
+  if (!Array.isArray(input) || !input.length) return defaultPatternMaterials()
+  const usedIds = new Set()
+  const materials = input.slice(0, 12).map((item, index) => {
+    const kind = ['board', 'beads', 'paper', 'other'].includes(item?.kind) ? item.kind : 'other'
+    let id = normalizeText(item?.id, 80)
+    if (!isValidBusinessId(id) || usedIds.has(id)) id = `material-${index + 1}`
+    while (usedIds.has(id)) id = `${id}-${usedIds.size + 1}`
+    usedIds.add(id)
+    const name = normalizeText(item?.name, 40)
+    const description = normalizeText(item?.description, 60)
+    const amount = normalizeText(item?.amount, 16)
+    const unit = normalizeText(item?.unit, 8)
+    return name && amount && unit ? { id, kind, name, description, amount, unit } : null
+  }).filter(Boolean)
+  return materials.length ? materials : defaultPatternMaterials()
+}
+
+function normalizeImportPattern(input = {}) {
+  const name = normalizeText(input.name, 40)
+  const image = normalizeText(input.image, 500)
+  if (!name) return { error: '请填写图纸名称' }
+  if (!isAdminUploadFileId(image, 'collections')) return { error: '图纸图片尚未上传成功，请重新导入' }
+  return { data: { name, image } }
+}
+
+function importPatternDecision(collection, pattern, options = {}) {
+  if (!collection || typeof collection !== 'object') return { error: 'NOT_FOUND' }
+  if (collection.status === 'archived') return { error: 'ARCHIVED' }
+  const images = Array.isArray(collection.images) ? collection.images.filter((item) => typeof item === 'string' && item) : []
+  const collectionKey = normalizeText(options.collectionId, 80) || 'collection'
+  const existingItems = Array.isArray(collection.items) ? collection.items.map((item, index) => typeof item === 'string'
+    ? { id: `${collectionKey}-pattern-${index + 1}`, name: normalizeText(item, 40), image: images[index % Math.max(1, images.length)] || '', materials: defaultPatternMaterials() }
+    : { id: normalizeText(item?.id, 80) || `pattern-${index + 1}`, name: normalizeText(item?.name, 40), image: normalizeText(item?.image, 500), materials: normalizePatternMaterials(item?.materials) }) : []
+  if (existingItems.length >= 100) return { error: 'ITEMS_FULL' }
+  if (existingItems.some((item) => item.id === pattern.id)) return { error: 'DUPLICATE_ID' }
+  const coverAdded = Boolean(options.setAsCover) && images.length < 4 && !images.includes(pattern.image)
+  return {
+    data: {
+      items: [...existingItems, { id: pattern.id, name: pattern.name, image: pattern.image, materials: defaultPatternMaterials() }],
+      images: coverAdded ? [...images, pattern.image] : images,
+      count: existingItems.length + 1,
+      coverAdded,
+    },
+  }
+}
+
 function isAdminUploadFileId(fileId, folder = '') {
   if (typeof fileId !== 'string' || !fileId.startsWith('cloud://')) return false
   const pathStart = fileId.indexOf('/', 'cloud://'.length)
@@ -126,35 +183,6 @@ function normalizeStoreConfig(input = {}) {
   } }
 }
 
-function normalizeImportPattern(input = {}) {
-  const name = normalizeText(input.name, 40)
-  const image = normalizeText(input.image, 500)
-  if (!name) return { error: '请填写图纸名称' }
-  if (!isAdminUploadFileId(image, 'collections')) return { error: '图纸图片尚未上传成功，请重新导入' }
-  return { data: { name, image } }
-}
-
-function importPatternDecision(collection, pattern, options = {}) {
-  if (!collection || typeof collection !== 'object') return { error: 'NOT_FOUND' }
-  if (collection.status === 'archived') return { error: 'ARCHIVED' }
-  const images = Array.isArray(collection.images) ? collection.images.filter((item) => typeof item === 'string' && item) : []
-  const collectionKey = normalizeText(options.collectionId, 80) || 'collection'
-  const existingItems = Array.isArray(collection.items) ? collection.items.map((item, index) => typeof item === 'string'
-    ? { id: `${collectionKey}-pattern-${index + 1}`, name: normalizeText(item, 40), image: images[index % Math.max(1, images.length)] || '' }
-    : { id: normalizeText(item?.id, 80) || `pattern-${index + 1}`, name: normalizeText(item?.name, 40), image: normalizeText(item?.image, 500) }) : []
-  if (existingItems.length >= 100) return { error: 'ITEMS_FULL' }
-  if (existingItems.some((item) => item.id === pattern.id)) return { error: 'DUPLICATE_ID' }
-  const coverAdded = Boolean(options.setAsCover) && images.length < 4 && !images.includes(pattern.image)
-  return {
-    data: {
-      items: [...existingItems, { id: pattern.id, name: pattern.name, image: pattern.image }],
-      images: coverAdded ? [...images, pattern.image] : images,
-      count: existingItems.length + 1,
-      coverAdded,
-    },
-  }
-}
-
 function bookingUsageTransition(currentStatus, nextStatus, used, capacity) {
   const wasActive = currentStatus !== 'cancelled'
   const willBeActive = nextStatus !== 'cancelled'
@@ -185,4 +213,4 @@ function auditRetentionCutoff(now = Date.now(), retentionDays = 365) {
   return new Date((Number.isFinite(timestamp) ? timestamp : Date.now()) - days * 86400000)
 }
 
-module.exports = { auditRetentionCutoff, bookingSlotUsage, bookingUsageTransition, canReactivateBooking, documentPayload, hasUniqueIds, importPatternDecision, isAdminUploadFileId, isValidBusinessId, memberRecordMatchesExpected, normalizeHexColor, normalizeImportPattern, normalizeMemberConfig, normalizeStoreConfig, normalizeStringList, normalizeText, revisionDecision, unreferencedFileIds, workVersionDecision }
+module.exports = { auditRetentionCutoff, bookingSlotUsage, bookingUsageTransition, canReactivateBooking, defaultPatternMaterials, documentPayload, hasUniqueIds, importPatternDecision, isAdminUploadFileId, isValidBusinessId, memberRecordMatchesExpected, normalizeHexColor, normalizeImportPattern, normalizeMemberConfig, normalizePatternMaterials, normalizeStoreConfig, normalizeStringList, normalizeText, revisionDecision, unreferencedFileIds, workVersionDecision }

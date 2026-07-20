@@ -14,6 +14,8 @@ coverage/
 .tmp/
 .cloudbase/
 project.private.config.json
+.omo/
+.playwright-mcp/
 
 # Local configuration and credentials
 .env

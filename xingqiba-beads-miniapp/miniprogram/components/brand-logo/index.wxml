@@ -1,0 +1,6 @@
+<image
+  class="brand-logo brand-logo--{{variant}} brand-logo--{{tone}}"
+  src="{{variant === 'lockup' ? '/assets/brand/day8-serif-wordmark.png' : variant === 'mono' ? '/assets/brand/day8-serif-mark-mono.png' : '/assets/brand/day8-serif-mark.png'}}"
+  mode="aspectFit"
+  aria-label="Day 8"
+/>

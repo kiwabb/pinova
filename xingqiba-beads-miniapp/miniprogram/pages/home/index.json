@@ -1,5 +1,8 @@
 {
-  "navigationBarTitleText": "星期八",
+  "navigationBarTitleText": "",
   "enablePullDownRefresh": true,
-  "backgroundTextStyle": "dark"
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "brand-logo": "/components/brand-logo/index"
+  }
 }

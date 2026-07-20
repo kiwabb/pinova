@@ -8,6 +8,7 @@ Page({
   data: {
     collection: null as Collection | null,
     items: [] as PatternItem[],
+    heroImages: [] as string[],
     loading: true,
     loadError: '',
     sortAscending: true,
@@ -23,6 +24,9 @@ Page({
       return
     }
     void this.loadCollection(this.collectionId)
+  },
+  onShow() {
+    if (this.data.collection) void this.loadFavoriteIds(this.data.collection.id)
   },
   async loadCollection(id: string) {
     this.setData({ loading: true, loadError: '' })
@@ -43,12 +47,12 @@ Page({
         }
         throw new Error(result?.message || '图集加载失败')
       }
-      this.setData({ collection: result.data.collection, items: result.data.patterns, loading: false })
+      this.setData({ collection: result.data.collection, items: result.data.patterns, heroImages: result.data.collection.images.slice(0, 4), loading: false })
       wx.setNavigationBarTitle({ title: result.data.collection.title })
       void this.loadFavoriteIds(result.data.collection.id)
     } catch (error) {
       console.error('云端系列加载失败', error)
-      this.setData({ collection: null, items: [], loading: false, loadError: error instanceof Error ? error.message : '系列加载失败' })
+      this.setData({ collection: null, items: [], heroImages: [], loading: false, loadError: error instanceof Error ? error.message : '系列加载失败' })
     }
   },
   retry() { void this.loadCollection(this.collectionId) },
@@ -65,9 +69,7 @@ Page({
     const pattern = this.data.items[index]
     const collection = this.data.collection
     if (!pattern || !collection) return
-    wx.navigateTo({
-      url: `/pages/editor/index?sourcePatternId=${encodeURIComponent(pattern.id || '')}&sourceCollectionId=${encodeURIComponent(collection.id)}&sourceImage=${encodeURIComponent(pattern.image)}&title=${encodeURIComponent(pattern.name)}`,
-    })
+    wx.navigateTo({ url: `/pages/pattern-detail/index?collectionId=${encodeURIComponent(collection.id)}&patternId=${encodeURIComponent(pattern.id || '')}` })
   },
   async toggleFavorite(event: WechatMiniprogram.TouchEvent) {
     const index = Number(event.currentTarget.dataset.index)

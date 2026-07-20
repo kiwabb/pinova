@@ -1,7 +1,16 @@
-import { hexToRgb, rgbToLab } from './color'
+import { deltaE2000, hexToRgb, rgbToLab } from './color'
+import colorSystemMapping from './colorSystemMapping.json'
 import type { BeadColor } from './types'
 
-const entries: Array<[string, string]> = [
+interface ColorSystemEntry {
+  MARD: string
+  COCO: string
+  漫漫: string
+  盼盼: string
+  咪小窝: string
+}
+
+const legacyEntries: Array<[string, string]> = [
   ['瓷白', '#f4f1e8'], ['暖白', '#fff8df'], ['奶油', '#f7e5b7'], ['浅灰', '#c8c8c2'],
   ['中灰', '#858681'], ['炭灰', '#4d4f4c'], ['墨黑', '#202220'], ['柠檬黄', '#f5df43'],
   ['向日黄', '#f2c332'], ['杏黄', '#f5b657'], ['浅橙', '#ee9660'], ['橘橙', '#e96e32'],
@@ -16,13 +25,35 @@ const entries: Array<[string, string]> = [
   ['浅卡其', '#d3c29f'], ['暖灰棕', '#a99b85'], ['砖红', '#9b5147'], ['苔绿灰', '#697568'],
 ]
 
-export const studioPalette: BeadColor[] = entries.map(([name, hex], index) => {
-  const rgb = hexToRgb(hex)
-  return {
-    id: `ST${String(index + 1).padStart(2, '0')}`,
-    name,
-    hex,
-    rgb,
-    lab: rgbToLab(rgb),
-  }
+export const studioPalette: BeadColor[] = Object.entries(colorSystemMapping as Record<string, ColorSystemEntry>)
+  .map(([hex, systems]) => {
+    const rgb = hexToRgb(hex)
+    return {
+      id: systems.MARD,
+      name: `MARD ${systems.MARD}`,
+      hex: hex.toLowerCase(),
+      rgb,
+      lab: rgbToLab(rgb),
+    }
+  })
+
+export function paletteIndexById(id: string): number {
+  const index = studioPalette.findIndex((color) => color.id === id)
+  return index >= 0 ? index : 0
+}
+
+// Projects saved with the original 48-color studio palette are migrated to the
+// nearest MARD color so upgrading the palette does not corrupt their appearance.
+export const legacyToStudioIndex = legacyEntries.map(([, hex]) => {
+  const lab = rgbToLab(hexToRgb(hex))
+  let bestIndex = 0
+  let bestDistance = Number.POSITIVE_INFINITY
+  studioPalette.forEach((color, index) => {
+    const distance = deltaE2000(lab, color.lab)
+    if (distance < bestDistance) {
+      bestDistance = distance
+      bestIndex = index
+    }
+  })
+  return bestIndex
 })

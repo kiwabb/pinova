@@ -1,20 +1,40 @@
 <view class="page store-page">
-  <view class="store-visual card"><image src="{{photos[0] || '/assets/store/studio-wide.jpg'}}" mode="aspectFill" /></view>
-  <view class="store-body">
-    <text class="store-name">{{storeName}}</text>
-    <view class="store-facts">
-      <view><image src="/assets/icons/muted/map-pin.svg" /><text>{{addressText}}</text></view>
-      <view><image src="/assets/icons/muted/clock-3.svg" /><text>{{businessHours}}</text></view>
+  <view class="store-intro"><text class="store-kicker">线下体验</text><text class="store-intro-title">让创作发生在真实空间</text><text class="store-intro-desc">查看门店信息、实景与可预约时段</text></view>
+  <view class="store-overview card">
+    <view class="store-visual">
+      <image src="{{photos[0] || '/assets/store/studio-wide.jpg'}}" mode="aspectFill" />
+      <view class="store-brand-badge">
+        <view class="store-brand-mark"><brand-logo variant="mark" /></view>
+        <view class="store-brand-copy"><text>DAY 8</text><small>星期八拼豆</small></view>
+      </view>
+      <text class="store-status">{{bookingEnabled ? '开放预约' : '线下门店'}}</text>
     </view>
-    <view class="store-actions"><button bindtap="navigate">导航</button><button bindtap="call">电话</button><button open-type="share">分享</button></view>
+    <view class="store-body">
+      <text class="store-name">{{storeName}}</text>
+      <view class="store-facts">
+        <view><image src="/assets/icons/muted/map-pin.svg" /><text>{{addressText}}</text></view>
+        <view><image src="/assets/icons/muted/clock-3.svg" /><text>{{businessHours}}</text></view>
+      </view>
+      <view class="store-actions">
+        <button bindtap="navigate"><image src="/assets/icons/muted/map-pin.svg" /><text>导航</text></button>
+        <button bindtap="call"><image src="/assets/icons/text/phone.svg" /><text>电话</text></button>
+        <button open-type="share"><image src="/assets/icons/text/share-2.svg" /><text>分享</text></button>
+      </view>
+    </view>
   </view>
   <view wx:if="{{loadError}}" class="store-error"><text>{{loadError}}</text><button bindtap="loadStore">重试</button></view>
   <view wx:if="{{booked}}" class="booking-summary"><image src="/assets/icons/green/circle-check.svg" /><view><b>{{bookingStatus === 'confirmed' ? '已确认' : '待门店确认'}} · {{bookingType}}</b><small>{{bookingDate}} · {{bookingTime}}</small></view><button disabled="{{bookingCancelling}}" loading="{{bookingCancelling}}" bindtap="cancelBooking">{{bookingCancelling ? '取消中' : '取消'}}</button></view>
   <button class="primary-button booking" disabled="{{loading || !bookingEnabled}}" bindtap="book" hover-class="button-hover"><image src="/assets/icons/white/calendar-check.svg" /><text>{{bookingEnabled ? '预约到店' : '暂停线上预约'}}</text></button>
 
+  <view class="store-highlights card">
+    <view><b>297</b><small>专业色号</small></view>
+    <view><b>{{photos.length}}</b><small>店内实景</small></view>
+    <view><b>{{bookingEnabled ? '可预约' : '线下'}}</b><small>体验方式</small></view>
+  </view>
+
   <view class="gallery-section">
-    <view class="gallery-head"><text>店内实景</text><small>{{photos.length}} 张</small></view>
-    <view class="photo-grid"><image wx:for="{{photos}}" wx:key="*this" src="{{item}}" data-src="{{item}}" bindtap="preview" mode="aspectFill" /></view>
+    <view class="gallery-head"><view><text>店内实景</text><small>提前看看创作空间</small></view><text>{{photos.length}} 张</text></view>
+    <view class="photo-grid"><image wx:for="{{photos}}" wx:for-index="photoIndex" wx:key="*this" class="photo photo-{{photoIndex}}" src="{{item}}" data-src="{{item}}" bindtap="preview" mode="aspectFill" /></view>
   </view>
 </view>
 

@@ -30,7 +30,7 @@ import {
   X,
 } from 'lucide-vue-next'
 import { ADMIN_AUTH_EXPIRED_EVENT, callAdmin, cleanupPendingAdminUploads, hasLoginState, isAdminServiceError, releaseAdminUploads, resolveImageUrls, signInAdmin, signOutAdmin, uploadCollectionImage, uploadStoreImage, validateAdminImage } from './cloud'
-import type { BookingRecord, BookingStatus, CollectionInput, CollectionRecord, CollectionStatus, MemberConfig, MemberLevel, OperationsConfig, PaginatedResult, StoreConfig } from './types'
+import type { BookingRecord, BookingStatus, CollectionInput, CollectionRecord, CollectionStatus, MemberConfig, MemberLevel, OperationsConfig, PaginatedResult, PatternMaterialInput, StoreConfig } from './types'
 
 type ViewState = 'checking' | 'guest' | 'admin'
 type AdminView = 'overview' | 'collections' | 'bookings' | 'users' | 'works' | 'tutorials' | 'settings' | 'audits'
@@ -113,6 +113,16 @@ const statuses: Array<{ value: Exclude<CollectionStatus, 'archived'>; label: str
   { value: 'published', label: '已发布' },
   { value: 'offline', label: '已下架' },
 ]
+
+const defaultPatternMaterials = (): PatternMaterialInput[] => [
+  { id: 'material-board', kind: 'board', name: '29 × 29 底板', description: '标准拼豆底板', amount: '4', unit: '块' },
+  { id: 'material-beads', kind: 'beads', name: 'MARD 拼豆', description: '按生成后的颜色清单准备', amount: '≤ 3364', unit: '颗' },
+  { id: 'material-paper', kind: 'paper', name: '隔热烫纸', description: '用于完成后的熨烫定型', amount: '1', unit: '张' },
+]
+
+const editablePatternMaterials = (materials?: PatternMaterialInput[]) => materials?.length
+  ? materials.map((item) => ({ ...item }))
+  : defaultPatternMaterials()
 
 const form = reactive<CollectionInput>({
   title: '',
@@ -483,7 +493,7 @@ async function openEdit(record: CollectionRecord) {
     level: record.level,
     status: record.status === 'archived' ? 'offline' : record.status,
     images: [...record.images],
-    items: record.items.map((item) => ({ ...item })),
+    items: record.items.map((item) => ({ ...item, materials: editablePatternMaterials(item.materials) })),
     background: record.background,
     sort: record.sort,
   })
@@ -569,7 +579,7 @@ async function handlePatternFiles(event: Event) {
       const fileId = await uploadCollectionImage(file, (progress) => { uploadProgress.value = progress })
       sessionUploads.add(fileId)
       const name = file.name.replace(/\.[^.]+$/, '').trim().slice(0, 40) || `图纸 ${form.items.length + 1}`
-      form.items.push({ id, name, image: fileId })
+      form.items.push({ id, name, image: fileId, materials: defaultPatternMaterials() })
       patternPreviews.value[id] = URL.createObjectURL(file)
     }
   } catch (error) {
@@ -596,12 +606,31 @@ function movePattern(index: number, direction: -1 | 1) {
   ;[form.items[index], form.items[target]] = [form.items[target], form.items[index]]
 }
 
+function addPatternMaterial(patternIndex: number) {
+  const materials = form.items[patternIndex]?.materials
+  if (!materials || materials.length >= 12) return
+  materials.push({
+    id: `material-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    kind: 'other',
+    name: '',
+    description: '',
+    amount: '1',
+    unit: '件',
+  })
+}
+
+function removePatternMaterial(patternIndex: number, materialIndex: number) {
+  form.items[patternIndex]?.materials.splice(materialIndex, 1)
+}
+
 async function saveCollection() {
   formError.value = ''
   if (!form.title.trim()) return void (formError.value = '请输入图集名称')
   if (form.status === 'published' && !form.images.length) return void (formError.value = '发布前请至少上传一张封面图片')
   if (form.status === 'published' && !form.items.length) return void (formError.value = '发布前请至少上传一张图纸')
   if (form.status === 'published' && form.items.some((item) => !item.image)) return void (formError.value = '发布前请为每张图纸上传图片')
+  if (form.items.some((item) => !item.materials.length)) return void (formError.value = '请为每张图纸至少配置一项材料')
+  if (form.items.some((item) => item.materials.some((material) => !material.name.trim() || !material.amount.trim() || !material.unit.trim()))) return void (formError.value = '请补齐材料名称、用量和单位')
   saving.value = true
   try {
     const result = await callAdmin<{ id: string; revision: number }>('saveCollection', { collectionId: editingId.value || creatingId.value, expectedRevision: editingId.value ? editingRevision.value : 0, collection: { ...form } })
@@ -869,8 +898,37 @@ onBeforeUnmount(() => {
             <div class="field"><label for="level">访问等级</label><select id="level" v-model="form.level"><option v-for="level in levels" :key="level" :value="level">{{ level }}</option></select></div>
           </div>
           <div class="field"><label for="description">简介</label><textarea id="description" v-model="form.description" maxlength="120" rows="3" placeholder="简单描述这个系列"></textarea><small>{{ form.description.length }}/120</small></div>
-          <fieldset class="field upload-field"><legend>封面图片</legend><p>最多 4 张，支持 JPEG、PNG、WebP，单张不超过 8MB。</p><div class="preview-grid"><div v-for="(preview, index) in imagePreviews" :key="form.images[index]" class="preview"><img :src="preview" alt="图集封面预览" /><button type="button" aria-label="移除图片" @click="removeImage(index)"><X :size="16" /></button><div class="preview-order"><button type="button" :aria-label="`将第 ${index + 1} 张封面前移`" :disabled="uploading || index === 0" @click="moveImage(index, -1)"><ChevronLeft :size="16" /></button><button type="button" :aria-label="`将第 ${index + 1} 张封面后移`" :disabled="uploading || index === form.images.length - 1" @click="moveImage(index, 1)"><ChevronRight :size="16" /></button></div></div><label v-if="form.images.length < 4" class="upload-tile"><UploadCloud :size="22" /><span>{{ uploading ? `上传中 ${uploadProgress}%` : '上传图片' }}</span><input type="file" accept="image/jpeg,image/png,image/webp" multiple :disabled="uploading" @change="handleFiles" /></label></div></fieldset>
-          <fieldset class="field pattern-field"><legend>系列图纸</legend><p>每张图纸包含独立图片和名称，支持一次选择多张。</p><label class="pattern-upload"><UploadCloud :size="19" /><span>{{ uploading ? `上传中 ${uploadProgress}%` : '上传图纸图片' }}</span><input type="file" accept="image/jpeg,image/png,image/webp" multiple :disabled="uploading" @change="handlePatternFiles" /></label><div v-if="form.items.length" class="pattern-list"><div v-for="(pattern, index) in form.items" :key="pattern.id" class="pattern-row"><div class="pattern-thumb"><img v-if="patternPreviews[pattern.id]" :src="patternPreviews[pattern.id]" alt="图纸预览" /><ImageIcon v-else :size="20" /></div><input v-model="pattern.name" :aria-label="`第 ${index + 1} 张图纸名称`" maxlength="40" /><span>{{ index + 1 }}</span><div class="pattern-order"><button type="button" class="icon-btn" :aria-label="`将第 ${index + 1} 张图纸上移`" :disabled="uploading || index === 0" @click="movePattern(index, -1)"><ChevronUp :size="17" /></button><button type="button" class="icon-btn" :aria-label="`将第 ${index + 1} 张图纸下移`" :disabled="uploading || index === form.items.length - 1" @click="movePattern(index, 1)"><ChevronDown :size="17" /></button></div><button type="button" class="icon-btn danger" aria-label="移除图纸" @click="removePattern(index)"><X :size="18" /></button></div></div><div v-else class="pattern-empty">尚未上传图纸。草稿可以暂时为空，发布前必须补齐。</div></fieldset>
+          <fieldset class="field upload-field"><legend>封面图片</legend><p>最多 4 张，支持 JPEG、PNG、WebP，单张不超过 8MB。</p><div class="preview-grid"><div v-for="(preview, index) in imagePreviews" :key="form.images[index]" class="preview"><img :src="preview" alt="图集封面预览" /><button type="button" aria-label="移除图片" @click="removeImage(index)"><X :size="12" /></button><div class="preview-order"><button type="button" :aria-label="`将第 ${index + 1} 张封面前移`" :disabled="uploading || index === 0" @click="moveImage(index, -1)"><ChevronLeft :size="12" /></button><button type="button" :aria-label="`将第 ${index + 1} 张封面后移`" :disabled="uploading || index === form.images.length - 1" @click="moveImage(index, 1)"><ChevronRight :size="12" /></button></div></div><label v-if="form.images.length < 4" class="upload-tile"><UploadCloud :size="22" /><span>{{ uploading ? `上传中 ${uploadProgress}%` : '上传图片' }}</span><input type="file" accept="image/jpeg,image/png,image/webp" multiple :disabled="uploading" @change="handleFiles" /></label></div></fieldset>
+          <fieldset class="field pattern-field">
+            <legend>系列图纸</legend>
+            <p>每张图纸可独立配置名称、图片和材料清单，支持一次选择多张。</p>
+            <label class="pattern-upload"><UploadCloud :size="19" /><span>{{ uploading ? `上传中 ${uploadProgress}%` : '上传图纸图片' }}</span><input type="file" accept="image/jpeg,image/png,image/webp" multiple :disabled="uploading" @change="handlePatternFiles" /></label>
+            <div v-if="form.items.length" class="pattern-list">
+              <div v-for="(pattern, index) in form.items" :key="pattern.id" class="pattern-card">
+                <div class="pattern-row">
+                  <div class="pattern-thumb"><img v-if="patternPreviews[pattern.id]" :src="patternPreviews[pattern.id]" alt="图纸预览" /><ImageIcon v-else :size="20" /></div>
+                  <input v-model="pattern.name" :aria-label="`第 ${index + 1} 张图纸名称`" maxlength="40" />
+                  <span>{{ index + 1 }}</span>
+                  <div class="pattern-order"><button type="button" class="icon-btn" :aria-label="`将第 ${index + 1} 张图纸上移`" :disabled="uploading || index === 0" @click="movePattern(index, -1)"><ChevronUp :size="17" /></button><button type="button" class="icon-btn" :aria-label="`将第 ${index + 1} 张图纸下移`" :disabled="uploading || index === form.items.length - 1" @click="movePattern(index, 1)"><ChevronDown :size="17" /></button></div>
+                  <button type="button" class="icon-btn danger" aria-label="移除图纸" @click="removePattern(index)"><X :size="18" /></button>
+                </div>
+                <div class="pattern-material-editor">
+                  <div class="material-editor-head"><div><strong>材料清单</strong><small>{{ pattern.materials.length }} 项</small></div><button type="button" :disabled="pattern.materials.length >= 12" @click="addPatternMaterial(index)"><Plus :size="15" />添加材料</button></div>
+                  <div v-if="pattern.materials.length" class="material-config-list">
+                    <div v-for="(material, materialIndex) in pattern.materials" :key="material.id" class="material-config-row">
+                      <select v-model="material.kind" :aria-label="`第 ${index + 1} 张图纸第 ${materialIndex + 1} 项材料类型`"><option value="board">底板</option><option value="beads">拼豆</option><option value="paper">烫纸</option><option value="other">其他</option></select>
+                      <input v-model="material.name" :aria-label="`第 ${index + 1} 张图纸第 ${materialIndex + 1} 项材料名称`" maxlength="40" placeholder="材料名称" />
+                      <div class="material-amount"><input v-model="material.amount" :aria-label="`第 ${index + 1} 张图纸第 ${materialIndex + 1} 项材料用量`" maxlength="16" placeholder="用量" /><input v-model="material.unit" :aria-label="`第 ${index + 1} 张图纸第 ${materialIndex + 1} 项材料单位`" maxlength="8" placeholder="单位" /></div>
+                      <button type="button" class="icon-btn danger" :aria-label="`删除第 ${materialIndex + 1} 项材料`" @click="removePatternMaterial(index, materialIndex)"><X :size="16" /></button>
+                      <input v-model="material.description" class="material-description" :aria-label="`第 ${index + 1} 张图纸第 ${materialIndex + 1} 项材料说明`" maxlength="60" placeholder="材料说明（选填）" />
+                    </div>
+                  </div>
+                  <div v-else class="material-config-empty">尚未配置材料，请至少添加一项。</div>
+                </div>
+              </div>
+            </div>
+            <div v-else class="pattern-empty">尚未上传图纸。草稿可以暂时为空，发布前必须补齐。</div>
+          </fieldset>
           <div class="field-grid">
             <div class="field"><label for="status">状态</label><select id="status" v-model="form.status"><option v-for="status in statuses" :key="status.value" :value="status.value">{{ status.label }}</option></select></div>
             <div class="field"><label for="sort">排序</label><input id="sort" v-model.number="form.sort" type="number" min="0" step="1" /></div>

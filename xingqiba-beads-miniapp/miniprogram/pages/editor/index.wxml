@@ -1,48 +1,215 @@
-<view class="editor-page">
-  <view class="toolbar">
-    <button aria-label="撤销" disabled="{{!hasUndo}}" bindtap="undo"><image src="/assets/icons/text/undo-2.svg" /></button>
-    <button aria-label="重做" disabled="{{!hasRedo}}" bindtap="redo"><image src="/assets/icons/text/redo-2.svg" /></button>
-    <button aria-label="清空" disabled="{{workLoading || workLoadError}}" bindtap="clear"><image src="/assets/icons/text/eraser.svg" /></button>
-    <button aria-label="图纸设置" disabled="{{workLoading || workLoadError}}" class="{{showSettings ? 'active' : ''}}" bindtap="toggleSettings"><image src="/assets/icons/text/sliders-horizontal.svg" /></button>
-    <view class="spacer" />
-    <button aria-label="导出图纸" disabled="{{exporting || converting || workLoading || workLoadError}}" bindtap="exportImage"><image src="/assets/icons/text/download.svg" /></button>
-    <button aria-label="保存作品" disabled="{{saving || converting || workLoading || workLoadError}}" bindtap="save"><image src="/assets/icons/text/save.svg" /></button>
+<view class="editor-page {{focusMode ? 'focus-active' : ''}} {{paletteOpen ? 'palette-active' : ''}}">
+  <!-- 顶部栏 -->
+  <view class="top-bar">
+    <view class="top-right">
+      <button class="bar-btn" disabled="{{converting || saving || exporting}}" bindtap="importImage"><image src="/assets/icons/text/image-plus.svg" /></button>
+      <button class="bar-btn" disabled="{{exporting || converting}}" bindtap="exportImage"><image src="/assets/icons/text/download.svg" /></button>
+      <button class="bar-btn" disabled="{{saving || converting}}" bindtap="save"><image src="/assets/icons/text/save.svg" /></button>
+    </view>
   </view>
 
-  <view wx:if="{{showSettings}}" class="settings-panel card">
-    <view class="setting-row"><text>网格尺寸</text><view class="segments"><button wx:for="{{[16,24,32,48]}}" wx:key="*this" class="{{gridSize === item ? 'active' : ''}}" data-value="{{item}}" bindtap="selectGridSize">{{item}}</button></view></view>
-    <view wx:if="{{hasSourceImage}}" class="setting-row"><text>颜色数量</text><view class="segments compact"><button wx:for="{{[6,8,12]}}" wx:key="*this" class="{{colorCount === item ? 'active' : ''}}" data-value="{{item}}" bindtap="selectColorCount">{{item}} 色</button></view></view>
-    <view class="setting-row"><text>图纸样式</text><view class="segments compact"><button class="{{previewMode === 'beads' ? 'active' : ''}}" data-value="beads" bindtap="selectPreviewMode">圆豆</button><button class="{{previewMode === 'grid' ? 'active' : ''}}" data-value="grid" bindtap="selectPreviewMode">方格</button></view></view>
-    <block wx:if="{{hasSourceImage}}">
-      <view class="setting-row"><text>照片适配</text><view class="segments compact"><button class="{{fitMode === 'cover' ? 'active' : ''}}" data-value="cover" bindtap="selectFitMode">填满裁剪</button><button class="{{fitMode === 'contain' ? 'active' : ''}}" data-value="contain" bindtap="selectFitMode">完整显示</button></view></view>
-      <view wx:if="{{fitMode === 'cover'}}" class="slider-field"><view><text>水平位置</text><small>{{cropX}}</small></view><slider min="-100" max="100" step="1" value="{{cropX}}" activeColor="#C42D5D" backgroundColor="#E9E9EC" block-size="20" bindchange="changeCropX" /></view>
-      <view wx:if="{{fitMode === 'cover'}}" class="slider-field"><view><text>垂直位置</text><small>{{cropY}}</small></view><slider min="-100" max="100" step="1" value="{{cropY}}" activeColor="#C42D5D" backgroundColor="#E9E9EC" block-size="20" bindchange="changeCropY" /></view>
-      <view class="slider-field"><view><text>亮度</text><small>{{brightness}}</small></view><slider min="-50" max="50" step="1" value="{{brightness}}" activeColor="#C42D5D" backgroundColor="#E9E9EC" block-size="20" bindchange="changeBrightness" /></view>
-      <view class="slider-field"><view><text>对比度</text><small>{{contrast}}</small></view><slider min="-50" max="50" step="1" value="{{contrast}}" activeColor="#C42D5D" backgroundColor="#E9E9EC" block-size="20" bindchange="changeContrast" /></view>
-      <button class="apply-button" disabled="{{converting}}" bindtap="applyImageSettings">{{converting ? '正在生成' : '应用照片设置'}}</button>
-    </block>
+  <!-- 画布 -->
+  <view id="editor-canvas-card" class="canvas-card card">
+    <view class="canvas-meta"><text>{{view === 'source' ? '原图预览' : gridSize + ' × ' + gridSize}}</text><text wx:if="{{view !== 'source'}}">{{totalBeads}} 颗</text></view>
+    <image wx:if="{{view === 'source'}}" class="source-canvas-image" src="{{sourcePreview}}" mode="aspectFit" />
+    <view class="canvas-viewport" hidden="{{view === 'source'}}" bindtouchstart="onCanvasTouch" bindtouchmove="onCanvasTouch" bindtouchend="onCanvasTouch" bindtouchcancel="onCanvasTouch">
+      <view class="canvas-zoom-layer" style="transform: translate({{canvasTranslateX}}px, {{canvasTranslateY}}px) scale({{canvasScale}}); transform-origin: 0 0;">
+        <canvas type="2d" id="beadCanvas" />
+      </view>
+    </view>
+    <view wx:if="{{view !== 'source' && (canvasScale !== 1 || canvasTranslateX !== 0 || canvasTranslateY !== 0)}}" class="canvas-zoom-badge" bindtap="resetZoom">{{canvasScale}}x · 重置</view>
+    <view wx:if="{{view !== 'source' && workLoading}}" class="canvas-status"><text>加载中…</text></view>
+    <view wx:elif="{{view !== 'source' && workLoadError}}" class="canvas-status error"><text>{{workLoadError}}</text><button bindtap="retryLoadWork">重试</button></view>
+    <view wx:elif="{{view !== 'source' && converting}}" class="canvas-status"><text>生成 {{gridSize}}×{{gridSize}}…</text></view>
+    <view wx:elif="{{view !== 'source' && convertError}}" class="canvas-status error"><text>{{convertError}}</text><button bindtap="retryConvertSourceImage">重试</button></view>
+    <view wx:if="{{view !== 'source'}}" class="canvas-history-actions">
+      <button disabled="{{!hasUndo || converting}}" bindtap="undo"><image src="/assets/icons/text/undo-2.svg" /></button>
+      <button disabled="{{!hasRedo || converting}}" bindtap="redo"><image src="/assets/icons/text/redo-2.svg" /></button>
+    </view>
+    <view wx:if="{{view !== 'source'}}" class="canvas-right-actions">
+      <button class="canvas-fit" bindtap="resetZoom" aria-label="适配画布"><image src="/assets/icons/text/maximize-2.svg" /></button>
+      <button class="canvas-focus {{focusMode ? 'active' : ''}} {{totalBeads === 0 ? 'unavailable' : ''}}" bindtap="toggleFocusMode" aria-label="{{focusMode ? '退出专注拼豆模式' : '进入专注拼豆模式'}}"><image src="/assets/icons/text/focus.svg" /></button>
+    </view>
   </view>
 
-  <view class="title-field card"><text>作品名称</text><input value="{{title}}" maxlength="40" disabled="{{workLoading || workLoadError}}" placeholder="输入作品名称" bindinput="inputTitle" /></view>
-  <view class="canvas-card card">
-    <canvas type="2d" id="beadCanvas" bindtouchstart="startPaint" catchtouchmove="movePaint" bindtouchend="endPaint" bindtouchcancel="endPaint" />
-    <view wx:if="{{workLoading}}" class="canvas-status"><text>正在加载云端作品</text><small>请稍候</small></view>
-    <view wx:elif="{{workLoadError}}" class="canvas-status error"><text>{{workLoadError}}</text><small>原作品尚未载入，不会覆盖云端内容</small><button bindtap="retryLoadWork">重新加载</button></view>
-    <view wx:elif="{{converting}}" class="canvas-status"><text>正在生成 {{gridSize}}×{{gridSize}} 图纸</text><small>照片仅在本机处理</small></view>
-    <view wx:elif="{{convertError}}" class="canvas-status error"><text>{{convertError}}</text><button bindtap="convertSourceImage">重试</button></view>
+  <view wx:if="{{paletteOpen && (tool === 'brush' || tool === 'eyedropper' || tool === 'fill' || tool === 'replace') && view !== 'source'}}" class="palette-panel">
+    <view class="palette-titlebar">
+      <view class="palette-copy"><text>{{paletteTitle}}</text><small>{{paletteHint}}</small></view>
+      <view class="palette-current"><view style="background: {{selectedColorHex}}" /><text>{{selectedColorId}}</text></view>
+      <button class="palette-collapse" bindtap="togglePalette"><image src="/assets/icons/text/chevron-down.svg" /></button>
+    </view>
+    <view class="palette-head">
+      <view class="palette-tabs"><button class="{{paletteFilter === 'all' ? 'active' : ''}}" data-filter="all" bindtap="selectPaletteFilter">全部</button><button class="{{paletteFilter === 'used' ? 'active' : ''}}" data-filter="used" bindtap="selectPaletteFilter">已用 ({{usedColorIndices.length}})</button></view>
+    </view>
+    <view wx:if="{{tool === 'replace' && replaceSourceColor >= 0}}" class="replace-flow">
+      <view class="replace-color selected"><view class="replace-swatch" style="background: {{replaceSourceMeta.hex}}" /><view><small>旧颜色</small><text>{{replaceSourceMeta.id}}</text><span>{{replaceSourceMeta.count}} 颗</span></view></view>
+      <text class="replace-arrow">→</text>
+      <view class="replace-color target"><view class="replace-swatch placeholder">＋</view><view><small>新颜色</small><text>从下方选择</text><span>点击色块立即替换</span></view></view>
+      <button class="replace-reset" bindtap="resetReplaceSource">重选旧色</button>
+    </view>
+    <view wx:elif="{{tool === 'replace' && replaceResultText}}" class="replace-result"><view class="replace-result-swatches"><view style="background: {{replaceResultSourceHex}}" /><text>→</text><view style="background: {{replaceResultTargetHex}}" /></view><text>{{replaceResultText}}</text></view>
+    <view wx:elif="{{tool === 'replace'}}" class="replace-hint"><b>第 1 步</b><text>点击画布中需要替换的颜色</text></view>
+    <view class="palette-search"><image src="/assets/icons/text/search.svg" /><input value="{{paletteQuery}}" maxlength="24" placeholder="搜索色号或颜色" bindinput="inputPaletteSearch" /><text>{{visiblePaletteColors.length}} 色</text></view>
+    <scroll-view class="palette-grid-scroll" scroll-y enhanced show-scrollbar="{{false}}" scroll-with-animation scroll-into-view="{{paletteScrollIntoView}}">
+      <view wx:if="{{visiblePaletteColors.length}}" class="palette-grid">
+        <button wx:for="{{visiblePaletteColors}}" wx:key="index" id="palette-color-{{item.index}}" class="palette-color {{selectedColor === item.index ? 'active' : ''}}" data-index="{{item.index}}" bindtap="selectColor" aria-label="选择颜色 {{item.id}}"><view style="background: {{item.hex}}"><text wx:if="{{selectedColor === item.index}}">✓</text></view><text>{{item.id}}</text></button>
+      </view>
+      <view wx:else class="palette-empty">{{paletteFilter === 'used' ? '画布中还没有可用颜色' : '没有符合条件的颜色'}}</view>
+    </scroll-view>
   </view>
-  <scroll-view class="palette" scroll-x enhanced show-scrollbar="{{false}}"><view class="palette-row"><button wx:for="{{palette}}" wx:key="*this" aria-label="选择颜色 {{item}}" disabled="{{workLoading || workLoadError}}" class="swatch {{activeColor === item ? 'active' : ''}}" style="background: {{item}}" data-color="{{item}}" bindtap="chooseColor" /></view></scroll-view>
-  <view class="editor-meta"><text>{{gridSize}}×{{gridSize}} · {{colorStats.length}} 种颜色</text><button bindtap="toggleStats">{{showStats ? '收起用量' : '查看用量'}}</button></view>
-  <view wx:if="{{showStats}}" class="stats-panel card"><view wx:for="{{colorStats}}" wx:key="hex" class="stat-row"><i style="background: {{item.hex}}" /><view><text>{{item.name}}</text><small>{{item.code}} · {{item.percent}}%</small></view><b>{{item.count}} 颗</b></view></view>
-  <text class="tip">{{hasSourceImage ? '照片已在本机转换，可继续调色和绘制；原照片不会主动上传。' : '点击或拖动画布进行绘制，修改会在保存作品时同步到云端。'}}</text>
+
+  <!-- 视图 -->
+  <view class="view-switcher">
+    <view class="segments">
+      <button class="{{view === 'source' ? 'active' : ''}}" data-view="source" disabled="{{!hasSourceImage}}" bindtap="selectView">原图</button>
+      <button class="{{view === 'chart' ? 'active' : ''}}" data-view="chart" bindtap="selectView">图纸</button>
+      <button class="{{view === 'edit' ? 'active' : ''}}" data-view="edit" bindtap="selectView">编辑</button>
+      <button class="{{view === 'preview' ? 'active' : ''}}" data-view="preview" bindtap="selectView">烫后</button>
+    </view>
+    <button class="settings-trigger {{showSettings ? 'active' : ''}}" disabled="{{focusMode}}" bindtap="toggleSettings"><image src="/assets/icons/text/sliders-horizontal.svg" /><text>设置</text></button>
+  </view>
+
+  <!-- 烫后 -->
+  <view wx:if="{{view === 'preview'}}" class="melt-controls card">
+    <view class="segments compact">
+      <button class="{{meltAmount === 0 ? 'active' : ''}}" data-melt="0" bindtap="selectMeltPreset">摆豆</button>
+      <button class="{{meltAmount === 35 ? 'active' : ''}}" data-melt="35" bindtap="selectMeltPreset">轻烫</button>
+      <button class="{{meltAmount === 62 ? 'active' : ''}}" data-melt="62" bindtap="selectMeltPreset">标准</button>
+      <button class="{{meltAmount === 92 ? 'active' : ''}}" data-melt="92" bindtap="selectMeltPreset">重烫</button>
+    </view>
+    <slider min="0" max="100" value="{{meltAmount}}" activeColor="#E14C7D" backgroundColor="#F5E5EB" bindchange="changeMelt" />
+    <text class="setting-help">预览仅供参考</text>
+  </view>
+
+  <!-- 统计 -->
+  <view class="summary-band"><view><b>{{totalBeads}}</b><span>颗数</span></view><view><b>{{colorStats.length}}</b><span>颜色</span></view><view><b>{{boardCount}}</b><span>拼板</span></view></view>
+
+  <!-- 材料清单 -->
+  <view class="material-panel card">
+    <view class="material-head">
+      <view class="material-heading"><text>材料清单</text><small>{{colorStats.length}} 种颜色 · 共 {{totalBeads}} 颗</small></view>
+      <text class="material-guide">{{focusMode ? '点击开始计时' : '点击颜色可高亮'}}</text>
+    </view>
+    <scroll-view class="material-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+      <view class="material-list">
+        <view wx:for="{{colorStats}}" wx:key="index" class="material-row {{highlightedColor === item.index ? 'active' : ''}}">
+          <view class="material-main" data-index="{{item.index}}" bindtap="highlightColor">
+            <view class="material-swatch" style="background:{{item.hex}}"></view>
+            <view class="material-info"><text class="material-id">{{item.id}}</text><text class="material-name">{{item.name}}</text></view>
+            <view class="material-count"><text>{{item.count}}</text><small>颗</small></view>
+          </view>
+          <button wx:if="{{!focusMode}}" class="exclude-btn" disabled="{{converting}}" data-index="{{item.index}}" bindtap="excludeColor" aria-label="排除颜色 {{item.id}}"><image src="/assets/icons/text/circle-slash-2.svg" /></button>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view wx:if="{{excludedColors.length}}" class="excluded-panel card">
+    <view class="excluded-head">
+      <view class="excluded-title">
+        <view class="excluded-title-icon"><image src="/assets/icons/text/circle-slash-2.svg" /></view>
+        <view><text>已排除颜色</text><small>{{excludedColors.length}} 种 · 重新转换时不再使用</small></view>
+      </view>
+      <button class="restore-all" disabled="{{converting}}" bindtap="restoreAllColors">全部恢复</button>
+    </view>
+    <view class="excluded-list">
+      <view wx:for="{{excludedItems}}" wx:key="index" class="excluded-item">
+        <view class="excluded-swatch" style="background:{{item.hex}}"></view>
+        <view class="excluded-info"><text>{{item.id}}</text><small>{{item.name}} · 原 {{item.count}} 颗</small></view>
+        <button class="restore-one" disabled="{{converting}}" data-index="{{item.index}}" bindtap="restoreColor">恢复</button>
+      </view>
+    </view>
+  </view>
+
+  <text class="tip">{{hasSourceImage ? '照片本机处理' : '点击画布绘制'}}</text>
+
+  <scroll-view wx:if="{{!focusMode}}" class="tool-dock" scroll-x enhanced show-scrollbar="{{false}}">
+    <view class="tool-dock-row">
+      <button class="dock-tool {{tool === 'move' ? 'active' : ''}}" data-tool="move" bindtap="selectTool"><image src="/assets/icons/text/move.svg" /><text>移动</text></button>
+      <button class="dock-tool {{tool === 'brush' ? 'active' : ''}}" data-tool="brush" bindtap="selectTool"><view class="dock-icon-wrap"><image src="/assets/icons/text/brush.svg" /><view class="dock-color-badge" style="background: {{selectedColorHex}}" /></view><text>画笔</text></button>
+      <button class="dock-tool {{tool === 'eyedropper' ? 'active' : ''}}" data-tool="eyedropper" bindtap="selectTool"><image src="/assets/icons/text/pipette.svg" /><text>取色</text></button>
+      <button class="dock-tool {{tool === 'fill' ? 'active' : ''}}" data-tool="fill" bindtap="selectTool"><view class="dock-icon-wrap"><image src="/assets/icons/text/paint-bucket.svg" /><view class="dock-color-badge" style="background: {{selectedColorHex}}" /></view><text>填充</text></button>
+      <button class="dock-tool {{tool === 'replace' ? 'active' : ''}}" data-tool="replace" bindtap="selectTool"><image src="/assets/icons/text/replace-all.svg" /><text>替换</text></button>
+      <button class="dock-tool {{tool === 'eraser' ? 'active' : ''}}" data-tool="eraser" bindtap="selectTool"><image src="/assets/icons/text/eraser.svg" /><text>擦除</text></button>
+      <button class="dock-tool {{tool === 'exclude' ? 'active' : ''}} {{!hasSourceImage ? 'unavailable' : ''}}" data-tool="exclude" bindtap="selectTool" aria-label="{{hasSourceImage ? '排除颜色' : '排除颜色仅适用于照片作品'}}"><image src="/assets/icons/text/circle-slash-2.svg" /><text>排除色</text></button>
+      <button class="dock-tool" disabled="{{converting || view === 'source'}}" bindtap="mirrorHorizontal"><image src="/assets/icons/text/flip-horizontal-2.svg" /><text>镜像</text></button>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{focusMode}}" class="focus-dock">
+    <view class="focus-handle" />
+    <view class="focus-summary">
+      <view class="focus-header">
+        <view class="focus-current">
+          <view wx:if="{{focusColorIndex >= 0}}" class="focus-current-swatch" style="background: {{focusColorHex}}"></view>
+          <view wx:else class="focus-current-placeholder"><image src="/assets/icons/text/focus.svg" /></view>
+          <view class="focus-current-copy"><text>{{focusColorIndex >= 0 ? focusColorId : '选择正在拼的颜色'}}</text><small>{{focusColorIndex >= 0 ? (focusRunning ? '计时中 · 画布已高亮' : '计时已暂停') : '点击下方色号自动开始计时'}}</small></view>
+        </view>
+        <button class="focus-exit" bindtap="exitFocusMode">退出专注</button>
+      </view>
+      <view class="focus-timer-row">
+        <view class="focus-timer-copy"><small>本次专注</small><text class="focus-time">{{focusTimeText}}</text></view>
+        <button class="focus-pause" disabled="{{focusColorIndex < 0}}" bindtap="toggleFocusTimer"><image src="{{focusRunning ? '/assets/icons/text/pause.svg' : '/assets/icons/text/play.svg'}}" /><text>{{focusRunning ? '暂停计时' : '继续计时'}}</text></button>
+      </view>
+    </view>
+    <scroll-view class="focus-colors" scroll-x enhanced show-scrollbar="{{false}}">
+      <view class="focus-color-row">
+        <button wx:for="{{colorStats}}" wx:key="index" class="focus-color {{focusColorIndex === item.index ? 'active' : ''}}" data-index="{{item.index}}" bindtap="selectFocusColor" aria-label="{{item.id}}，{{item.count}}颗">
+          <view class="focus-color-swatch" style="background: {{item.hex}}"><text style="color: {{item.foreground}}">{{item.id}}</text></view>
+          <view class="focus-color-count"><text>{{item.count}}</text><small>颗</small></view>
+        </button>
+      </view>
+    </scroll-view>
+  </view>
 </view>
+
+<view wx:if="{{showSettings}}" class="settings-overlay" bindtap="cancelSettings">
+  <view class="settings-sheet {{hasSourceImage ? 'source-settings' : 'blank-settings'}}" catchtap="noop">
+    <view class="settings-handle" />
+    <view class="settings-head">
+      <view><text>{{hasSourceImage ? '转换与生成设置' : '画布设置'}}</text><small>{{hasSourceImage ? '确认后重新生成，不会边调边覆盖' : '空白画布仅调整尺寸'}}</small></view>
+      <view class="settings-head-actions"><text wx:if="{{settingsChanged}}" class="draft-badge">未应用</text><button bindtap="cancelSettings">×</button></view>
+    </view>
+    <scroll-view class="settings-content" scroll-y enhanced show-scrollbar="{{false}}">
+      <view wx:if="{{hasSourceImage}}" class="setting-section">
+        <view class="section-label">生成参数</view>
+        <view class="mode-grid">
+          <button class="mode-btn {{settingsDraft.conversionMode === 'illustration' ? 'active' : ''}}" data-mode="illustration" bindtap="selectMode"><text class="mode-title">卡通</text><text class="mode-hint">保留主导色</text></button>
+          <button class="mode-btn {{settingsDraft.conversionMode === 'photo' ? 'active' : ''}}" data-mode="photo" bindtap="selectMode"><text class="mode-title">真实</text><text class="mode-hint">保留明暗层次</text></button>
+        </view>
+      </view>
+      <view class="slider-field {{!hasSourceImage && totalBeads > 0 ? 'disabled' : ''}}"><view class="slider-label"><text>板子尺寸</text><text class="slider-value">{{settingsDraft.gridSize}} × {{settingsDraft.gridSize}}</text></view><slider min="12" max="120" value="{{settingsDraft.gridSize}}" disabled="{{!hasSourceImage && totalBeads > 0}}" activeColor="#E14C7D" backgroundColor="#F5E5EB" block-size="18" bindchange="changeGridSize" /><text wx:if="{{!hasSourceImage && totalBeads > 0}}" class="setting-help">画布已有内容，为避免丢失暂不允许修改尺寸</text></view>
+      <view wx:if="{{hasSourceImage}}" class="slider-field"><view class="slider-label"><text>颜色合并</text><text class="slider-value">{{settingsDraft.mergeDistance}}</text></view><slider min="0" max="100" value="{{settingsDraft.mergeDistance}}" activeColor="#E14C7D" backgroundColor="#F5E5EB" block-size="18" bindchange="changeMergeDistance" /></view>
+
+      <view wx:if="{{hasSourceImage}}" class="setting-action-section">
+        <view class="section-label-row"><text>原图处理</text><span>立即执行</span></view>
+        <view class="action-row">
+          <button class="act-btn" loading="{{converting && !sourceImageRemoved}}" disabled="{{sourceImageRemoved || converting}}" bindtap="removeSourceBackground">{{sourceImageRemoved ? '已去背景' : '去背景'}}</button>
+          <button class="act-btn" disabled="{{!sourceImageRemoved || converting}}" bindtap="restoreSource">恢复原图</button>
+        </view>
+        <text class="setting-help">处理结果会同步更新上方原图预览和当前图纸</text>
+      </view>
+      <view class="setting-action-section">
+        <view class="section-label-row"><text>图纸处理</text><span>立即执行 · 可撤销</span></view>
+        <button class="act-btn full" disabled="{{totalBeads === 0 || converting}}" bindtap="removeBoardBackground">去除图纸边缘底色</button>
+      </view>
+    </scroll-view>
+    <view class="settings-footer">
+      <text wx:if="{{hasSourceImage && hasManualGridChanges}}" class="settings-warning">重新生成会覆盖手工修改，生成后可通过撤销恢复</text>
+      <text wx:if="{{convertError}}" class="settings-error">{{convertError}}</text>
+      <view class="settings-footer-actions"><button class="settings-cancel" disabled="{{converting}}" bindtap="cancelSettings">取消</button><button class="settings-apply" loading="{{converting}}" disabled="{{converting || (!hasSourceImage && totalBeads > 0 && settingsDraft.gridSize !== gridSize)}}" bindtap="applyImageSettings">{{hasSourceImage ? (converting ? '正在生成…' : '重新生成') : '应用尺寸'}}</button></view>
+    </view>
+  </view>
+</view>
+
+<canvas type="2d" id="sourcePreviewCanvas" class="source-preview-canvas" />
 
 <view wx:if="{{showPhoneBinding}}" class="phone-modal" bindtap="closePhoneBinding">
   <view class="phone-sheet" catchtap="noop">
     <view class="phone-sheet-icon"><image src="/assets/icons/primary/user-round.svg" /></view>
     <text class="phone-sheet-title">绑定后保存云端</text>
-    <text class="phone-sheet-copy">用于同步作品、累计会员积分，并在其他设备继续编辑。</text>
-    <button class="phone-bind-button" open-type="getPhoneNumber" bindgetphonenumber="bindPhoneAndSave" loading="{{bindingPhone}}" disabled="{{bindingPhone}}">{{bindingPhone ? '正在绑定' : '授权手机号并继续保存'}}</button>
+    <text class="phone-sheet-copy">同步作品、累计积分</text>
+    <button class="phone-bind-button" open-type="getPhoneNumber" bindgetphonenumber="bindPhoneAndSave" loading="{{bindingPhone}}" disabled="{{bindingPhone}}">{{bindingPhone ? '绑定中' : '授权手机号'}}</button>
     <button class="phone-cancel-button" disabled="{{bindingPhone}}" bindtap="closePhoneBinding">暂不绑定</button>
   </view>
 </view>

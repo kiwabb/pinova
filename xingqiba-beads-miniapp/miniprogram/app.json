@@ -6,14 +6,15 @@
     "pages/profile/index",
     "pages/member/index",
     "pages/collection/index",
+    "pages/pattern-detail/index",
     "pages/editor/index",
     "pages/records/index",
     "pages/tutorial/index"
   ],
   "window": {
-    "backgroundColor": "#F9FAFC",
+    "backgroundColor": "#FFF8FA",
     "backgroundTextStyle": "dark",
-    "navigationBarBackgroundColor": "#F9FAFC",
+    "navigationBarBackgroundColor": "#FFF8FA",
     "navigationBarTitleText": "星期八",
     "navigationBarTextStyle": "black"
   },
@@ -24,9 +25,9 @@
   },
   "tabBar": {
     "custom": true,
-    "color": "#858189",
-    "selectedColor": "#C42D5D",
-    "backgroundColor": "#FFFFFF",
+    "color": "#8D888D",
+    "selectedColor": "#E14C7D",
+    "backgroundColor": "#FFF8FA",
     "borderStyle": "white",
     "list": [
       { "pagePath": "pages/home/index", "text": "首页" },
