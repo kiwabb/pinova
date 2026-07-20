@@ -1,0 +1,13 @@
+{"file":".trellis/spec/backend/index.md","reason":"Backend guideline routing and pre-development checklist"}
+{"file":".trellis/spec/backend/trade-order-contract.md","reason":"Order aggregate, idempotency, snapshot and inventory boundaries"}
+{"file":".trellis/spec/backend/payment-contract.md","reason":"Payment aggregation, provider results, locks and inventory conversion"}
+{"file":".trellis/spec/backend/admin-order-contract.md","reason":"Admin identity, authorization and masked API boundary"}
+{"file":".trellis/spec/backend/member-order-query-contract.md","reason":"Member order ownership and response contract"}
+{"file":".trellis/spec/backend/request-validation-contract.md","reason":"JSON request validation and stable error ownership"}
+{"file":".trellis/spec/frontend/index.md","reason":"Frontend guideline routing"}
+{"file":".trellis/spec/frontend/pinova-admin.md","reason":"Independent admin application conventions"}
+{"file":".trellis/spec/frontend/checkout-order-contract.md","reason":"Customer checkout and order behavior"}
+{"file":".trellis/spec/frontend/payment-contract.md","reason":"Customer payment UI and proxy contract"}
+{"file":".trellis/spec/frontend/member-orders-contract.md","reason":"Customer order history behavior"}
+{"file":".trellis/spec/frontend/quality-guidelines.md","reason":"Frontend accessibility and verification expectations"}
+{"file":".trellis/tasks/07-20-commerce-operation-lifecycle/research/domain-design.md","reason":"Chosen domain design, concurrency, permissions and testing approach"}
